@@ -1,120 +1,1288 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="uk">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Spark Gallery</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Галерея Pro - Зима 2025</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        /* === Зимова Тема (За замовчуванням) === */
+        :root {
+            --bg-primary: #f0f4f8; /* Світло-сіро-блакитний (сніговий) */
+            --bg-secondary: #ffffff; /* Чистий білий */
+            --bg-card: #e3f2fd; /* Дуже світло-блакитний */
+            --text-primary: #03a9f4; /* Яскраво-блакитний (лід/небо) */
+            --text-secondary: #546e7a; /* Сіро-синій */
+            --accent: #29b6f6; /* Середньо-блакитний */
+            --border: #bbdefb; /* Світло-блакитний */
+            --gradient: linear-gradient(135deg, #4fc3f7 0%, #03a9f4 100%); /* Блакитний градієнт */
+            --text-on-accent: #ffffff;
+        }
 
-<!-- Tailwind -->
-<script src="https://cdn.tailwindcss.com"></script>
+        /* === Базові стилі === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-<style>
-body {
-    font-family: 'Inter', sans-serif;
-}
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg-primary);
+            color: #333; /* Темний текст на світлому фоні */
+            min-height: 100vh;
+            padding-bottom: 70px;
+            /* Зимовий фон: ледь помітні сніжинки */
+            background-image: 
+                radial-gradient(circle at 10% 90%, rgba(179, 229, 252, 0.5) 0%, transparent 50%),
+                radial-gradient(circle at 90% 10%, rgba(179, 229, 252, 0.5) 0%, transparent 50%);
+        }
 
-/* Карточки */
-.card {
-    background: rgba(255,255,255,0.08);
-    border-radius: 1rem;
-    padding: 1rem;
-    backdrop-filter: blur(12px);
-    transition: 0.25s ease;
-}
-.card:hover {
-    background: rgba(255,255,255,0.18);
-    transform: scale(1.02);
-}
+        body::before {
+            content: '❄️'; /* Зимовий емодзі */
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            font-size: 30px;
+            z-index: 1;
+            animation: float 3s ease-in-out infinite;
+        }
 
-/* Анимация вкладок */
-.fade {
-    animation: fadeIn 0.35s ease;
-}
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(6px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+        }
 
-/* Кнопки вкладок */
-.tab-btn {
-    opacity: 0.5;
-    font-size: 1.7rem;
-    padding: 0.4rem 1rem;
-    transition: 0.25s ease;
-}
-.tab-btn:hover {
-    opacity: 0.8;
-}
-.active-tab {
-    opacity: 1 !important;
-    border-top: 3px solid #ff9800;
-    padding-top: 0.2rem;
-}
-</style>
+        .title {
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        /* === Привітальний екран === */
+        .welcome-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg-primary);
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+        }
+
+        .welcome-screen.hidden {
+            display: none;
+        }
+
+        .welcome-logo {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .welcome-title {
+            font-size: 32px;
+            font-weight: bold;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+        }
+
+        .welcome-rules {
+            background: var(--bg-card);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+            max-width: 400px;
+            border: 2px solid var(--border);
+            color: #333;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .welcome-rules h3 {
+            color: var(--text-primary);
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .welcome-rules ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .welcome-rules li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .welcome-rules li::before {
+            content: '☃️'; /* Зимовий емодзі */
+            position: absolute;
+            left: 0;
+        }
+
+        .welcome-btn {
+            padding: 16px 40px;
+            background: var(--gradient);
+            color: var(--text-on-accent);
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 4px 20px rgba(3, 169, 244, 0.4);
+            transition: transform 0.2s;
+        }
+
+        .welcome-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* === Сховище (Storage) === */
+        .storage-bar {
+            background: var(--bg-secondary);
+            padding: 12px 20px;
+            margin: -20px -20px 20px -20px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .storage-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+        }
+
+        .storage-progress {
+            height: 6px;
+            background: var(--bg-card);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .storage-fill {
+            height: 100%;
+            background: var(--gradient);
+            transition: width 0.3s;
+        }
+
+        /* === Навігація (Navbar) === */
+        .navbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-secondary);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            border-top: 1px solid var(--border);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            padding: 8px 10px;
+            border-radius: 12px;
+            transition: all 0.3s;
+            color: var(--text-secondary);
+        }
+
+        .nav-item.active {
+            background: var(--gradient);
+            color: var(--text-on-accent);
+        }
+
+        .nav-icon {
+            font-size: 24px;
+        }
+
+        .nav-label {
+            font-size: 10px;
+            font-weight: 500;
+            margin-top: -2px;
+            color: inherit;
+        }
+
+        .page {
+            display: none;
+            padding: 20px;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* === Профіль === */
+        .profile-header {
+            background: var(--gradient);
+            padding: 40px 20px 30px;
+            border-radius: 0 0 30px 30px;
+            text-align: center;
+            color: var(--text-on-accent);
+            margin: -20px -20px 20px -20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-header::before {
+            content: '⛷️🏂⛸️';
+            position: absolute;
+            top: 10px;
+            left: 0;
+            right: 0;
+            font-size: 20px;
+            opacity: 0.3;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            margin: 0 auto 15px;
+            border: 4px solid var(--text-on-accent);
+            position: relative;
+            z-index: 1;
+            color: var(--text-primary);
+            font-weight: bold;
+        }
+
+        .profile-rank {
+            display: inline-block;
+            background: rgba(0, 0, 0, 0.1);
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-top: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .profile-name, .profile-username {
+            color: var(--text-on-accent);
+        }
+
+        .profile-level {
+            margin-top: 15px;
+        }
+
+        .level-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            margin-bottom: 5px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .level-bar {
+            height: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .level-fill {
+            height: 100%;
+            background: var(--text-on-accent);
+            transition: width 0.3s;
+        }
+
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+             color: var(--text-secondary);
+        }
+
+
+        /* === Галерея та Пости === */
+        .gallery-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .filter-select {
+            flex: 1;
+            padding: 12px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: #333;
+            font-size: 14px;
+            appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="%23546e7a" d="M7 10l5 5 5-5z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+        }
+
+        .add-post-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--gradient);
+            color: var(--text-on-accent);
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(3, 169, 244, 0.4);
+            transition: transform 0.2s;
+        }
+
+        .add-post-btn:active {
+            transform: scale(0.9);
+        }
+
+        .posts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .post-card {
+            background: var(--bg-secondary);
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .post-card:active {
+            transform: scale(0.98);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .post-media {
+            width: 100%;
+            height: 150px; /* Зменшив висоту для компактності */
+            object-fit: cover;
+            background: var(--bg-card);
+        }
+
+        .post-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .post-action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.4);
+            color: var(--text-on-accent);
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .post-action-btn.active {
+            background: var(--gradient);
+        }
+
+        .post-content {
+            padding: 10px;
+        }
+
+        .post-description {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .post-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        .post-date {
+            font-size: 11px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* === Модальні вікна (Modal) === */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 25px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 2px solid var(--border);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+
+        .close-btn {
+            font-size: 28px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 5px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .file-input-wrapper {
+            border: 2px dashed var(--text-primary);
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: background 0.3s;
+            color: var(--text-secondary);
+        }
+
+        .file-input-wrapper:hover {
+            background: var(--border);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-preview {
+            margin-top: 15px;
+            border-radius: 12px;
+            overflow: hidden;
+            display: none;
+            border: 1px solid var(--border);
+        }
+
+        .file-preview img,
+        .file-preview video {
+            width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+        }
+
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            padding: 12px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            color: #333;
+            font-family: inherit;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .char-counter {
+            text-align: right;
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--gradient);
+            color: var(--text-on-accent);
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(3, 169, 244, 0.4);
+            transition: opacity 0.2s;
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* === Налаштування === */
+        .settings-section {
+            background: var(--bg-secondary);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .settings-title {
+            font-size: 18px;
+            color: var(--text-primary);
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .theme-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .theme-btn {
+            padding: 15px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .theme-btn.active {
+            border-color: var(--text-primary);
+            background: var(--gradient);
+            color: var(--text-on-accent);
+        }
+
+        .music-control {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: var(--bg-card);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            color: #333;
+        }
+
+        .toggle-switch {
+            width: 50px;
+            height: 26px;
+            background: #bdbdbd;
+            border-radius: 13px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: var(--text-primary);
+        }
+
+        .toggle-slider {
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
+        }
+
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(24px);
+        }
+
+        /* === Пустий стан (Empty State) === */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 15px;
+        }
+        
+        /* Стиль для відображення поточного часу */
+        #currentTime {
+            font-size: 14px;
+            color: var(--text-secondary);
+            text-align: center;
+            padding-top: 10px;
+        }
+    </style>
 </head>
+<body>
+    <audio id="bgMusic" loop>
+        <source src="" type="audio/mpeg">
+    </audio>
 
-<body class="bg-black text-white flex flex-col min-h-screen">
+    <div id="currentTime" style="padding-top: 10px; text-align: center; color: var(--text-secondary);"></div>
 
-<main class="flex-1 p-5">
-
-    <!-- Галерея -->
-    <section id="gallery-section" class="fade">
-        <h1 class="text-2xl font-bold mb-4">Галерея</h1>
-
-        <div class="grid grid-cols-2 gap-4" id="gallery-list">
-            <div class="card">Фото 1</div>
-            <div class="card">Фото 2</div>
-            <div class="card">Фото 3</div>
-            <div class="card">Фото 4</div>
+    <div class="welcome-screen" id="welcomeScreen">
+        <div class="welcome-logo">❄️</div>
+        <h1 class="welcome-title">Галерея Pro</h1>
+        <p style="color: var(--text-secondary); text-align: center; margin-bottom: 20px;">
+            Зимове видання 2025
+        </p>
+        
+        <div class="welcome-rules">
+            <h3>📋 Правила спільноти</h3>
+            <ul>
+                <li>Заборонена публікація контенту 18+</li>
+                <li>Купальники дозволені з цензурою</li>
+                <li>Будьте поважні до інших</li>
+                <li>2 порушення = бан акаунту</li>
+                <li>За спам - попередження</li>
+            </ul>
         </div>
-    </section>
 
-    <!-- Избранное -->
-    <section id="favorites-section" class="hidden fade">
-        <h1 class="text-2xl font-bold mb-4">Избранное</h1>
-        <div id="favorites-list" class="grid grid-cols-2 gap-4">
-            <div class="card">Пусто ⭐</div>
+        <button class="welcome-btn" onclick="closeWelcome()">Почати</button>
+    </div>
+
+    <div class="page active" id="profilePage">
+        <div class="storage-bar">
+            <div class="storage-info">
+                <span>Сховище</span>
+                <span id="storageText">0 МБ / 500 МБ</span>
+            </div>
+            <div class="storage-progress">
+                <div class="storage-fill" id="storageFill" style="width: 0%"></div>
+            </div>
         </div>
-    </section>
 
-    <!-- Профиль -->
-    <section id="profile-section" class="hidden fade">
-        <h1 class="text-2xl font-bold mb-4">Профиль</h1>
-        <p class="text-neutral-300">Здесь будут данные Telegram WebApp</p>
-    </section>
+        <div class="profile-header">
+            <div class="profile-avatar" id="profileAvatar">?</div>
+            <div class="profile-name" id="profileName">Завантаження...</div>
+            <div class="profile-username" id="profileUsername">@username</div>
+            <div class="profile-rank" id="profileRank">☃️ Новачок</div>
+            
+            <div class="profile-level">
+                <div class="level-info">
+                    <span>Рівень <span id="userLevel">1</span></span>
+                    <span><span id="currentExp">0</span>/<span id="neededExp">100</span> XP</span>
+                </div>
+                <div class="level-bar">
+                    <div class="level-fill" id="levelFill" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
 
-</main>
+        <div class="profile-stats">
+            <div class="stat-card">
+                <div class="stat-value" id="postsCount">0</div>
+                <div class="stat-label">Постів</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="likesCount">0</div>
+                <div class="stat-label">Лайків</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="favoritesCount">0</div>
+                <div class="stat-label">Обране</div>
+            </div>
+        </div>
+    </div>
 
-<!-- Навигация -->
-<nav class="bg-neutral-900 p-3 flex justify-around border-t border-neutral-700">
-    <button onclick="showTab('gallery')" id="tab-gallery" class="tab-btn active-tab">🏠</button>
-    <button onclick="showTab('favorites')" id="tab-favorites" class="tab-btn">⭐</button>
-    <button onclick="showTab('profile')" id="tab-profile" class="tab-btn">👤</button>
-</nav>
+    <div class="page" id="galleryPage">
+        <h2 class="title">🖼️ Галерея</h2>
+        <div class="gallery-controls">
+            <select class="filter-select" id="dateFilter" onchange="filterPosts()">
+                <option value="all">Усі пости</option>
+                <option value="today">Сьогодні</option>
+                <option value="week">Цей тиждень</option>
+                <option value="month">Цей місяць</option>
+            </select>
+            <button class="add-post-btn" onclick="openCreateModal()">+</button>
+        </div>
 
-<script>
-console.log("Spark Gallery Loaded ✅");
+        <div class="posts-grid" id="postsGrid">
+            <div class="empty-state">
+                <div class="empty-state-icon">⛷️</div>
+                <div class="empty-state-text">Поки що немає публікацій. Додайте свій перший пост!</div>
+            </div>
+        </div>
+    </div>
 
-function showTab(tab) {
-    const tabs = ["gallery", "favorites", "profile"];
+    <div class="page" id="favoritesPage">
+        <h2 class="title">⭐ Обране</h2>
+        <div class="posts-grid" id="favoritesGrid">
+            <div class="empty-state">
+                <div class="empty-state-icon">⭐</div>
+                <div class="empty-state-text">Немає обраних постів</div>
+            </div>
+        </div>
+    </div>
 
-    tabs.forEach(t => {
-        document.getElementById(`${t}-section`).classList.add("hidden");
-        document.getElementById(`tab-${t}`).classList.remove("active-tab");
-    });
+    <div class="page" id="settingsPage">
+        <div class="settings-section">
+            <h3 class="settings-title">🎨 Теми оформлення</h3>
+            <div class="theme-options">
+                <button class="theme-btn active" onclick="changeTheme('winter')">❄️ Зима</button>
+                <button class="theme-btn" onclick="changeTheme('autumn')">🍂 Осінь</button>
+                <button class="theme-btn" onclick="changeTheme('spring')">🌷 Весна</button>
+                <button class="theme-btn" onclick="changeTheme('summer')">☀️ Літо</button>
+            </div>
+        </div>
 
-    document.getElementById(`${tab}-section`).classList.remove("hidden");
-    document.getElementById(`tab-${tab}`).classList.add("active-tab");
+        <div class="settings-section" id="adminMusic" style="display: none;">
+            <h3 class="settings-title">🎵 Фонова музика (Адмін)</h3>
+            <div class="music-control">
+                <span>Увімкнути музику</span>
+                <div class="toggle-switch" id="musicToggle" onclick="toggleMusic()">
+                    <div class="toggle-slider"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="settings-section">
+            <h3 class="settings-title">⚙️ Додатково</h3>
+            <button class="submit-btn" style="background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);" onclick="alert('Функція видалення не реалізована в демо')">Видалити акаунт</button>
+        </div>
+    </div>
 
-    localStorage.setItem("activeTab", tab);
-}
+    <div class="modal" id="createModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Нова публікація</h2>
+                <button class="close-btn" onclick="closeCreateModal()">×</button>
+            </div>
 
-window.onload = () => {
-    let saved = localStorage.getItem("activeTab") || "gallery";
-    showTab(saved);
-};
-</script>
+            <form id="createPostForm">
+                <div class="form-group">
+                    <label class="form-label">Фото або відео (до 100 МБ)</label>
+                    <div class="file-input-wrapper" onclick="document.getElementById('fileInput').click()">
+                        <div style="font-size: 24px; margin-bottom: 10px;">📁</div>
+                        <div style="color: var(--text-secondary);">Виберіть файл</div>
+                        <input type="file" id="fileInput" class="file-input" accept="image/*,video/*">
+                        <div class="file-info" id="fileInfo" style="margin-top: 10px; color: var(--text-primary);"></div>
+                    </div>
+                    <div class="file-preview" id="filePreview"></div>
+                </div>
 
+                <div class="form-group">
+                    <label class="form-label">Опис</label>
+                    <textarea class="form-textarea" id="description" placeholder="Розкажіть про вашу публікацію..."></textarea>
+                    <div class="char-counter">
+                        <span id="charCount">0</span> / 150 слів
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Хештеги</label>
+                    <input type="text" class="form-input" id="hashtags" placeholder="#зима #гори #лижі">
+                </div>
+
+                <button type="submit" class="submit-btn">Опублікувати</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="viewModal">
+        <div class="modal-content" id="viewContent"></div>
+    </div>
+
+    <div class="navbar">
+        <div class="nav-item active" data-page="profile" onclick="switchPage('profile')">
+            <div class="nav-icon">👤</div>
+            <div class="nav-label">Профіль</div>
+        </div>
+        <div class="nav-item" data-page="gallery" onclick="switchPage('gallery')">
+            <div class="nav-icon">🖼️</div>
+            <div class="nav-label">Галерея</div>
+        </div>
+        <div class="nav-item" data-page="favorites" onclick="switchPage('favorites')">
+            <div class="nav-icon">⭐</div>
+            <div class="nav-label">Обране</div>
+        </div>
+        <div class="nav-item" data-page="settings" onclick="switchPage('settings')">
+            <div class="nav-icon">⚙️</div>
+            <div class="nav-label">Налаштування</div>
+        </div>
+    </div>
+
+    <script>
+        // === JS з script.js ===
+        function showTime() {
+            document.getElementById('currentTime').innerHTML = new Date().toUTCString();
+        }
+        showTime();
+        setInterval(function () {
+            showTime();
+        }, 1000);
+        
+        // === JS з index (3).html (основна логіка) ===
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
+
+        const MAX_FILE_SIZE = 100 * 1024 * 1024;
+        const MAX_STORAGE = 500 * 1024 * 1024;
+        const ADMIN_ID = 'YOUR_TELEGRAM_ID'; // Замініть на свій ID
+
+        let userData = {
+            id: null,
+            firstName: 'Пользователь',
+            username: '@demo',
+            isAdmin: false,
+            level: 1,
+            exp: 0,
+            posts: [],
+            likes: 0,
+            favorites: [],
+            storageUsed: 0,
+            warnings: 0,
+            banned: false
+        };
+
+        let posts = [];
+        let selectedFile = null;
+
+        // Теми (для функції changeTheme)
+        const themes = {
+            'winter': { 
+                '--bg-primary': '#f0f4f8', '--bg-secondary': '#ffffff', '--bg-card': '#e3f2fd', 
+                '--text-primary': '#03a9f4', '--text-secondary': '#546e7a', '--accent': '#29b6f6', 
+                '--border': '#bbdefb', '--gradient': 'linear-gradient(135deg, #4fc3f7 0%, #03a9f4 100%)',
+                '--text-on-accent': '#ffffff', 'emoji': '❄️' 
+            },
+            'autumn': { 
+                '--bg-primary': '#2d2d2d', '--bg-secondary': '#3a3a3a', '--bg-card': '#4a4a4a', 
+                '--text-primary': '#ff6b00', '--text-secondary': '#ffb366', '--accent': '#ff8533', 
+                '--border': '#5c5c5c', '--gradient': 'linear-gradient(135deg, #ff6b00 0%, #ff3d00 100%)',
+                '--text-on-accent': '#ffffff', 'emoji': '🍂'
+            },
+            'spring': { 
+                '--bg-primary': '#f4f9f4', '--bg-secondary': '#ffffff', '--bg-card': '#e8f5e9', 
+                '--text-primary': '#4caf50', '--text-secondary': '#66bb6a', '--accent': '#81c784', 
+                '--border': '#c8e6c9', '--gradient': 'linear-gradient(135deg, #81c784 0%, #4caf50 100%)',
+                '--text-on-accent': '#ffffff', 'emoji': '🌷'
+            },
+             'summer': { 
+                '--bg-primary': '#fffde7', '--bg-secondary': '#ffffff', '--bg-card': '#fff8e1', 
+                '--text-primary': '#ffeb3b', '--text-secondary': '#fbc02d', '--accent': '#ffc107', 
+                '--border': '#fff9c4', '--gradient': 'linear-gradient(135deg, #ffc107 0%, #ffeb3b 100%)',
+                '--text-on-accent': '#333333', 'emoji': '☀️'
+            },
+        };
+
+        // Ініціалізація
+        function init() {
+            const user = tg.initDataUnsafe.user;
+            if (user) {
+                userData.id = user.id;
+                userData.firstName = user.first_name || 'Користувач';
+                userData.username = user.username ? `@${user.username}` : '@user';
+                userData.isAdmin = user.id.toString() === ADMIN_ID;
+
+                document.getElementById('profileName').textContent = userData.firstName;
+                document.getElementById('profileUsername').textContent = userData.username;
+                document.getElementById('profileAvatar').textContent = userData.firstName.charAt(0).toUpperCase();
+
+                if (userData.isAdmin) {
+                    document.getElementById('adminMusic').style.display = 'block';
+                }
+            }
+            
+            // Встановлення зимової теми за замовчуванням
+            changeTheme('winter');
+            updateUI();
+        }
+
+        // Закриття привітального екрану
+        function closeWelcome() {
+            document.getElementById('welcomeScreen').classList.add('hidden');
+        }
+
+        // Перемикання сторінок (виправлено неповний код)
+        function switchPage(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+            const pageElement = document.getElementById(page + 'Page');
+            const navItem = document.querySelector(`.nav-item[data-page="${page}"]`);
+
+            if (pageElement && navItem) {
+                pageElement.classList.add('active');
+                navItem.classList.add('active');
+            }
+
+            // Додаткові дії при перемиканні
+            if (page === 'gallery') {
+                 filterPosts();
+            } else if (page === 'favorites') {
+                renderFavorites();
+            }
+        }
+
+        // Оновлення інтерфейсу (профіль, сховище)
+        function updateUI() {
+            // Оновлення профілю (просто демо-текст)
+            document.getElementById('userLevel').textContent = userData.level;
+            document.getElementById('currentExp').textContent = userData.exp;
+            document.getElementById('neededExp').textContent = userData.level * 100;
+            document.getElementById('levelFill').style.width = `${(userData.exp / (userData.level * 100)) * 100}%`;
+            
+            // Оновлення сховища
+            const usedMB = (userData.storageUsed / 1024 / 1024).toFixed(2);
+            const maxMB = (MAX_STORAGE / 1024 / 1024).toFixed(0);
+            const percentage = (userData.storageUsed / MAX_STORAGE) * 100;
+
+            document.getElementById('storageText').textContent = `${usedMB} МБ / ${maxMB} МБ`;
+            document.getElementById('storageFill').style.width = `${percentage}%`;
+            
+            // Оновлення статистики
+            document.getElementById('postsCount').textContent = userData.posts.length;
+            document.getElementById('likesCount').textContent = userData.likes;
+            document.getElementById('favoritesCount').textContent = userData.favorites.length;
+        }
+        
+        // Зміна теми
+        function changeTheme(themeName) {
+            const theme = themes[themeName];
+            if (!theme) return;
+
+            const root = document.documentElement.style;
+            for (const key in theme) {
+                if (key !== 'emoji') {
+                    root.setProperty(key, theme[key]);
+                }
+            }
+            
+            // Оновлення емодзі на body
+            document.body.style.setProperty('--emoji', `'${theme.emoji}'`);
+            document.body.querySelector('style').textContent = document.body.querySelector('style').textContent.replace(/content: '.*';/g, `content: '${theme.emoji}';`);
+            
+            // Оновлення активної кнопки теми
+            document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`.theme-btn[onclick="changeTheme('${themeName}')"]`).classList.add('active');
+        }
+
+        // Функції відкриття/закриття модальних вікон
+        function openCreateModal() {
+            document.getElementById('createModal').classList.add('active');
+        }
+
+        function closeCreateModal() {
+            document.getElementById('createModal').classList.remove('active');
+            document.getElementById('createPostForm').reset();
+            document.getElementById('filePreview').style.display = 'none';
+            document.getElementById('fileInfo').textContent = '';
+            selectedFile = null;
+        }
+        
+        function openViewModal(postId) {
+            const post = posts.find(p => p.id === postId);
+            if (!post) return;
+            
+            const content = `
+                <div class="modal-header">
+                    <h2 class="modal-title">${post.description.substring(0, 30)}...</h2>
+                    <button class="close-btn" onclick="closeViewModal()">×</button>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    ${post.fileType.startsWith('image') ? `<img src="${post.fileUrl}" style="width: 100%; border-radius: 10px;"/>` : `<video src="${post.fileUrl}" controls style="width: 100%; border-radius: 10px;"></video>`}
+                </div>
+                <p style="font-size: 16px; margin-bottom: 10px;">${post.description}</p>
+                <p style="font-size: 14px; color: var(--text-primary); margin-bottom: 15px;">Хештеги: ${post.hashtags}</p>
+                <div style="display: flex; justify-content: space-between; font-size: 12px; color: #999;">
+                    <span>Автор: ${post.authorName}</span>
+                    <span>${post.date}</span>
+                </div>
+                <button class="submit-btn" style="margin-top: 20px;" onclick="toggleFavorite(${postId})">${userData.favorites.includes(postId) ? '⭐ В обраному' : '⭐ Додати в обране'}</button>
+            `;
+            
+            document.getElementById('viewContent').innerHTML = content;
+            document.getElementById('viewModal').classList.add('active');
+        }
+
+        function closeViewModal() {
+             document.getElementById('viewModal').classList.remove('active');
+        }
+        
+        // Перемикання обраного
+        function toggleFavorite(postId) {
+            const index = userData.favorites.indexOf(postId);
+            if (index > -1) {
+                userData.favorites.splice(index, 1);
+                tg.showPopup({message: 'Видалено з обраного!'});
+            } else {
+                userData.favorites.push(postId);
+                tg.showPopup({message: 'Додано в обране!'});
+            }
+            updateUI();
+            closeViewModal();
+            // Повторне відкриття модалки, щоб оновити кнопку
+            if (document.getElementById('galleryPage').classList.contains('active')) {
+                // openViewModal(postId);
+            } else if (document.getElementById('favoritesPage').classList.contains('active')) {
+                renderFavorites();
+            }
+        }
+        
+        // Відображення одного посту
+        function createPostCard(post) {
+            const isFavorite = userData.favorites.includes(post.id);
+            return `
+                <div class="post-card" onclick="openViewModal(${post.id})">
+                    <div class="post-actions">
+                        <button class="post-action-btn ${isFavorite ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavorite(${post.id})">⭐</button>
+                    </div>
+                    ${post.fileType.startsWith('image') ? `<img class="post-media" src="${post.fileUrl}" alt="Пост">` : `<video class="post-media" src="${post.fileUrl}"></video>`}
+                    <div class="post-content">
+                        <p class="post-description">${post.description}</p>
+                        <div class="post-meta">
+                            <span>❤️ ${post.likes}</span>
+                            <span class="post-date">${post.date}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Відображення постів галереї
+        function renderPosts(postList, targetId) {
+            const grid = document.getElementById(targetId);
+            grid.innerHTML = '';
+            
+            if (postList.length === 0) {
+                 grid.innerHTML = targetId === 'postsGrid' 
+                    ? `<div class="empty-state"><div class="empty-state-icon">⛷️</div><div class="empty-state-text">Поки що немає публікацій. Додайте свій перший пост!</div></div>`
+                    : `<div class="empty-state"><div class="empty-state-icon">⭐</div><div class="empty-state-text">Немає обраних постів</div></div>`;
+                return;
+            }
+
+            postList.forEach(post => {
+                grid.innerHTML += createPostCard(post);
+            });
+        }
+        
+        // Фільтрація постів (просто заглушка)
+        function filterPosts() {
+            const filterValue = document.getElementById('dateFilter').value;
+            let filteredPosts = posts;
+            
+            // Тут має бути логіка фільтрації, але для демо просто відображаємо всі
+            // Якщо потрібно, я можу додати логіку фільтрації за датою
+            
+            renderPosts(filteredPosts, 'postsGrid');
+        }
+        
+        // Відображення обраного
+        function renderFavorites() {
+            const favoritePosts = posts.filter(p => userData.favorites.includes(p.id));
+            renderPosts(favoritePosts, 'favoritesGrid');
+        }
+
+        // Обробка форми створення посту (заглушка)
+        document.getElementById('createPostForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!selectedFile) {
+                tg.showAlert('Будь ласка, виберіть файл!');
+                return;
+            }
+            
+            if (userData.storageUsed + selectedFile.size > MAX_STORAGE) {
+                tg.showAlert('Перевищено ліміт сховища (500 МБ)!');
+                return;
+            }
+
+            const description = document.getElementById('description').value;
+            const hashtags = document.getElementById('hashtags').value;
+            
+            // Демо-пост
+            const newPost = {
+                id: posts.length + 1,
+                authorId: userData.id,
+                authorName: userData.firstName,
+                description: description || 'Без опису',
+                hashtags: hashtags || 'Без хештегів',
+                fileUrl: URL.createObjectURL(selectedFile),
+                fileType: selectedFile.type,
+                fileSize: selectedFile.size,
+                likes: Math.floor(Math.random() * 50),
+                date: new Date().toLocaleDateString('uk-UA')
+            };
+            
+            posts.unshift(newPost);
+            userData.posts.push(newPost.id);
+            userData.storageUsed += newPost.fileSize;
+            userData.exp += 10;
+            if (userData.exp >= userData.level * 100) {
+                userData.level++;
+                userData.exp = 0;
+            }
+
+            updateUI();
+            filterPosts();
+            closeCreateModal();
+            tg.showPopup({message: 'Публікацію успішно створено!'});
+        });
+        
+        // Обробка вибору файлу
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const filePreview = document.getElementById('filePreview');
+            const fileInfo = document.getElementById('fileInfo');
+            selectedFile = null;
+            filePreview.innerHTML = '';
+            filePreview.style.display = 'none';
+
+            if (file) {
+                selectedFile = file;
+                const fileSizeMB = (file.size / 1024 / 1024).toFixed(2);
+
+                if (file.size > MAX_FILE_SIZE) {
+                    fileInfo.textContent = `Файл завеликий: ${fileSizeMB} МБ (макс. 100 МБ)`;
+                    selectedFile = null;
+                    return;
+                }
+                
+                fileInfo.textContent = `Вибрано: ${file.name} (${fileSizeMB} МБ)`;
+
+                if (file.type.startsWith('image/')) {
+                    const img = document.createElement('img');
+                    img.src = URL.createObjectURL(file);
+                    filePreview.appendChild(img);
+                    filePreview.style.display = 'block';
+                } else if (file.type.startsWith('video/')) {
+                    const video = document.createElement('video');
+                    video.src = URL.createObjectURL(file);
+                    video.controls = true;
+                    filePreview.appendChild(video);
+                    filePreview.style.display = 'block';
+                }
+            } else {
+                fileInfo.textContent = '';
+            }
+        });
+
+        // Лічильник слів для опису
+        document.getElementById('description').addEventListener('input', function() {
+            const text = this.value.trim();
+            const wordCount = text.split(/\s+/).filter(word => word.length > 0).length;
+            document.getElementById('charCount').textContent = wordCount;
+        });
+
+        // Увімкнення/вимкнення музики (заглушка)
+        function toggleMusic() {
+            const toggle = document.getElementById('musicToggle');
+            const music = document.getElementById('bgMusic');
+            
+            if (toggle.classList.contains('active')) {
+                toggle.classList.remove('active');
+                music.pause();
+                tg.showPopup({message: 'Музику вимкнено'});
+            } else {
+                toggle.classList.add('active');
+                // Демо: музика має бути додана до 'src'
+                music.src = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'; // Приклад
+                music.play().catch(e => console.error("Помилка відтворення музики:", e));
+                tg.showPopup({message: 'Музику увімкнено (лише для демо)'});
+            }
+        }
+
+        // Запуск
+        init();
+        
+        // Початкове відображення галереї
+        filterPosts();
+
+    </script>
 </body>
 </html>
-
