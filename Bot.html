@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spark Gallery</title>
+
+<!-- Tailwind -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+/* Карточки */
+.card {
+    background: rgba(255,255,255,0.08);
+    border-radius: 1rem;
+    padding: 1rem;
+    backdrop-filter: blur(12px);
+    transition: 0.25s ease;
+}
+.card:hover {
+    background: rgba(255,255,255,0.18);
+    transform: scale(1.02);
+}
+
+/* Анимация вкладок */
+.fade {
+    animation: fadeIn 0.35s ease;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Кнопки вкладок */
+.tab-btn {
+    opacity: 0.5;
+    font-size: 1.7rem;
+    padding: 0.4rem 1rem;
+    transition: 0.25s ease;
+}
+.tab-btn:hover {
+    opacity: 0.8;
+}
+.active-tab {
+    opacity: 1 !important;
+    border-top: 3px solid #ff9800;
+    padding-top: 0.2rem;
+}
+</style>
+</head>
+
+<body class="bg-black text-white flex flex-col min-h-screen">
+
+<main class="flex-1 p-5">
+
+    <!-- Галерея -->
+    <section id="gallery-section" class="fade">
+        <h1 class="text-2xl font-bold mb-4">Галерея</h1>
+
+        <div class="grid grid-cols-2 gap-4" id="gallery-list">
+            <div class="card">Фото 1</div>
+            <div class="card">Фото 2</div>
+            <div class="card">Фото 3</div>
+            <div class="card">Фото 4</div>
+        </div>
+    </section>
+
+    <!-- Избранное -->
+    <section id="favorites-section" class="hidden fade">
+        <h1 class="text-2xl font-bold mb-4">Избранное</h1>
+        <div id="favorites-list" class="grid grid-cols-2 gap-4">
+            <div class="card">Пусто ⭐</div>
+        </div>
+    </section>
+
+    <!-- Профиль -->
+    <section id="profile-section" class="hidden fade">
+        <h1 class="text-2xl font-bold mb-4">Профиль</h1>
+        <p class="text-neutral-300">Здесь будут данные Telegram WebApp</p>
+    </section>
+
+</main>
+
+<!-- Навигация -->
+<nav class="bg-neutral-900 p-3 flex justify-around border-t border-neutral-700">
+    <button onclick="showTab('gallery')" id="tab-gallery" class="tab-btn active-tab">🏠</button>
+    <button onclick="showTab('favorites')" id="tab-favorites" class="tab-btn">⭐</button>
+    <button onclick="showTab('profile')" id="tab-profile" class="tab-btn">👤</button>
+</nav>
+
+<script>
+console.log("Spark Gallery Loaded ✅");
+
+function showTab(tab) {
+    const tabs = ["gallery", "favorites", "profile"];
+
+    tabs.forEach(t => {
+        document.getElementById(`${t}-section`).classList.add("hidden");
+        document.getElementById(`tab-${t}`).classList.remove("active-tab");
+    });
+
+    document.getElementById(`${tab}-section`).classList.remove("hidden");
+    document.getElementById(`tab-${tab}`).classList.add("active-tab");
+
+    localStorage.setItem("activeTab", tab);
+}
+
+window.onload = () => {
+    let saved = localStorage.getItem("activeTab") || "gallery";
+    showTab(saved);
+};
+</script>
+
+</body>
+</html>
+
