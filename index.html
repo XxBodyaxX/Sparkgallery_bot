@@ -735,4 +735,772 @@
                 <li>2 нарушения = бан аккаунта</li>
                 <li>За спам - предупреждение</li>
             </ul>
- 
+        </div>
+
+        <button class="welcome-btn" onclick="closeWelcome()">Начать</button>
+    </div>
+
+    <div class="page active" id="profilePage">
+        <div class="storage-bar">
+            <div class="storage-info">
+                <span>Хранилище</span>
+                <span id="storageText">0 МБ / 500 МБ</span>
+            </div>
+            <div class="storage-progress">
+                <div class="storage-fill" id="storageFill" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <div class="profile-header">
+            <div class="profile-avatar" id="profileAvatar" onclick="document.getElementById('avatarInput').click()" style="cursor: pointer;">?</div>
+            
+            <input type="file" id="avatarInput" class="file-input" accept="image/png, image/jpeg, image/gif">
+            
+            <div class="profile-name" id="profileName">Загрузка...</div>
+            <div class="profile-username" id="profileUsername">@username</div>
+            <div class="profile-rank" id="profileRank">☃️ Новичок</div>
+            
+            <div class="profile-level">
+                <div class="level-info">
+                    <span>Уровень <span id="userLevel">1</span></span>
+                    <span><span id="currentExp">0</span>/<span id="neededExp">100</span> XP</span>
+                </div>
+                <div class="level-bar">
+                    <div class="level-fill" id="levelFill" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-stats">
+            <div class="stat-card">
+                <div class="stat-value" id="postsCount">0</div>
+                <div class="stat-label">Постов</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="likesCount">0</div>
+                <div class="stat-label">Лайков</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="favoritesCount">0</div>
+                <div class="stat-label">Избранное</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page" id="galleryPage">
+        <h2 class="title">🖼️ Галерея</h2>
+        <div class="gallery-controls">
+            <select class="filter-select" id="dateFilter" onchange="filterPosts()">
+                <option value="all">Все посты</option>
+                <option value="today">Сегодня</option>
+                <option value="week">Эта неделя</option>
+                <option value="month">Этот месяц</option>
+            </select>
+            <button class="add-post-btn" onclick="openCreateModal()">+</button>
+        </div>
+
+        <div class="posts-grid" id="postsGrid">
+            <div class="empty-state">
+                <div class="empty-state-icon">⛷️</div>
+                <div class="empty-state-text">Пока нет публикаций. Добавьте свой первый пост!</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page" id="favoritesPage">
+        <h2 class="title">⭐ Избранное</h2>
+        <div class="posts-grid" id="favoritesGrid">
+            <div class="empty-state">
+                <div class="empty-state-icon">⭐</div>
+                <div class="empty-state-text">Нет избранных постов</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page" id="settingsPage">
+        <div class="settings-section">
+            <h3 class="settings-title">🎨 Темы оформления</h3>
+            <div class="theme-options">
+                <button class="theme-btn active" onclick="changeTheme('winter')">❄️ Зима</button>
+                <button class="theme-btn" onclick="changeTheme('autumn')">🍂 Осень</button>
+                <button class="theme-btn" onclick="changeTheme('spring')">🌷 Весна</button>
+                <button class="theme-btn" onclick="changeTheme('summer')">☀️ Лето</button>
+            </div>
+        </div>
+
+        <div class="settings-section" id="adminMusic" style="display: none;">
+            <h3 class="settings-title">🎵 Фоновая музыка (Админ)</h3>
+            <div class="music-control">
+                <span>Включить музыку</span>
+                <div class="toggle-switch" id="musicToggle" onclick="toggleMusic()">
+                    <div class="toggle-slider"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="settings-section">
+            <h3 class="settings-title">⚙️ Дополнительно</h3>
+            <button class="submit-btn" style="background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);" onclick="alert('Функция удаления не реализована в демо')">Удалить аккаунт</button>
+        </div>
+    </div>
+
+    <div class="modal" id="createModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Новая публикация</h2>
+                <button class="close-btn" onclick="closeCreateModal()">×</button>
+            </div>
+
+            <form id="createPostForm">
+                <div class="form-group">
+                    <label class="form-label">Фото или видео (до 100 МБ)</label>
+                    <div class="file-input-wrapper" onclick="document.getElementById('fileInput').click()">
+                        <div style="font-size: 24px; margin-bottom: 10px;">📁</div>
+                        <div style="color: var(--text-secondary);">Выберите файл</div>
+                        <input type="file" id="fileInput" class="file-input" accept="image/*,video/*">
+                        <div class="file-info" id="fileInfo" style="margin-top: 10px; color: var(--text-primary);"></div>
+                    </div>
+                    <div class="file-preview" id="filePreview"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Описание</label>
+                    <textarea class="form-textarea" id="description" placeholder="Расскажите о вашей публикации..."></textarea>
+                    <div class="char-counter">
+                        <span id="charCount">0</span> / 150 слов
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Хэштеги</label>
+                    <input type="text" class="form-input" id="hashtags" placeholder="#зима #горы #лыжи">
+                </div>
+
+                <button type="submit" class="submit-btn">Опубликовать</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="viewModal">
+        <div class="modal-content" id="viewContent"></div>
+    </div>
+
+    <div class="navbar">
+        <div class="nav-item active" data-page="profile" onclick="switchPage('profile')">
+            <div class="nav-icon">👤</div>
+            <div class="nav-label">Профиль</div>
+        </div>
+        <div class="nav-item" data-page="gallery" onclick="switchPage('gallery')">
+            <div class="nav-icon">🖼️</div>
+            <div class="nav-label">Галерея</div>
+        </div>
+        <div class="nav-item" data-page="favorites" onclick="switchPage('favorites')">
+            <div class="nav-icon">⭐</div>
+            <div class="nav-label">Избранное</div>
+        </div>
+        <div class="nav-item" data-page="settings" onclick="switchPage('settings')">
+            <div class="nav-icon">⚙️</div>
+            <div class="nav-label">Настройки</div>
+        </div>
+    </div>
+
+    <script>
+        // === JS из script.js ===
+        // Отображение текущего времени
+        function showTime() {
+            document.getElementById('currentTime').innerHTML = new Date().toUTCString();
+        }
+        showTime();
+        setInterval(function () {
+            showTime();
+        }, 1000);
+        
+        // === ОСНОВНАЯ ЛОГИКА ===
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
+
+        const MAX_FILE_SIZE = 100 * 1024 * 1024;
+        const MAX_STORAGE = 500 * 1024 * 1024;
+        const ADMIN_ID = '6918933194'; // ID администратора
+
+        // =========================================================
+        // !!! ДАННЫЕ CLOUDINARY !!!
+        // !!! ОБЯЗАТЕЛЬНО ЗАМЕНИТЕ ЭТИ ДАННЫЕ НА ВАШИ РЕАЛЬНЫЕ !!!
+        // =========================================================
+        const CLOUDINARY_CLOUD_NAME = 'ВАШ_CLOUD_NAME'; // <--- ЗАМЕНИТЕ НА ВАШ Cloud Name
+        const CLOUDINARY_UPLOAD_PRESET = 'ВАШ_UNSIGNED_PRESET'; // <--- ЗАМЕНИТЕ НА ВАШ Unsigned Upload Preset
+        // =========================================================
+        
+        // --- КЛЮЧИ ДЛЯ ЛОКАЛЬНОГО ХРАНИЛИЩА (localStorage) ---
+        const STORAGE_KEY_USER_DATA = 'galleryUserData';
+        const STORAGE_KEY_POSTS = 'galleryPosts';
+        const STORAGE_KEY_THEME = 'galleryTheme';
+
+        let userData = {
+            id: null,
+            firstName: 'Пользователь',
+            username: '@demo',
+            isAdmin: false,
+            level: 1,
+            exp: 0,
+            posts: [], // Список ID постов пользователя
+            likes: 0,
+            favorites: [], // Список ID избранных постов
+            storageUsed: 0,
+            warnings: 0,
+            banned: false,
+            avatarUrl: null // ДОБАВЛЕНО: URL аватара
+        };
+
+        let posts = []; // Список всех постов галереи
+        let selectedFile = null;
+        let currentTheme = 'winter'; // Переменная для отслеживания текущей темы
+
+        // Темы (для функции changeTheme)
+        const themes = {
+            'winter': { 
+                '--bg-primary': '#f0f4f8', '--bg-secondary': '#ffffff', '--bg-card': '#e3f2fd', 
+                '--text-primary': '#03a9f4', '--text-secondary': '#546e7a', '--accent': '#29b6f6', 
+                '--border': '#bbdefb', '--gradient': 'linear-gradient(135deg, #4fc3f7 0%, #03a9f4 100%)',
+                '--text-on-accent': '#ffffff', 'emoji': '❄️' 
+            },
+            'autumn': { 
+                '--bg-primary': '#2d2d2d', '--bg-secondary': '#3a3a3a', '--bg-card': '#4a4a4a', 
+                '--text-primary': '#ff6b00', '--text-secondary': '#ffb366', '--accent': '#ff8533', 
+                '--border': '#5c5c5c', '--gradient': 'linear-gradient(135deg, #ff6b00 0%, #ff3d00 100%)',
+                '--text-on-accent': '#ffffff', 'emoji': '🍂'
+            },
+            'spring': { 
+                '--bg-primary': '#f4f9f4', '--bg-secondary': '#ffffff', '--bg-card': '#e8f5e9', 
+                '--text-primary': '#4caf50', '--text-secondary': '#66bb6a', '--accent': '#81c784', 
+                '--border': '#c8e6c9', '--gradient': 'linear-gradient(135deg, #81c784 0%, #4caf50 100%)',
+                '--text-on-accent': '#ffffff', 'emoji': '🌷'
+            },
+             'summer': { 
+                '--bg-primary': '#fffde7', '--bg-secondary': '#ffffff', '--bg-card': '#fff8e1', 
+                '--text-primary': '#ffeb3b', '--text-secondary': '#fbc02d', '--accent': '#ffc107', 
+                '--border': '#fff9c4', '--gradient': 'linear-gradient(135deg, #ffc107 0%, #ffeb3b 100%)',
+                '--text-on-accent': '#333333', 'emoji': '☀️'
+            },
+        };
+
+        // --- ФУНКЦИИ СОХРАНЕНИЯ/ЗАГРУЗКИ ДАННЫХ (LOCAL STORAGE) ---
+        
+        /** Сохраняет данные пользователя (уровень, XP, избранное, тема) и список постов в localStorage. */
+        function saveData() {
+            try {
+                const dataToSave = {
+                    level: userData.level,
+                    exp: userData.exp,
+                    likes: userData.likes,
+                    favorites: userData.favorites,
+                    storageUsed: userData.storageUsed,
+                    posts: userData.posts, // Список ID постов пользователя
+                    avatarUrl: userData.avatarUrl // ДОБАВЛЕНО
+                };
+                localStorage.setItem(STORAGE_KEY_USER_DATA, JSON.stringify(dataToSave));
+                localStorage.setItem(STORAGE_KEY_POSTS, JSON.stringify(posts));
+                localStorage.setItem(STORAGE_KEY_THEME, currentTheme);
+            } catch (e) {
+                console.error('Ошибка сохранения данных в localStorage:', e);
+            }
+        }
+
+        /** Загружает данные пользователя и посты из localStorage. */
+        function loadData() {
+            try {
+                const savedUserData = localStorage.getItem(STORAGE_KEY_USER_DATA);
+                const savedPosts = localStorage.getItem(STORAGE_KEY_POSTS);
+                const savedTheme = localStorage.getItem(STORAGE_KEY_THEME);
+
+                if (savedUserData) {
+                    const loadedData = JSON.parse(savedUserData);
+                    userData.level = loadedData.level || 1;
+                    userData.exp = loadedData.exp || 0;
+                    userData.likes = loadedData.likes || 0;
+                    userData.favorites = loadedData.favorites || [];
+                    userData.storageUsed = loadedData.storageUsed || 0;
+                    userData.posts = loadedData.posts || [];
+                    userData.avatarUrl = loadedData.avatarUrl || null; // ДОБАВЛЕНО
+                }
+
+                if (savedPosts) {
+                    posts = JSON.parse(savedPosts);
+                }
+                
+                if (savedTheme && themes[savedTheme]) {
+                    currentTheme = savedTheme;
+                } else {
+                    currentTheme = 'winter';
+                }
+
+            } catch (e) {
+                console.error('Ошибка загрузки данных из localStorage:', e);
+                posts = [];
+                currentTheme = 'winter';
+            }
+        }
+        
+        // --- ФУНКЦИЯ ЗАГРУЗКИ НА CLOUDINARY (сохраняет файлы в облаке) ---
+        async function uploadFileToCloudinary(file) {
+            const url = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/upload`;
+            const formData = new FormData();
+            
+            formData.append('file', file);
+            formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+            formData.append('tags', 'tma_gallery_post'); 
+
+            tg.showPopup({message: 'Загрузка файла... Пожалуйста, подождите.'});
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(`Cloudinary вернул ошибку: ${response.status} - ${errorData.error ? errorData.error.message : response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                tg.showPopup({message: 'Файл успешно загружен на Cloudinary!'});
+                return data.secure_url; 
+                
+            } catch (error) {
+                console.error('Ошибка загрузки в Cloudinary:', error);
+                tg.showAlert(`Ошибка загрузки: ${error.message}. Проверьте Cloud Name и Preset.`);
+                throw error; 
+            }
+        }
+        
+        // --- Функции управления музыкой ---
+        function saveMusicLink(link) {
+            localStorage.setItem('musicLink', link); 
+            tg.showPopup({message: 'Ссылка на музыку сохранена!'});
+        }
+
+        function toggleMusic() {
+            const toggle = document.getElementById('musicToggle');
+            const music = document.getElementById('bgMusic');
+            let savedMusicLink = localStorage.getItem('musicLink');
+            
+            if (!savedMusicLink && userData.isAdmin && !toggle.classList.contains('active')) {
+                const link = prompt('Введите прямую ссылку на MP3-файл для плейлиста:');
+                if (link) {
+                    saveMusicLink(link);
+                    savedMusicLink = link;
+                } else {
+                    tg.showAlert('Ссылка не указана.');
+                    return;
+                }
+            }
+            
+            if (savedMusicLink) {
+                music.src = savedMusicLink;
+            } else {
+                 music.src = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'; 
+            }
+            
+            if (toggle.classList.contains('active')) {
+                toggle.classList.remove('active');
+                music.pause();
+                tg.showPopup({message: 'Музыка выключена'});
+            } else {
+                toggle.classList.add('active');
+                music.play().catch(e => {
+                    console.error("Ошибка воспроизведения:", e);
+                    tg.showAlert('Музыка не запустилась автоматически. Нажмите кнопку еще раз, если она не играет.');
+                });
+                tg.showPopup({message: 'Музыка включена'});
+            }
+        }
+        
+        // Инициализация
+        function init() {
+            loadData(); 
+
+            const user = tg.initDataUnsafe.user;
+            if (user) {
+                userData.id = user.id;
+                userData.firstName = user.first_name || 'Пользователь';
+                userData.username = user.username ? `@${user.username}` : '@user';
+                userData.isAdmin = user.id.toString() === ADMIN_ID; 
+
+                document.getElementById('profileName').textContent = userData.firstName;
+                document.getElementById('profileUsername').textContent = userData.username;
+                
+                if (userData.isAdmin) {
+                    document.getElementById('adminMusic').style.display = 'block';
+                }
+            }
+            
+            changeTheme(currentTheme, false); 
+            updateUI(); // Вызываем updateUI, чтобы обновить аватар
+        }
+
+        // Закрытие приветственного экрана
+        function closeWelcome() {
+            document.getElementById('welcomeScreen').classList.add('hidden');
+        }
+
+        // Переключение страниц
+        function switchPage(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+            const pageElement = document.getElementById(page + 'Page');
+            const navItem = document.querySelector(`.nav-item[data-page="${page}"]`);
+
+            if (pageElement && navItem) {
+                pageElement.classList.add('active');
+                navItem.classList.add('active');
+            }
+
+            if (page === 'gallery') {
+                 filterPosts();
+            } else if (page === 'favorites') {
+                renderFavorites();
+            }
+        }
+
+        // Обновление интерфейса (профиль, хранилище, АВАТАР)
+        function updateUI() {
+            // Обновление профиля 
+            document.getElementById('userLevel').textContent = userData.level;
+            document.getElementById('currentExp').textContent = userData.exp;
+            document.getElementById('neededExp').textContent = userData.level * 100;
+            document.getElementById('levelFill').style.width = `${(userData.exp / (userData.level * 100)) * 100}%`;
+            
+            // Обновление хранилища
+            const usedMB = (userData.storageUsed / 1024 / 1024).toFixed(2);
+            const maxMB = (MAX_STORAGE / 1024 / 1024).toFixed(0);
+            const percentage = (userData.storageUsed / MAX_STORAGE) * 100;
+
+            document.getElementById('storageText').textContent = `${usedMB} МБ / ${maxMB} МБ`;
+            document.getElementById('storageFill').style.width = `${percentage}%`;
+            
+            // Обновление статистики
+            document.getElementById('postsCount').textContent = userData.posts.length;
+            document.getElementById('likesCount').textContent = userData.likes;
+            document.getElementById('favoritesCount').textContent = userData.favorites.length;
+            
+            // НОВЫЙ БЛОК: Обновление аватара (GIF/ИЗОБРАЖЕНИЕ)
+            const avatarElement = document.getElementById('profileAvatar');
+            if (userData.avatarUrl) {
+                // Если есть URL, используем его (для GIF/Image)
+                avatarElement.textContent = ''; 
+                avatarElement.style.backgroundImage = `url('${userData.avatarUrl}')`;
+                avatarElement.style.backgroundColor = 'transparent'; 
+                avatarElement.style.color = 'transparent'; 
+            } else {
+                // Если нет URL, показываем первую букву (дефолтное состояние)
+                avatarElement.textContent = userData.firstName.charAt(0).toUpperCase();
+                avatarElement.style.backgroundImage = 'none';
+                avatarElement.style.backgroundColor = 'rgba(255, 255, 255, 0.5)';
+                avatarElement.style.color = 'var(--text-primary)';
+            }
+        }
+        
+        // Смена темы
+        function changeTheme(themeName, save = true) {
+            const theme = themes[themeName];
+            if (!theme) return;
+
+            const root = document.documentElement.style;
+            for (const key in theme) {
+                if (key !== 'emoji') {
+                    root.setProperty(key, theme[key]);
+                }
+            }
+            
+            const styleElement = document.querySelector('style');
+            let styleContent = styleElement.textContent;
+            styleContent = styleContent.replace(/body::before\s*{[^}]*content:\s*'[^']*';/g, `body::before { content: '${theme.emoji}';`);
+            styleElement.textContent = styleContent;
+            
+            document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`.theme-btn[onclick="changeTheme('${themeName}')"]`).classList.add('active');
+            
+            currentTheme = themeName; 
+            
+            if (save) {
+                saveData();
+            }
+        }
+
+        // Функции открытия/закрытия модальных окон
+        function openCreateModal() {
+            document.getElementById('createModal').classList.add('active');
+        }
+
+        function closeCreateModal() {
+            document.getElementById('createModal').classList.remove('active');
+            document.getElementById('createPostForm').reset();
+            document.getElementById('filePreview').innerHTML = ''; 
+            document.getElementById('filePreview').style.display = 'none';
+            document.getElementById('fileInfo').textContent = '';
+            selectedFile = null;
+        }
+        
+        function openViewModal(postId) {
+            const post = posts.find(p => p.id === postId);
+            if (!post) return;
+            
+            const content = `
+                <div class="modal-header">
+                    <h2 class="modal-title">${post.description.substring(0, 30)}...</h2>
+                    <button class="close-btn" onclick="closeViewModal()">×</button>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    ${post.fileType.startsWith('image') ? `<img src="${post.fileUrl}" style="width: 100%; border-radius: 10px;"/>` : `<video src="${post.fileUrl}" controls style="width: 100%; border-radius: 10px;"></video>`}
+                </div>
+                <p style="font-size: 16px; margin-bottom: 10px;">${post.description}</p>
+                <p style="font-size: 14px; color: var(--text-primary); margin-bottom: 15px;">Хэштеги: ${post.hashtags}</p>
+                <div style="display: flex; justify-content: space-between; font-size: 12px; color: #999;">
+                    <span>Автор: ${post.authorName}</span>
+                    <span>${post.date}</span>
+                </div>
+                <button class="submit-btn" style="margin-top: 20px;" onclick="toggleFavorite(${postId})">${userData.favorites.includes(postId) ? '⭐ В избранном' : '⭐ Добавить в избранное'}</button>
+            `;
+            
+            document.getElementById('viewContent').innerHTML = content;
+            document.getElementById('viewModal').classList.add('active');
+        }
+
+        function closeViewModal() {
+             document.getElementById('viewModal').classList.remove('active');
+        }
+        
+        // Переключение избранного
+        function toggleFavorite(postId) {
+            const index = userData.favorites.indexOf(postId);
+            if (index > -1) {
+                userData.favorites.splice(index, 1);
+                tg.showPopup({message: 'Удалено из избранного!'});
+            } else {
+                userData.favorites.push(postId);
+                tg.showPopup({message: 'Добавлено в избранное!'});
+            }
+            
+            saveData(); 
+            updateUI();
+            closeViewModal();
+             if (document.getElementById('favoritesPage').classList.contains('active')) {
+                renderFavorites();
+            }
+        }
+        
+        // Отображение одной карточки поста
+        function createPostCard(post) {
+            const isFavorite = userData.favorites.includes(post.id);
+            // Если это видео, добавляем #t=0.1, чтобы получить превью
+            const posterAttr = post.fileType.startsWith('video') ? `poster="${post.fileUrl}#t=0.1"` : '';
+            
+            return `
+                <div class="post-card" onclick="openViewModal(${post.id})">
+                    <div class="post-actions">
+                        <button class="post-action-btn ${isFavorite ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavorite(${post.id})">⭐</button>
+                    </div>
+                    ${post.fileType.startsWith('image') ? `<img class="post-media" src="${post.fileUrl}" alt="Пост">` : `<video class="post-media" src="${post.fileUrl}" ${posterAttr}></video>`}
+                    <div class="post-content">
+                        <p class="post-description">${post.description}</p>
+                        <div class="post-meta">
+                            <span>❤️ ${post.likes}</span>
+                            <span class="post-date">${post.date}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Отображение постов галереи
+        function renderPosts(postList, targetId) {
+            const grid = document.getElementById(targetId);
+            grid.innerHTML = '';
+            
+            if (postList.length === 0) {
+                 grid.innerHTML = targetId === 'postsGrid' 
+                    ? `<div class="empty-state"><div class="empty-state-icon">⛷️</div><div class="empty-state-text">Пока нет публикаций. Добавьте свой первый пост!</div></div>`
+                    : `<div class="empty-state"><div class="empty-state-icon">⭐</div><div class="empty-state-text">Нет избранных постов</div></div>`;
+                return;
+            }
+
+            postList.forEach(post => {
+                grid.innerHTML += createPostCard(post);
+            });
+        }
+        
+        // Фильтрация постов (просто заглушка)
+        function filterPosts() {
+            const filterValue = document.getElementById('dateFilter').value;
+            let filteredPosts = posts;
+            
+            // Здесь должна быть логика фильтрации
+            
+            renderPosts(filteredPosts, 'postsGrid');
+        }
+        
+        // Отображение избранного
+        function renderFavorites() {
+            const favoritePosts = posts.filter(p => userData.favorites.includes(p.id));
+            renderPosts(favoritePosts, 'favoritesGrid');
+        }
+
+        // --- Обработка формы создания поста (с Cloudinary) ---
+        document.getElementById('createPostForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!selectedFile) {
+                tg.showAlert('Пожалуйста, выберите файл!');
+                return;
+            }
+            
+            if (userData.storageUsed + selectedFile.size > MAX_STORAGE) {
+                tg.showAlert('Превышен лимит хранилища (500 МБ)!');
+                return;
+            }
+
+            const description = document.getElementById('description').value;
+            const hashtags = document.getElementById('hashtags').value;
+            
+            const submitBtn = this.querySelector('.submit-btn');
+            submitBtn.disabled = true;
+
+            try {
+                // ШАГ 1: Загрузка файла на Cloudinary (файлы сохраняются в облаке)
+                const permanentFileUrl = await uploadFileToCloudinary(selectedFile);
+                
+                // ШАГ 2: Создание объекта поста с ПОСТОЯННЫМ URL
+                const newPost = {
+                    id: posts.length + 1, 
+                    authorId: userData.id,
+                    authorName: userData.firstName,
+                    description: description || 'Без описания',
+                    hashtags: hashtags || 'Без хэштегов',
+                    fileUrl: permanentFileUrl, // Используем ПОСТОЯННУЮ ссылку Cloudinary
+                    fileType: selectedFile.type,
+                    fileSize: selectedFile.size,
+                    likes: Math.floor(Math.random() * 50), 
+                    date: new Date().toLocaleDateString('ru-RU') 
+                };
+                
+                // ШАГ 3: Обновление локальных данных
+                posts.unshift(newPost); 
+                userData.posts.push(newPost.id);
+                userData.storageUsed += newPost.fileSize;
+                userData.exp += 10;
+                if (userData.exp >= userData.level * 100) {
+                    userData.level++;
+                    userData.exp = 0;
+                }
+                
+                // ШАГ 4: Сохранение данных 
+                saveData(); 
+
+                updateUI();
+                filterPosts();
+                closeCreateModal();
+                tg.showPopup({message: 'Публикация успешно создана!'});
+                
+            } catch (error) {
+                console.error('Не удалось создать пост из-за ошибки загрузки.', error);
+            } finally {
+                submitBtn.disabled = false; 
+            }
+        });
+        
+        // Обработка выбора файла
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const filePreview = document.getElementById('filePreview');
+            const fileInfo = document.getElementById('fileInfo');
+            selectedFile = null;
+            filePreview.innerHTML = '';
+            filePreview.style.display = 'none';
+
+            if (file) {
+                selectedFile = file;
+                const fileSizeMB = (file.size / 1024 / 1024).toFixed(2);
+
+                if (file.size > MAX_FILE_SIZE) {
+                    fileInfo.textContent = `Файл слишком большой: ${fileSizeMB} МБ (макс. 100 МБ)`;
+                    selectedFile = null;
+                    return;
+                }
+                
+                fileInfo.textContent = `Выбрано: ${file.name} (${fileSizeMB} МБ)`;
+
+                if (file.type.startsWith('image/')) {
+                    const img = document.createElement('img');
+                    img.src = URL.createObjectURL(file);
+                    filePreview.appendChild(img);
+                    filePreview.style.display = 'block';
+                } else if (file.type.startsWith('video/')) {
+                    const video = document.createElement('video');
+                    video.src = URL.createObjectURL(file);
+                    video.controls = true;
+                    filePreview.appendChild(video);
+                    filePreview.style.display = 'block';
+                }
+            } else {
+                fileInfo.textContent = '';
+            }
+        });
+
+        // Счетчик слов для описания
+        document.getElementById('description').addEventListener('input', function() {
+            const text = this.value.trim();
+            const wordCount = text.split(/\s+/).filter(word => word.length > 0).length;
+            document.getElementById('charCount').textContent = wordCount;
+        });
+
+        // --- НОВЫЙ ОБРАБОТЧИК: Загрузка аватара (GIF/Image) ---
+        document.getElementById('avatarInput').addEventListener('change', async function(e) {
+            const file = e.target.files[0];
+            
+            // Ограничение размера аватара
+            const MAX_AVATAR_SIZE = 5 * 1024 * 1024; 
+
+            if (file) {
+                if (!file.type.startsWith('image/')) {
+                    tg.showAlert('Для аватара разрешены только изображения (PNG, JPG, GIF).');
+                    e.target.value = ''; // Сброс
+                    return;
+                }
+                
+                if (file.size > MAX_AVATAR_SIZE) {
+                    tg.showAlert('Файл аватара не должен превышать 5 МБ.');
+                    e.target.value = ''; 
+                    return;
+                }
+                
+                try {
+                    // Используем ту же функцию загрузки Cloudinary
+                    tg.showPopup({message: 'Загрузка аватара...'});
+                    const avatarUrl = await uploadFileToCloudinary(file);
+                    
+                    userData.avatarUrl = avatarUrl;
+                    saveData();
+                    updateUI();
+                    tg.showPopup({message: 'Аватар успешно обновлен!'});
+                } catch (error) {
+                    console.error('Не удалось загрузить аватар:', error);
+                    tg.showAlert('Ошибка загрузки аватара. Проверьте Cloud Name и Preset Cloudinary.');
+                }
+            }
+            e.target.value = ''; // Сбрасываем значение input
+        });
+
+
+        // Запуск
+        init();
+        
+        // Начальное отображение галереи
+        filterPosts();
+
+    </script>
+</body>
+</html>
