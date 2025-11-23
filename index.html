@@ -6,7 +6,7 @@
     <title>Галерея Pro - Зима 2025</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        /* === Зимняя Тема (По умолчанию) === */
+        /* === Динамические переменные для темы === */
         :root {
             --bg-primary: #f0f4f8; /* Светло-серо-голубой (снежный) */
             --bg-secondary: #ffffff; /* Чистый белый */
@@ -17,6 +17,10 @@
             --border: #bbdefb; /* Светло-голубой */
             --gradient: linear-gradient(135deg, #4fc3f7 0%, #03a9f4 100%); /* Голубой градиент */
             --text-on-accent: #ffffff;
+            
+            /* Переменные для динамической анимации частиц */
+            --particle-color: #ffffff;
+            --particle-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
         }
 
         /* === Базовые стили === */
@@ -32,14 +36,17 @@
             color: #333; /* Темный текст на светлом фоне */
             min-height: 100vh;
             padding-bottom: 70px;
+            padding-top: 10px; /* Отступ сверху для времени */
+            transition: background-color 0.3s ease;
             /* Зимний фон: едва заметные снежинки */
             background-image: 
-                radial-gradient(circle at 10% 90%, rgba(179, 229, 252, 0.5) 0%, transparent 50%),
-                radial-gradient(circle at 90% 10%, rgba(179, 229, 252, 0.5) 0%, transparent 50%);
+                radial-gradient(circle at 10% 90%, rgba(179, 229, 252, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 90% 10%, rgba(179, 229, 252, 0.2) 0%, transparent 50%);
         }
 
+        /* Эмодзи на фоне */
         body::before {
-            content: '❄️'; /* Зимний эмодзи */
+            content: var(--emoji-content); 
             position: fixed;
             top: 10px;
             right: 10px;
@@ -47,10 +54,10 @@
             z-index: 1;
             animation: float 3s ease-in-out infinite;
         }
-
+        
         @keyframes float {
             0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-10px) rotate(5deg); }
+            50% { transform: translateY(-5px) rotate(2deg); }
         }
 
         .title {
@@ -58,6 +65,66 @@
             margin-bottom: 20px;
             font-size: 24px;
         }
+        
+        /* Стиль для отображения текущего времени */
+        #currentTime {
+            font-size: 14px;
+            color: var(--text-secondary);
+            text-align: center;
+            padding-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        /* === Анимация частиц (НОВАЯ СИСТЕМА) === */
+        #particleOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 50; 
+            overflow: hidden;
+            display: block; 
+        }
+
+        .particle {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+            will-change: transform, opacity;
+            color: var(--particle-color); 
+            text-shadow: var(--particle-shadow);
+        }
+
+        /* Общие ключевые кадры для движения */
+        
+        /* Прямое падение (Снег, Дождь, Весна) */
+        @keyframes fall-straight {
+            0% { transform: translate(var(--x), -5vh) rotate(0deg); opacity: 0; }
+            5% { opacity: 1; }
+            95% { opacity: 1; }
+            100% { transform: translate(var(--x), 105vh) rotate(360deg); opacity: 0; }
+        }
+        
+        /* Падение с покачиванием (Листья, Лапки, Кровь) */
+        @keyframes sway-fall {
+            0% { transform: translate(calc(var(--x) + 0vw), -5vh); opacity: 0; }
+            5% { opacity: 1; }
+            50% { transform: translate(calc(var(--x) + var(--sway)), 50vh) rotate(180deg); }
+            95% { opacity: 1; }
+            100% { transform: translate(calc(var(--x) + 0vw), 105vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* Статический глитч (Киберпанк) */
+        @keyframes glitch-static {
+            0%, 100% { opacity: 0.9; transform: translate(var(--x), var(--y)); }
+            20% { transform: translate(calc(var(--x) + 5px), calc(var(--y) - 5px)); filter: blur(1px) brightness(2); }
+            40% { transform: translate(calc(var(--x) - 5px), calc(var(--y) + 5px)); filter: blur(0px) brightness(1); }
+            60% { transform: translate(calc(var(--x) + 2px), calc(var(--y) - 2px)); filter: contrast(1.5); }
+            80% { transform: translate(calc(var(--x) - 2px), calc(var(--y) + 2px)); filter: contrast(1); }
+        }
+
 
         /* === Приветственный экран === */
         .welcome-screen {
@@ -696,20 +763,14 @@
             font-size: 64px;
             margin-bottom: 15px;
         }
-        
-        /* Стиль для отображения текущего времени */
-        #currentTime {
-            font-size: 14px;
-            color: var(--text-secondary);
-            text-align: center;
-            padding-top: 10px;
-        }
     </style>
 </head>
 <body>
     <audio id="bgMusic" loop>
         <source src="" type="audio/mpeg">
     </audio>
+    
+    <div id="particleOverlay"></div>
 
     <div id="currentTime"></div>
 
@@ -748,7 +809,7 @@
         <div class="profile-header">
             <div class="profile-avatar" id="profileAvatar">?</div>
             <div class="profile-name" id="profileName">Загрузка...</div>
-            <div class="profile-username" id="profileUsername">@username</div>
+            <div class="profile-username" id="profileUsername">@demo</div>
             <div class="profile-rank" id="profileRank">☃️ Новичок</div>
             
             <div class="profile-level">
@@ -932,10 +993,10 @@
         // =========================================================
         
         // --- КЛЮЧИ ДЛЯ ЛОКАЛЬНОГО ХРАНИЛИЩА (localStorage) ---
-        // Эти ключи используются для сохранения ПРОГРЕССА пользователя (уровень, XP, избранное, тема)
         const STORAGE_KEY_USER_DATA = 'galleryUserData';
         const STORAGE_KEY_POSTS = 'galleryPosts';
         const STORAGE_KEY_THEME = 'galleryTheme';
+        const root = document.documentElement.style; // Для легкого доступа к CSS-переменным
 
         let userData = {
             id: null,
@@ -944,90 +1005,116 @@
             isAdmin: false,
             level: 1,
             exp: 0,
-            posts: [], // Список ID постов пользователя
+            posts: [], 
             likes: 0,
-            favorites: [], // Список ID избранных постов
+            favorites: [], 
             storageUsed: 0,
             warnings: 0,
             banned: false
         };
 
-        let posts = []; // Список всех постов галереи
+        let posts = []; 
         let selectedFile = null;
-        let currentTheme = 'winter'; // Переменная для отслеживания текущей темы
+        let currentTheme = 'winter'; 
 
-        // Темы (для функции changeTheme)
+        // Темы (добавлены настройки для анимации)
         const themes = {
             'winter': { 
                 '--bg-primary': '#f0f4f8', '--bg-secondary': '#ffffff', '--bg-card': '#e3f2fd', 
                 '--text-primary': '#03a9f4', '--text-secondary': '#546e7a', '--accent': '#29b6f6', 
                 '--border': '#bbdefb', '--gradient': 'linear-gradient(135deg, #4fc3f7 0%, #03a9f4 100%)',
-                '--text-on-accent': '#ffffff', 'emoji': '❄️' 
+                '--text-on-accent': '#ffffff', 'emoji-content': '❄️',
+                'particle-char': '❄️', 'particle-color': '#ffffff',
+                'particle-shadow': '0 0 5px rgba(255, 255, 255, 0.8)',
+                'particle-animation': 'fall-straight',
+                'particle-speed': 15000,
+                'particle-count': 25
             },
             'autumn': { 
                 '--bg-primary': '#2d2d2d', '--bg-secondary': '#3a3a3a', '--bg-card': '#4a4a4a', 
                 '--text-primary': '#ff6b00', '--text-secondary': '#ffb366', '--accent': '#ff8533', 
                 '--border': '#5c5c5c', '--gradient': 'linear-gradient(135deg, #ff6b00 0%, #ff3d00 100%)',
-                '--text-on-accent': '#ffffff', 'emoji': '🍂'
+                '--text-on-accent': '#ffffff', 'emoji-content': '🍂',
+                'particle-char': '🍁', 'particle-color': '#ffb366',
+                'particle-shadow': '0 0 3px #ff6b00',
+                'particle-animation': 'sway-fall',
+                'particle-speed': 20000,
+                'particle-count': 20
             },
             'spring': { 
                 '--bg-primary': '#f4f9f4', '--bg-secondary': '#ffffff', '--bg-card': '#e8f5e9', 
                 '--text-primary': '#4caf50', '--text-secondary': '#66bb6a', '--accent': '#81c784', 
                 '--border': '#c8e6c9', '--gradient': 'linear-gradient(135deg, #81c784 0%, #4caf50 100%)',
-                '--text-on-accent': '#ffffff', 'emoji': '🌷'
+                '--text-on-accent': '#ffffff', 'emoji-content': '🌷',
+                'particle-char': '🌸', 'particle-color': '#ffc0cb',
+                'particle-shadow': '0 0 5px #4caf50',
+                'particle-animation': 'fall-straight',
+                'particle-speed': 18000,
+                'particle-count': 20
             },
              'summer': { 
                 '--bg-primary': '#fffde7', '--bg-secondary': '#ffffff', '--bg-card': '#fff8e1', 
                 '--text-primary': '#ffeb3b', '--text-secondary': '#fbc02d', '--accent': '#ffc107', 
                 '--border': '#fff9c4', '--gradient': 'linear-gradient(135deg, #ffc107 0%, #ffeb3b 100%)',
-                '--text-on-accent': '#333333', 'emoji': '☀️'
+                '--text-on-accent': '#333333', 'emoji-content': '☀️',
+                'particle-char': '✨', 'particle-color': '#ffeb3b',
+                'particle-shadow': '0 0 10px #ffc107',
+                'particle-animation': 'fall-straight',
+                'particle-speed': 12000,
+                'particle-count': 15
             },
-            // НОВЫЕ ТЕМЫ
             'cyberpunk': { 
                 '--bg-primary': '#11001c', '--bg-secondary': '#1e0030', '--bg-card': '#2a0045', 
                 '--text-primary': '#00ffff', '--text-secondary': '#ff005d', '--accent': '#00e0e0', 
                 '--border': '#ff005d', '--gradient': 'linear-gradient(135deg, #00ffff 0%, #ff005d 100%)',
-                '--text-on-accent': '#11001c', 'emoji': '🌃'
+                '--text-on-accent': '#11001c', 'emoji-content': '🌃',
+                'particle-char': '█', 'particle-color': '#00ffff',
+                'particle-shadow': '0 0 5px #ff005d',
+                'particle-animation': 'glitch-static',
+                'particle-speed': 500, 
+                'particle-count': 40
             },
             'gothic': { 
                 '--bg-primary': '#000000', '--bg-secondary': '#1c1c1c', '--bg-card': '#2a2a2a', 
                 '--text-primary': '#8b0000', '--text-secondary': '#b0b0b0', '--accent': '#8b0000', 
                 '--border': '#505050', '--gradient': 'linear-gradient(135deg, #440000 0%, #8b0000 100%)',
-                '--text-on-accent': '#ffffff', 'emoji': '🦇'
+                '--text-on-accent': '#ffffff', 'emoji-content': '🦇',
+                'particle-char': '🩸', 'particle-color': '#8b0000',
+                'particle-shadow': '0 0 5px #ff0000',
+                'particle-animation': 'sway-fall',
+                'particle-speed': 25000,
+                'particle-count': 15
             },
             'cats': { 
                 '--bg-primary': '#ffe0f0', '--bg-secondary': '#ffffff', '--bg-card': '#f8bbd0', 
                 '--text-primary': '#e91e63', '--text-secondary': '#4a148c', '--accent': '#f48fb1', 
                 '--border': '#f06292', '--gradient': 'linear-gradient(135deg, #f48fb1 0%, #e91e63 100%)',
-                '--text-on-accent': '#ffffff', 'emoji': '🐈'
+                '--text-on-accent': '#ffffff', 'emoji-content': '🐈',
+                'particle-char': '🐾', 'particle-color': '#f48fb1',
+                'particle-shadow': '0 0 5px #e91e63',
+                'particle-animation': 'sway-fall',
+                'particle-speed': 17000,
+                'particle-count': 20
             },
         };
 
         // --- ФУНКЦИИ СОХРАНЕНИЯ/ЗАГРУЗКИ ДАННЫХ (LOCAL STORAGE) ---
         
-        /** Сохраняет данные пользователя (уровень, XP, избранное, тема) и список постов в localStorage. 
-         * Это обеспечивает сохранение прогресса пользователя при закрытии Web App. */
         function saveData() {
             try {
-                // userData содержит только те данные, которые нужно сохранять между сессиями
                 const dataToSave = {
-                    level: userData.level,
-                    exp: userData.exp,
-                    likes: userData.likes,
-                    favorites: userData.favorites,
-                    storageUsed: userData.storageUsed,
-                    posts: userData.posts // Список ID постов пользователя
+                    level: userData.level, exp: userData.exp, likes: userData.likes,
+                    favorites: userData.favorites, storageUsed: userData.storageUsed,
+                    posts: userData.posts 
                 };
                 localStorage.setItem(STORAGE_KEY_USER_DATA, JSON.stringify(dataToSave));
                 localStorage.setItem(STORAGE_KEY_POSTS, JSON.stringify(posts));
                 localStorage.setItem(STORAGE_KEY_THEME, currentTheme);
-                // console.log('Данные сохранены локально.'); // Отладочная информация
             } catch (e) {
                 console.error('Ошибка сохранения данных в localStorage:', e);
             }
         }
 
-        /** Загружает данные пользователя и посты из localStorage. */
         function loadData() {
             try {
                 const savedUserData = localStorage.getItem(STORAGE_KEY_USER_DATA);
@@ -1036,7 +1123,6 @@
 
                 if (savedUserData) {
                     const loadedData = JSON.parse(savedUserData);
-                    // Перезаписываем только изменяемые данные, сохраняя ID из Telegram
                     userData.level = loadedData.level || 1;
                     userData.exp = loadedData.exp || 0;
                     userData.likes = loadedData.likes || 0;
@@ -1054,25 +1140,22 @@
                 } else {
                     currentTheme = 'winter';
                 }
-                // console.log('Данные загружены локально.'); // Отладочная информация
 
             } catch (e) {
                 console.error('Ошибка загрузки данных из localStorage:', e);
-                // В случае ошибки, используем дефолтные значения
                 posts = [];
                 currentTheme = 'winter';
             }
         }
         
-        // --- ФУНКЦИЯ ЗАГРУЗКИ НА CLOUDINARY (сохраняет файлы в облаке) ---
+        // --- ФУНКЦИЯ ЗАГРУЗКИ НА CLOUDINARY ---
         async function uploadFileToCloudinary(file) {
             const url = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/upload`;
             const formData = new FormData();
             
-            // Отправляем файл и имя пресета (для Unsigned Upload)
             formData.append('file', file);
             formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-            formData.append('tags', 'tma_gallery_post'); // Дополнительный тег
+            formData.append('tags', 'tma_gallery_post'); 
 
             tg.showPopup({message: 'Загрузка файла... Пожалуйста, подождите.'});
             
@@ -1088,7 +1171,6 @@
                 
                 const data = await response.json();
                 
-                // data.secure_url - это ПОСТОЯННАЯ HTTPS-ссылка на ваш файл в облаке
                 tg.showPopup({message: 'Файл успешно загружен на Cloudinary!'});
                 return data.secure_url; 
                 
@@ -1111,12 +1193,10 @@
             let savedMusicLink = localStorage.getItem('musicLink');
             
             if (!savedMusicLink) {
-                // Если нет ссылки, используем демо-ссылку для всех или требуем ввода от админа
                 if (userData.isAdmin) {
                     tg.showAlert('Пожалуйста, вставьте прямую ссылку на MP3-файл в поле выше!');
                     return;
                 } else {
-                    // Используем демо-ссылку, если нет сохраненной
                     music.src = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'; 
                 }
             } else {
@@ -1129,7 +1209,7 @@
                 tg.showPopup({message: 'Музыка выключена'});
             } else {
                 toggle.classList.add('active');
-                music.load(); // Обновляем источник
+                music.load(); 
                 music.play().catch(e => {
                     console.error("Ошибка воспроизведения:", e);
                     tg.showAlert('Музыка не запустилась автоматически. Нажмите кнопку еще раз, если она не играет.');
@@ -1140,7 +1220,6 @@
         
         // Инициализация
         function init() {
-            // ШАГ 1: Загружаем все сохраненные данные (уровень, избранное, посты, тема)
             loadData(); 
 
             const user = tg.initDataUnsafe.user;
@@ -1148,7 +1227,6 @@
                 userData.id = user.id;
                 userData.firstName = user.first_name || 'Пользователь';
                 userData.username = user.username ? `@${user.username}` : '@user';
-                // Проверяем ID на соответствие ADMIN_ID
                 userData.isAdmin = user.id.toString() === ADMIN_ID; 
 
                 document.getElementById('profileName').textContent = userData.firstName;
@@ -1157,7 +1235,6 @@
 
                 if (userData.isAdmin) {
                     document.getElementById('adminMusic').style.display = 'block';
-                    // Загружаем сохраненную ссылку в поле ввода
                     const savedLink = localStorage.getItem('musicLink');
                     const musicInput = document.getElementById('musicLinkInput');
                     if (savedLink && musicInput) {
@@ -1166,8 +1243,7 @@
                 }
             }
             
-            // ШАГ 2: Устанавливаем загруженную тему (или 'winter' по умолчанию)
-            changeTheme(currentTheme, false); // false, чтобы не сохранять тему сразу при загрузке
+            changeTheme(currentTheme, false);
             updateUI();
         }
 
@@ -1189,7 +1265,6 @@
                 navItem.classList.add('active');
             }
 
-            // Дополнительные действия при переключении
             if (page === 'gallery') {
                  filterPosts();
             } else if (page === 'favorites') {
@@ -1219,44 +1294,88 @@
             document.getElementById('favoritesCount').textContent = userData.favorites.length;
         }
         
+        // НОВАЯ ФУНКЦИЯ: Генерация и запуск анимации частиц
+        function generateParticles(theme) {
+            const overlay = document.getElementById('particleOverlay');
+            overlay.innerHTML = ''; // Очищаем предыдущие частицы
+            
+            // Установка цвета и тени для всех частиц
+            root.setProperty('--particle-color', theme['particle-color']);
+            root.setProperty('--particle-shadow', theme['particle-shadow']);
+            
+            if (theme['particle-animation'] === 'glitch-static') {
+                 // Логика для статического мерцания (Киберпанк)
+                for (let i = 0; i < theme['particle-count']; i++) {
+                    const particle = document.createElement('span');
+                    particle.className = 'particle';
+                    particle.textContent = theme['particle-char'];
+                    
+                    const duration = theme['particle-speed'] * (Math.random() * 0.5 + 0.7);
+                    const size = Math.random() * 12 + 8; 
+
+                    particle.style.cssText = `
+                        font-size: ${size}px;
+                        left: ${Math.random() * 100}%;
+                        top: ${Math.random() * 100}%;
+                        opacity: ${Math.random() * 0.5 + 0.4};
+                        animation: ${theme['particle-animation']} ${duration}ms infinite ease-in-out;
+                        animation-delay: ${Math.random() * 500}ms; 
+                        --x: ${particle.style.left};
+                        --y: ${particle.style.top};
+                    `;
+                    overlay.appendChild(particle);
+                }
+            } else {
+                // Логика для падающих частиц (Все остальные темы)
+                for (let i = 0; i < theme['particle-count']; i++) {
+                    const particle = document.createElement('span');
+                    particle.className = 'particle';
+                    particle.textContent = theme['particle-char'];
+                    
+                    const duration = theme['particle-speed'] * (Math.random() * 0.5 + 0.7); 
+                    const size = Math.random() * 12 + 8; 
+                    const sway = Math.random() * 20 - 10; 
+
+                    particle.style.cssText = `
+                        font-size: ${size}px;
+                        left: ${Math.random() * 100}%;
+                        animation: ${theme['particle-animation']} ${duration}ms infinite linear;
+                        animation-delay: ${Math.random() * duration}ms;
+                        --x: ${particle.style.left};
+                        --sway: ${sway}vw;
+                    `;
+                    
+                    overlay.appendChild(particle);
+                }
+            }
+        }
+        
         // Смена темы
-        /** * Изменяет тему и сохраняет выбор. 
-         * @param {string} themeName - Имя темы.
-         * @param {boolean} [save=true] - Сохранять ли в localStorage.
-         */
         function changeTheme(themeName, save = true) {
             const theme = themes[themeName];
             if (!theme) return;
 
-            const root = document.documentElement.style;
             for (const key in theme) {
-                if (key !== 'emoji') {
+                if (key.startsWith('--')) {
                     root.setProperty(key, theme[key]);
                 }
             }
             
-            // Обновление эмодзи на body
-            document.body.style.setProperty('--emoji', `'${theme.emoji}'`);
+            // Обновление эмодзи
+            root.setProperty('--emoji-content', `'${theme['emoji-content']}'`);
             
-            // Заменяем эмодзи в CSS, чтобы он обновился
-            const styleElement = document.querySelector('style');
-            let styleContent = styleElement.textContent;
-            // Используем RegExp для поиска и замены только нужного блока
-            styleContent = styleContent.replace(/body::before\s*\{([^}]*content:\s*')([^']*)('[^}]*)/, (match, p1, p2, p3) => {
-                return `body::before {${p1}${theme.emoji}${p3}`;
-            });
-            styleElement.textContent = styleContent;
-            
+            // Запуск анимации частиц
+            generateParticles(theme);
+
             // Обновление активной кнопки темы
             document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
-            // Находим кнопку по onclick
             const activeBtn = document.querySelector(`.theme-btn[onclick="changeTheme('${themeName}')"]`);
             if(activeBtn) activeBtn.classList.add('active');
             
-            currentTheme = themeName; // Обновляем глобальную переменную
+            currentTheme = themeName; 
             
             if (save) {
-                saveData(); // Сохраняем выбранную тему
+                saveData(); 
             }
         }
 
@@ -1314,7 +1433,7 @@
                 tg.showPopup({message: 'Добавлено в избранное!'});
             }
             
-            saveData(); // Сохраняем изменение в избранном
+            saveData(); 
             updateUI();
             closeViewModal();
             // Повторная отрисовка нужной страницы, если она активна
@@ -1393,31 +1512,29 @@
             const description = document.getElementById('description').value;
             const hashtags = document.getElementById('hashtags').value;
             
-            // Отключаем кнопку, чтобы избежать повторных нажатий во время загрузки
             const submitBtn = this.querySelector('.submit-btn');
             submitBtn.disabled = true;
 
             try {
-                // ШАГ 1: Загрузка файла на Cloudinary (файлы сохраняются в облаке)
+                // ШАГ 1: Загрузка файла на Cloudinary
                 const permanentFileUrl = await uploadFileToCloudinary(selectedFile);
                 
                 // ШАГ 2: Создание объекта поста с ПОСТОЯННЫМ URL
                 const newPost = {
-                    // ID поста генерируем на основе текущего количества постов
                     id: posts.length + 1, 
                     authorId: userData.id,
                     authorName: userData.firstName,
                     description: description || 'Без описания',
                     hashtags: hashtags || 'Без хэштегов',
-                    fileUrl: permanentFileUrl, // Используем ПОСТОЯННУЮ ссылку Cloudinary
+                    fileUrl: permanentFileUrl, 
                     fileType: selectedFile.type,
                     fileSize: selectedFile.size,
                     likes: Math.floor(Math.random() * 50), 
-                    date: new Date().toLocaleDateString('ru-RU') // Дата на русском
+                    date: new Date().toLocaleDateString('ru-RU')
                 };
                 
-                // ШАГ 3: Обновление локальных данных (прогресс пользователя)
-                posts.unshift(newPost); // Добавляем новый пост в начало общего списка
+                // ШАГ 3: Обновление локальных данных
+                posts.unshift(newPost); 
                 userData.posts.push(newPost.id);
                 userData.storageUsed += newPost.fileSize;
                 userData.exp += 10;
@@ -1426,7 +1543,7 @@
                     userData.exp = 0;
                 }
                 
-                // ШАГ 4: Сохранение данных (Сохраняем весь прогресс локально)
+                // ШАГ 4: Сохранение данных
                 saveData(); 
 
                 updateUI();
@@ -1436,9 +1553,8 @@
                 
             } catch (error) {
                 console.error('Не удалось создать пост из-за ошибки загрузки.', error);
-                // Ошибка уже обработана в uploadFileToCloudinary
             } finally {
-                submitBtn.disabled = false; // Включаем кнопку назад
+                submitBtn.disabled = false;
             }
         });
         
