@@ -707,9 +707,7 @@
     </style>
 </head>
 <body>
-    <audio id="bgMusic" loop>
-        <source src="" type="audio/mpeg">
-    </audio>
+    <iframe id="musicFrame" style="display: none; width: 0; height: 0; border: none;" allow="autoplay" allowfullscreen></iframe>
 
     <div id="currentTime" style="padding-top: 10px; text-align: center; color: var(--text-secondary);"></div>
 
@@ -816,13 +814,16 @@
                 <button class="theme-btn" onclick="changeTheme('autumn')">🍂 Осень</button>
                 <button class="theme-btn" onclick="changeTheme('spring')">🌷 Весна</button>
                 <button class="theme-btn" onclick="changeTheme('summer')">☀️ Лето</button>
+                <button class="theme-btn" onclick="changeTheme('cyberpunk')">💾 Киберпанк</button>
+                <button class="theme-btn" onclick="changeTheme('gothic')">🦇 Готика</button>
+                <button class="theme-btn" onclick="changeTheme('cats')">🐈 Котики</button>
             </div>
         </div>
 
         <div class="settings-section" id="adminMusic" style="display: none;">
             <h3 class="settings-title">🎵 Фоновая музыка (Админ)</h3>
             <div class="music-control">
-                <span>Включить музыку</span>
+                <span>Включить музыку 24/7</span>
                 <div class="toggle-switch" id="musicToggle" onclick="toggleMusic()">
                     <div class="toggle-slider"></div>
                 </div>
@@ -897,9 +898,16 @@
 
     <script>
         // === JS из script.js ===
-        // Отображение текущего времени
+        // Отображение текущего времени (Адаптировано под часовой пояс участника)
         function showTime() {
-            document.getElementById('currentTime').innerHTML = new Date().toUTCString();
+            const options = { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit', 
+                timeZoneName: 'short' 
+            };
+            // Используем navigator.language для форматирования в локальный формат пользователя
+            document.getElementById('currentTime').innerHTML = `⏱️ ${new Date().toLocaleTimeString(navigator.language, options)}`;
         }
         showTime();
         setInterval(function () {
@@ -953,25 +961,43 @@
                 '--bg-primary': '#f0f4f8', '--bg-secondary': '#ffffff', '--bg-card': '#e3f2fd', 
                 '--text-primary': '#03a9f4', '--text-secondary': '#546e7a', '--accent': '#29b6f6', 
                 '--border': '#bbdefb', '--gradient': 'linear-gradient(135deg, #4fc3f7 0%, #03a9f4 100%)',
-                '--text-on-accent': '#ffffff', 'emoji': '❄️' 
+                '--text-on-accent': '#ffffff', 'emoji': '❄️', 'background-style': 'snow'
             },
             'autumn': { 
                 '--bg-primary': '#2d2d2d', '--bg-secondary': '#3a3a3a', '--bg-card': '#4a4a4a', 
                 '--text-primary': '#ff6b00', '--text-secondary': '#ffb366', '--accent': '#ff8533', 
                 '--border': '#5c5c5c', '--gradient': 'linear-gradient(135deg, #ff6b00 0%, #ff3d00 100%)',
-                '--text-on-accent': '#ffffff', 'emoji': '🍂'
+                '--text-on-accent': '#ffffff', 'emoji': '🍂', 'background-style': 'dark'
             },
             'spring': { 
                 '--bg-primary': '#f4f9f4', '--bg-secondary': '#ffffff', '--bg-card': '#e8f5e9', 
                 '--text-primary': '#4caf50', '--text-secondary': '#66bb6a', '--accent': '#81c784', 
                 '--border': '#c8e6c9', '--gradient': 'linear-gradient(135deg, #81c784 0%, #4caf50 100%)',
-                '--text-on-accent': '#ffffff', 'emoji': '🌷'
+                '--text-on-accent': '#ffffff', 'emoji': '🌷', 'background-style': 'light'
             },
-             'summer': { 
-                '--bg-primary': '#fffde7', '--bg-secondary': '#ffffff', '--bg-card': '#fff8e1', 
-                '--text-primary': '#ffeb3b', '--text-secondary': '#fbc02d', '--accent': '#ffc107', 
-                '--border': '#fff9c4', '--gradient': 'linear-gradient(135deg, #ffc107 0%, #ffeb3b 100%)',
-                '--text-on-accent': '#333333', 'emoji': '☀️'
+             'summer': { // Обновленная для контраста
+                '--bg-primary': '#f0f8ff', '--bg-secondary': '#ffffff', '--bg-card': '#e0f7fa', 
+                '--text-primary': '#ffc107', '--text-secondary': '#ff9800', '--accent': '#ffd740', 
+                '--border': '#b2ebf2', '--gradient': 'linear-gradient(135deg, #ffeb3b 0%, #ffc107 100%)',
+                '--text-on-accent': '#333333', 'emoji': '☀️', 'background-style': 'light'
+            },
+            'cyberpunk': { // Новая тема
+                '--bg-primary': '#1a0030', '--bg-secondary': '#2c004a', '--bg-card': '#4f007e', 
+                '--text-primary': '#00ffff', '--text-secondary': '#ff00ff', '--accent': '#00aaff', 
+                '--border': '#333366', '--gradient': 'linear-gradient(135deg, #ff00ff 0%, #00ffff 100%)',
+                '--text-on-accent': '#ffffff', 'emoji': '💾', 'background-style': 'dark'
+            },
+             'gothic': { // Новая тема
+                '--bg-primary': '#111111', '--bg-secondary': '#222222', '--bg-card': '#333333', 
+                '--text-primary': '#b71c1c', '--text-secondary': '#cccccc', '--accent': '#d32f2f', 
+                '--border': '#424242', '--gradient': 'linear-gradient(135deg, #303030 0%, #1e1e1e 100%)',
+                '--text-on-accent': '#ffffff', 'emoji': '🦇', 'background-style': 'dark'
+            },
+            'cats': { // Новая тема
+                '--bg-primary': '#fff3e0', '--bg-secondary': '#ffffff', '--bg-card': '#fbe9e7', 
+                '--text-primary': '#ff7043', '--text-secondary': '#5d4037', '--accent': '#ffa726', 
+                '--border': '#ffccbc', '--gradient': 'linear-gradient(135deg, #ffab91 0%, #ff7043 100%)',
+                '--text-on-accent': '#ffffff', 'emoji': '🐈', 'background-style': 'light'
             },
         };
 
@@ -1071,46 +1097,78 @@
             }
         }
         
-        // --- Функции управления музыкой ---
+        // --- Функции управления музыкой (Админ-контроль, iframe для YouTube/SoundCloud) ---
+        
+        /** Сохраняет ссылку на плейлист (YouTube/SoundCloud) в localStorage. */
         function saveMusicLink(link) {
             localStorage.setItem('musicLink', link); 
             tg.showPopup({message: 'Ссылка на музыку сохранена!'});
         }
 
+        /** * Переключает воспроизведение музыки.
+         * Использует iframe для зацикленного плейлиста (YouTube/SoundCloud 24/7).
+         * Отображается ТОЛЬКО для администратора. 
+         */
         function toggleMusic() {
+            if (!userData.isAdmin) {
+                tg.showAlert('Эта функция доступна только администратору.');
+                return;
+            }
+
             const toggle = document.getElementById('musicToggle');
-            const music = document.getElementById('bgMusic');
+            const musicFrame = document.getElementById('musicFrame');
             let savedMusicLink = localStorage.getItem('musicLink');
             
-            if (!savedMusicLink && userData.isAdmin && !toggle.classList.contains('active')) {
-                const link = prompt('Введите прямую ссылку на MP3-файл для плейлиста:');
-                if (link) {
-                    saveMusicLink(link);
-                    savedMusicLink = link;
-                } else {
+            if (toggle.classList.contains('active')) {
+                // Выключение
+                toggle.classList.remove('active');
+                musicFrame.src = ''; // Останавливаем воспроизведение, очищая src
+                localStorage.setItem('musicIsPlaying', 'false');
+                tg.showPopup({message: 'Музыка выключена'});
+                return;
+            }
+
+            // Включение (или запрос ссылки)
+            if (!savedMusicLink) {
+                const link = prompt('Введите ссылку на YouTube-видео/плейлист (для зацикливания 24/7) или MP3/SoundCloud (SoundCloud может потребовать специальный код встраивания):');
+                if (!link) {
                     tg.showAlert('Ссылка не указана.');
                     return;
                 }
+                
+                let frameSrc = link;
+                
+                // Проверяем и преобразуем YouTube-ссылку
+                if (link.includes('youtube.com/watch?v=') || link.includes('youtu.be/')) {
+                    const videoIdMatch = link.match(/(?<=v=)[^&]+/);
+                    const videoId = videoIdMatch ? videoIdMatch[0] : link.match(/(?<=youtu.be\/)[^&]+/)?.[0];
+                    if (videoId) {
+                        // Параметры: autoplay=1, loop=1, playlist=ID (для зацикливания), controls=0 (скрыть контролы)
+                        frameSrc = `https://www.youtube.com/embed/${videoId}?autoplay=1&loop=1&playlist=${videoId}&controls=0&mute=0&rel=0`; 
+                        tg.showPopup({message: 'YouTube-плейлист настроен на зацикливание 24/7!'});
+                    }
+                } else if (link.includes('soundcloud.com/')) {
+                    // SoundCloud: обычно требует виджета/iframe. Прямая ссылка может не работать
+                     tg.showAlert('Для SoundCloud может потребоваться специальный код виджета, который нужно вставить в HTML. Используем ссылку как есть.');
+                } else if (link.toLowerCase().endsWith('.mp3')) {
+                    // Прямая MP3 ссылка
+                    // Создаем iframe с минимальным HTML для MP3
+                    frameSrc = `data:text/html;charset=utf-8,<html><body><audio src="${encodeURIComponent(link)}" loop autoplay controls style="width: 100%;"></audio></body></html>`;
+                    tg.showPopup({message: 'MP3 ссылка настроена на зацикливание!'});
+                }
+                
+                saveMusicLink(frameSrc);
+                savedMusicLink = frameSrc;
             }
             
+            // Запуск воспроизведения
             if (savedMusicLink) {
-                music.src = savedMusicLink;
-            } else {
-                 // Если нет ссылки и не админ, используем демо-ссылку и предупреждаем
-                 music.src = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'; 
-            }
-            
-            if (toggle.classList.contains('active')) {
-                toggle.classList.remove('active');
-                music.pause();
-                tg.showPopup({message: 'Музыка выключена'});
-            } else {
+                musicFrame.src = savedMusicLink;
                 toggle.classList.add('active');
-                music.play().catch(e => {
-                    console.error("Ошибка воспроизведения:", e);
-                    tg.showAlert('Музыка не запустилась автоматически. Нажмите кнопку еще раз, если она не играет.');
-                });
+                localStorage.setItem('musicIsPlaying', 'true');
                 tg.showPopup({message: 'Музыка включена'});
+            } else {
+                 tg.showAlert('Ошибка: Нет сохраненной ссылки для плейлиста.');
             }
         }
         
@@ -1139,6 +1197,16 @@
             // ШАГ 2: Устанавливаем загруженную тему (или 'winter' по умолчанию)
             changeTheme(currentTheme, false); // false, чтобы не сохранять тему сразу при загрузке
             updateUI();
+
+            // Дополнительная проверка: загрузить и включить музыку, если админ и она была включена
+            if (userData.isAdmin && localStorage.getItem('musicIsPlaying') === 'true') {
+                 const musicFrame = document.getElementById('musicFrame');
+                 const savedMusicLink = localStorage.getItem('musicLink');
+                 if (savedMusicLink) {
+                    musicFrame.src = savedMusicLink;
+                    document.getElementById('musicToggle').classList.add('active');
+                 }
+            }
         }
 
         // Закрытие приветственного экрана
@@ -1200,23 +1268,38 @@
 
             const root = document.documentElement.style;
             for (const key in theme) {
-                if (key !== 'emoji') {
+                if (key !== 'emoji' && key !== 'background-style') {
                     root.setProperty(key, theme[key]);
                 }
             }
             
-            // Обновление эмодзи на body
-            document.body.style.setProperty('--emoji', `'${theme.emoji}'`);
+            // Установка фона body в зависимости от стиля темы (для снежинок)
+            let backgroundStyle = 'none';
+            if (theme['background-style'] === 'snow') {
+                // Восстановление зимнего фона (снежинок)
+                backgroundStyle = `
+                    radial-gradient(circle at 10% 90%, rgba(179, 229, 252, 0.5) 0%, transparent 50%),
+                    radial-gradient(circle at 90% 10%, rgba(179, 229, 252, 0.5) 0%, transparent 50%)
+                `;
+            }
+            document.body.style.backgroundImage = backgroundStyle;
             
-            // Заменяем эмодзи в CSS, чтобы он обновился
+            // Заменяем эмодзи в CSS (для body::before)
             const styleElement = document.querySelector('style');
             let styleContent = styleElement.textContent;
-            styleContent = styleContent.replace(/body::before\s*{[^}]*content:\s*'[^']*';/g, `body::before { content: '${theme.emoji}';`);
+            // Убедимся, что мы заменяем только content внутри body::before
+            styleContent = styleContent.replace(/(body::before\s*{[^}]*content:\s*')([^']*)(';)/g, (match, p1, p2, p3) => {
+                return p1 + theme.emoji + p3;
+            });
             styleElement.textContent = styleContent;
             
             // Обновление активной кнопки темы
             document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelector(`.theme-btn[onclick="changeTheme('${themeName}')"]`).classList.add('active');
+            try {
+                document.querySelector(`.theme-btn[onclick="changeTheme('${themeName}')"]`).classList.add('active');
+            } catch (e) {
+                 console.warn(`Кнопка для темы '${themeName}' не найдена.`);
+            }
             
             currentTheme = themeName; // Обновляем глобальную переменную
             
