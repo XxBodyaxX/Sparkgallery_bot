@@ -1,25 +1,25 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Галерея Pro - Зима 2025</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        /* === Зимова Тема (За замовчуванням) === */
+        /* === Зимняя Тема (По умолчанию) === */
         :root {
-            --bg-primary: #f0f4f8; /* Світло-сіро-блакитний (сніговий) */
-            --bg-secondary: #ffffff; /* Чистий білий */
-            --bg-card: #e3f2fd; /* Дуже світло-блакитний */
-            --text-primary: #03a9f4; /* Яскраво-блакитний (лід/небо) */
-            --text-secondary: #546e7a; /* Сіро-синій */
-            --accent: #29b6f6; /* Середньо-блакитний */
-            --border: #bbdefb; /* Світло-блакитний */
-            --gradient: linear-gradient(135deg, #4fc3f7 0%, #03a9f4 100%); /* Блакитний градієнт */
+            --bg-primary: #f0f4f8; /* Светло-серо-голубой (снежный) */
+            --bg-secondary: #ffffff; /* Чистый белый */
+            --bg-card: #e3f2fd; /* Очень светло-голубой */
+            --text-primary: #03a9f4; /* Ярко-голубой (лед/небо) */
+            --text-secondary: #546e7a; /* Серо-синий */
+            --accent: #29b6f6; /* Средне-голубой */
+            --border: #bbdefb; /* Светло-голубой */
+            --gradient: linear-gradient(135deg, #4fc3f7 0%, #03a9f4 100%); /* Голубой градиент */
             --text-on-accent: #ffffff;
         }
 
-        /* === Базові стилі === */
+        /* === Базовые стили === */
         * {
             margin: 0;
             padding: 0;
@@ -29,17 +29,17 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background: var(--bg-primary);
-            color: #333; /* Темний текст на світлому фоні */
+            color: #333; /* Темный текст на светлом фоне */
             min-height: 100vh;
             padding-bottom: 70px;
-            /* Зимовий фон: ледь помітні сніжинки */
+            /* Зимний фон: едва заметные снежинки */
             background-image: 
                 radial-gradient(circle at 10% 90%, rgba(179, 229, 252, 0.5) 0%, transparent 50%),
                 radial-gradient(circle at 90% 10%, rgba(179, 229, 252, 0.5) 0%, transparent 50%);
         }
 
         body::before {
-            content: '❄️'; /* Зимовий емодзі */
+            content: '❄️'; /* Зимний эмодзи */
             position: fixed;
             top: 10px;
             right: 10px;
@@ -59,7 +59,7 @@
             font-size: 24px;
         }
 
-        /* === Привітальний екран === */
+        /* === Приветственный экран === */
         .welcome-screen {
             position: fixed;
             top: 0;
@@ -130,7 +130,7 @@
         }
 
         .welcome-rules li::before {
-            content: '☃️'; /* Зимовий емодзі */
+            content: '☃️'; /* Зимний эмодзи */
             position: absolute;
             left: 0;
         }
@@ -153,7 +153,7 @@
             transform: scale(0.95);
         }
 
-        /* === Сховище (Storage) === */
+        /* === Хранилище (Storage) === */
         .storage-bar {
             background: var(--bg-secondary);
             padding: 12px 20px;
@@ -183,7 +183,7 @@
             transition: width 0.3s;
         }
 
-        /* === Навігація (Navbar) === */
+        /* === Навигация (Navbar) === */
         .navbar {
             position: fixed;
             bottom: 0;
@@ -235,7 +235,7 @@
             display: block;
         }
 
-        /* === Профіль === */
+        /* === Профиль === */
         .profile-header {
             background: var(--gradient);
             padding: 40px 20px 30px;
@@ -341,7 +341,7 @@
         }
 
 
-        /* === Галерея та Пости === */
+        /* === Галерея и Посты === */
         .gallery-controls {
             display: flex;
             gap: 10px;
@@ -404,7 +404,7 @@
 
         .post-media {
             width: 100%;
-            height: 150px; /* Зменшив висоту для компактності */
+            height: 150px; /* Уменьшил высоту для компактности */
             object-fit: cover;
             background: var(--bg-card);
         }
@@ -463,7 +463,7 @@
             font-weight: 500;
         }
 
-        /* === Модальні вікна (Modal) === */
+        /* === Модальные окна (Modal) === */
         .modal {
             display: none;
             position: fixed;
@@ -606,7 +606,7 @@
             cursor: not-allowed;
         }
 
-        /* === Налаштування === */
+        /* === Настройки === */
         .settings-section {
             background: var(--bg-secondary);
             border-radius: 15px;
@@ -685,7 +685,7 @@
             transform: translateX(24px);
         }
 
-        /* === Пустий стан (Empty State) === */
+        /* === Пустое состояние (Empty State) === */
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -697,7 +697,7 @@
             margin-bottom: 15px;
         }
         
-        /* Стиль для відображення поточного часу */
+        /* Стиль для отображения текущего времени */
         #currentTime {
             font-size: 14px;
             color: var(--text-secondary);
@@ -717,27 +717,27 @@
         <div class="welcome-logo">❄️</div>
         <h1 class="welcome-title">Галерея Pro</h1>
         <p style="color: var(--text-secondary); text-align: center; margin-bottom: 20px;">
-            Зимове видання 2025
+            Зимнее издание 2025
         </p>
         
         <div class="welcome-rules">
-            <h3>📋 Правила спільноти</h3>
+            <h3>📋 Правила сообщества</h3>
             <ul>
-                <li>Заборонена публікація контенту 18+</li>
-                <li>Купальники дозволені з цензурою</li>
-                <li>Будьте поважні до інших</li>
-                <li>2 порушення = бан акаунту</li>
-                <li>За спам - попередження</li>
+                <li>Запрещена публикация контента 18+</li>
+                <li>Купальники разрешены с цензурой</li>
+                <li>Будьте уважительны к другим</li>
+                <li>2 нарушения = бан аккаунта</li>
+                <li>За спам - предупреждение</li>
             </ul>
         </div>
 
-        <button class="welcome-btn" onclick="closeWelcome()">Почати</button>
+        <button class="welcome-btn" onclick="closeWelcome()">Начать</button>
     </div>
 
     <div class="page active" id="profilePage">
         <div class="storage-bar">
             <div class="storage-info">
-                <span>Сховище</span>
+                <span>Хранилище</span>
                 <span id="storageText">0 МБ / 500 МБ</span>
             </div>
             <div class="storage-progress">
@@ -747,13 +747,13 @@
 
         <div class="profile-header">
             <div class="profile-avatar" id="profileAvatar">?</div>
-            <div class="profile-name" id="profileName">Завантаження...</div>
+            <div class="profile-name" id="profileName">Загрузка...</div>
             <div class="profile-username" id="profileUsername">@username</div>
-            <div class="profile-rank" id="profileRank">☃️ Новачок</div>
+            <div class="profile-rank" id="profileRank">☃️ Новичок</div>
             
             <div class="profile-level">
                 <div class="level-info">
-                    <span>Рівень <span id="userLevel">1</span></span>
+                    <span>Уровень <span id="userLevel">1</span></span>
                     <span><span id="currentExp">0</span>/<span id="neededExp">100</span> XP</span>
                 </div>
                 <div class="level-bar">
@@ -765,15 +765,15 @@
         <div class="profile-stats">
             <div class="stat-card">
                 <div class="stat-value" id="postsCount">0</div>
-                <div class="stat-label">Постів</div>
+                <div class="stat-label">Постов</div>
             </div>
             <div class="stat-card">
                 <div class="stat-value" id="likesCount">0</div>
-                <div class="stat-label">Лайків</div>
+                <div class="stat-label">Лайков</div>
             </div>
             <div class="stat-card">
                 <div class="stat-value" id="favoritesCount">0</div>
-                <div class="stat-label">Обране</div>
+                <div class="stat-label">Избранное</div>
             </div>
         </div>
     </div>
@@ -782,10 +782,10 @@
         <h2 class="title">🖼️ Галерея</h2>
         <div class="gallery-controls">
             <select class="filter-select" id="dateFilter" onchange="filterPosts()">
-                <option value="all">Усі пости</option>
-                <option value="today">Сьогодні</option>
-                <option value="week">Цей тиждень</option>
-                <option value="month">Цей місяць</option>
+                <option value="all">Все посты</option>
+                <option value="today">Сегодня</option>
+                <option value="week">Эта неделя</option>
+                <option value="month">Этот месяц</option>
             </select>
             <button class="add-post-btn" onclick="openCreateModal()">+</button>
         </div>
@@ -793,36 +793,36 @@
         <div class="posts-grid" id="postsGrid">
             <div class="empty-state">
                 <div class="empty-state-icon">⛷️</div>
-                <div class="empty-state-text">Поки що немає публікацій. Додайте свій перший пост!</div>
+                <div class="empty-state-text">Пока нет публикаций. Добавьте свой первый пост!</div>
             </div>
         </div>
     </div>
 
     <div class="page" id="favoritesPage">
-        <h2 class="title">⭐ Обране</h2>
+        <h2 class="title">⭐ Избранное</h2>
         <div class="posts-grid" id="favoritesGrid">
             <div class="empty-state">
                 <div class="empty-state-icon">⭐</div>
-                <div class="empty-state-text">Немає обраних постів</div>
+                <div class="empty-state-text">Нет избранных постов</div>
             </div>
         </div>
     </div>
 
     <div class="page" id="settingsPage">
         <div class="settings-section">
-            <h3 class="settings-title">🎨 Теми оформлення</h3>
+            <h3 class="settings-title">🎨 Темы оформления</h3>
             <div class="theme-options">
                 <button class="theme-btn active" onclick="changeTheme('winter')">❄️ Зима</button>
-                <button class="theme-btn" onclick="changeTheme('autumn')">🍂 Осінь</button>
+                <button class="theme-btn" onclick="changeTheme('autumn')">🍂 Осень</button>
                 <button class="theme-btn" onclick="changeTheme('spring')">🌷 Весна</button>
-                <button class="theme-btn" onclick="changeTheme('summer')">☀️ Літо</button>
+                <button class="theme-btn" onclick="changeTheme('summer')">☀️ Лето</button>
             </div>
         </div>
 
         <div class="settings-section" id="adminMusic" style="display: none;">
-            <h3 class="settings-title">🎵 Фонова музика (Адмін)</h3>
+            <h3 class="settings-title">🎵 Фоновая музыка (Админ)</h3>
             <div class="music-control">
-                <span>Увімкнути музику</span>
+                <span>Включить музыку</span>
                 <div class="toggle-switch" id="musicToggle" onclick="toggleMusic()">
                     <div class="toggle-slider"></div>
                 </div>
@@ -830,24 +830,24 @@
         </div>
         
         <div class="settings-section">
-            <h3 class="settings-title">⚙️ Додатково</h3>
-            <button class="submit-btn" style="background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);" onclick="alert('Функція видалення не реалізована в демо')">Видалити акаунт</button>
+            <h3 class="settings-title">⚙️ Дополнительно</h3>
+            <button class="submit-btn" style="background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);" onclick="alert('Функция удаления не реализована в демо')">Удалить аккаунт</button>
         </div>
     </div>
 
     <div class="modal" id="createModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title">Нова публікація</h2>
+                <h2 class="modal-title">Новая публикация</h2>
                 <button class="close-btn" onclick="closeCreateModal()">×</button>
             </div>
 
             <form id="createPostForm">
                 <div class="form-group">
-                    <label class="form-label">Фото або відео (до 100 МБ)</label>
+                    <label class="form-label">Фото или видео (до 100 МБ)</label>
                     <div class="file-input-wrapper" onclick="document.getElementById('fileInput').click()">
                         <div style="font-size: 24px; margin-bottom: 10px;">📁</div>
-                        <div style="color: var(--text-secondary);">Виберіть файл</div>
+                        <div style="color: var(--text-secondary);">Выберите файл</div>
                         <input type="file" id="fileInput" class="file-input" accept="image/*,video/*">
                         <div class="file-info" id="fileInfo" style="margin-top: 10px; color: var(--text-primary);"></div>
                     </div>
@@ -855,19 +855,19 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Опис</label>
-                    <textarea class="form-textarea" id="description" placeholder="Розкажіть про вашу публікацію..."></textarea>
+                    <label class="form-label">Описание</label>
+                    <textarea class="form-textarea" id="description" placeholder="Расскажите о вашей публикации..."></textarea>
                     <div class="char-counter">
-                        <span id="charCount">0</span> / 150 слів
+                        <span id="charCount">0</span> / 150 слов
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Хештеги</label>
-                    <input type="text" class="form-input" id="hashtags" placeholder="#зима #гори #лижі">
+                    <label class="form-label">Хэштеги</label>
+                    <input type="text" class="form-input" id="hashtags" placeholder="#зима #горы #лыжи">
                 </div>
 
-                <button type="submit" class="submit-btn">Опублікувати</button>
+                <button type="submit" class="submit-btn">Опубликовать</button>
             </form>
         </div>
     </div>
@@ -879,7 +879,7 @@
     <div class="navbar">
         <div class="nav-item active" data-page="profile" onclick="switchPage('profile')">
             <div class="nav-icon">👤</div>
-            <div class="nav-label">Профіль</div>
+            <div class="nav-label">Профиль</div>
         </div>
         <div class="nav-item" data-page="gallery" onclick="switchPage('gallery')">
             <div class="nav-icon">🖼️</div>
@@ -887,16 +887,17 @@
         </div>
         <div class="nav-item" data-page="favorites" onclick="switchPage('favorites')">
             <div class="nav-icon">⭐</div>
-            <div class="nav-label">Обране</div>
+            <div class="nav-label">Избранное</div>
         </div>
         <div class="nav-item" data-page="settings" onclick="switchPage('settings')">
             <div class="nav-icon">⚙️</div>
-            <div class="nav-label">Налаштування</div>
+            <div class="nav-label">Настройки</div>
         </div>
     </div>
 
     <script>
-        // === JS з script.js ===
+        // === JS из script.js ===
+        // Отображение текущего времени
         function showTime() {
             document.getElementById('currentTime').innerHTML = new Date().toUTCString();
         }
@@ -905,21 +906,27 @@
             showTime();
         }, 1000);
         
-        // === JS з index (3).html (основна логіка) ===
+        // === ОСНОВНАЯ ЛОГИКА ===
         const tg = window.Telegram.WebApp;
         tg.ready();
         tg.expand();
 
         const MAX_FILE_SIZE = 100 * 1024 * 1024;
         const MAX_STORAGE = 500 * 1024 * 1024;
-        const ADMIN_ID = '6918933194'; // Ваш ID администратора
+        const ADMIN_ID = '6918933194'; // ID администратора
 
         // =========================================================
-        // !!! ВАШИ ДАННЫЕ ИЗ CLOUDINARY ВСТАВЛЕНЫ !!!
+        // !!! ДАННЫЕ CLOUDINARY !!!
         // =========================================================
         const CLOUDINARY_CLOUD_NAME = 'ddjfgk8a0'; 
         const CLOUDINARY_UPLOAD_PRESET = 'Sparkgallery'; 
         // =========================================================
+        
+        // --- КЛЮЧИ ДЛЯ ЛОКАЛЬНОГО ХРАНИЛИЩА (localStorage) ---
+        // Эти ключи используются для сохранения ПРОГРЕССА пользователя (уровень, XP, избранное, тема)
+        const STORAGE_KEY_USER_DATA = 'galleryUserData';
+        const STORAGE_KEY_POSTS = 'galleryPosts';
+        const STORAGE_KEY_THEME = 'galleryTheme';
 
         let userData = {
             id: null,
@@ -928,18 +935,19 @@
             isAdmin: false,
             level: 1,
             exp: 0,
-            posts: [],
+            posts: [], // Список ID постов пользователя
             likes: 0,
-            favorites: [],
+            favorites: [], // Список ID избранных постов
             storageUsed: 0,
             warnings: 0,
             banned: false
         };
 
-        let posts = [];
+        let posts = []; // Список всех постов галереи
         let selectedFile = null;
+        let currentTheme = 'winter'; // Переменная для отслеживания текущей темы
 
-        // Теми (для функції changeTheme)
+        // Темы (для функции changeTheme)
         const themes = {
             'winter': { 
                 '--bg-primary': '#f0f4f8', '--bg-secondary': '#ffffff', '--bg-card': '#e3f2fd', 
@@ -967,8 +975,68 @@
             },
         };
 
+        // --- ФУНКЦИИ СОХРАНЕНИЯ/ЗАГРУЗКИ ДАННЫХ (LOCAL STORAGE) ---
+        
+        /** Сохраняет данные пользователя (уровень, XP, избранное, тема) и список постов в localStorage. 
+         * Это обеспечивает сохранение прогресса пользователя при закрытии Web App. */
+        function saveData() {
+            try {
+                // userData содержит только те данные, которые нужно сохранять между сессиями
+                const dataToSave = {
+                    level: userData.level,
+                    exp: userData.exp,
+                    likes: userData.likes,
+                    favorites: userData.favorites,
+                    storageUsed: userData.storageUsed,
+                    posts: userData.posts // Список ID постов пользователя
+                };
+                localStorage.setItem(STORAGE_KEY_USER_DATA, JSON.stringify(dataToSave));
+                localStorage.setItem(STORAGE_KEY_POSTS, JSON.stringify(posts));
+                localStorage.setItem(STORAGE_KEY_THEME, currentTheme);
+                // console.log('Данные сохранены локально.'); // Отладочная информация
+            } catch (e) {
+                console.error('Ошибка сохранения данных в localStorage:', e);
+            }
+        }
 
-        // --- ФУНКЦИЯ ЗАГРУЗКИ НА CLOUDINARY ---
+        /** Загружает данные пользователя и посты из localStorage. */
+        function loadData() {
+            try {
+                const savedUserData = localStorage.getItem(STORAGE_KEY_USER_DATA);
+                const savedPosts = localStorage.getItem(STORAGE_KEY_POSTS);
+                const savedTheme = localStorage.getItem(STORAGE_KEY_THEME);
+
+                if (savedUserData) {
+                    const loadedData = JSON.parse(savedUserData);
+                    // Перезаписываем только изменяемые данные, сохраняя ID из Telegram
+                    userData.level = loadedData.level || 1;
+                    userData.exp = loadedData.exp || 0;
+                    userData.likes = loadedData.likes || 0;
+                    userData.favorites = loadedData.favorites || [];
+                    userData.storageUsed = loadedData.storageUsed || 0;
+                    userData.posts = loadedData.posts || [];
+                }
+
+                if (savedPosts) {
+                    posts = JSON.parse(savedPosts);
+                }
+                
+                if (savedTheme && themes[savedTheme]) {
+                    currentTheme = savedTheme;
+                } else {
+                    currentTheme = 'winter';
+                }
+                // console.log('Данные загружены локально.'); // Отладочная информация
+
+            } catch (e) {
+                console.error('Ошибка загрузки данных из localStorage:', e);
+                // В случае ошибки, используем дефолтные значения
+                posts = [];
+                currentTheme = 'winter';
+            }
+        }
+        
+        // --- ФУНКЦИЯ ЗАГРУЗКИ НА CLOUDINARY (сохраняет файлы в облаке) ---
         async function uploadFileToCloudinary(file) {
             const url = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/upload`;
             const formData = new FormData();
@@ -976,9 +1044,9 @@
             // Отправляем файл и имя пресета (для Unsigned Upload)
             formData.append('file', file);
             formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-            formData.append('tags', 'tma_gallery_post'); // Додатковий тег
+            formData.append('tags', 'tma_gallery_post'); // Дополнительный тег
 
-            tg.showPopup({message: 'Завантаження файлу... Будь ласка, зачекайте.'});
+            tg.showPopup({message: 'Загрузка файла... Пожалуйста, подождите.'});
             
             try {
                 const response = await fetch(url, {
@@ -987,26 +1055,26 @@
                 });
                 
                 if (!response.ok) {
-                    throw new Error(`Cloudinary повернув помилку: ${response.statusText}`);
+                    throw new Error(`Cloudinary вернул ошибку: ${response.statusText}`);
                 }
                 
                 const data = await response.json();
                 
-                // data.secure_url - це постійне HTTPS-посилання на ваш файл
-                tg.showPopup({message: 'Файл успішно завантажено на Cloudinary!'});
+                // data.secure_url - это ПОСТОЯННАЯ HTTPS-ссылка на ваш файл в облаке
+                tg.showPopup({message: 'Файл успешно загружен на Cloudinary!'});
                 return data.secure_url; 
                 
             } catch (error) {
-                console.error('Помилка завантаження в Cloudinary:', error);
-                tg.showAlert(`Помилка завантаження: ${error.message}. Перевірте Cloud Name та Preset.`);
+                console.error('Ошибка загрузки в Cloudinary:', error);
+                tg.showAlert(`Ошибка загрузки: ${error.message}. Проверьте Cloud Name и Preset.`);
                 throw error; 
             }
         }
         
-        // --- Функции управления музыкой (Обновленные) ---
+        // --- Функции управления музыкой ---
         function saveMusicLink(link) {
             localStorage.setItem('musicLink', link); 
-            tg.showPopup({message: 'Посилання на музику збережено!'});
+            tg.showPopup({message: 'Ссылка на музыку сохранена!'});
         }
 
         function toggleMusic() {
@@ -1015,12 +1083,12 @@
             let savedMusicLink = localStorage.getItem('musicLink');
             
             if (!savedMusicLink && userData.isAdmin && !toggle.classList.contains('active')) {
-                const link = prompt('Введіть пряме посилання на MP3-файл для плейлиста:');
+                const link = prompt('Введите прямую ссылку на MP3-файл для плейлиста:');
                 if (link) {
                     saveMusicLink(link);
                     savedMusicLink = link;
                 } else {
-                    tg.showAlert('Посилання не вказано.');
+                    tg.showAlert('Ссылка не указана.');
                     return;
                 }
             }
@@ -1035,23 +1103,26 @@
             if (toggle.classList.contains('active')) {
                 toggle.classList.remove('active');
                 music.pause();
-                tg.showPopup({message: 'Музику вимкнено'});
+                tg.showPopup({message: 'Музыка выключена'});
             } else {
                 toggle.classList.add('active');
                 music.play().catch(e => {
-                    console.error("Помилка відтворення:", e);
-                    tg.showAlert('Музика не запустилася автоматично. Натисніть кнопку ще раз, якщо вона не грає.');
+                    console.error("Ошибка воспроизведения:", e);
+                    tg.showAlert('Музыка не запустилась автоматически. Нажмите кнопку еще раз, если она не играет.');
                 });
-                tg.showPopup({message: 'Музику увімкнено'});
+                tg.showPopup({message: 'Музыка включена'});
             }
         }
         
-        // Ініціалізація
+        // Инициализация
         function init() {
+            // ШАГ 1: Загружаем все сохраненные данные (уровень, избранное, посты, тема)
+            loadData(); 
+
             const user = tg.initDataUnsafe.user;
             if (user) {
                 userData.id = user.id;
-                userData.firstName = user.first_name || 'Користувач';
+                userData.firstName = user.first_name || 'Пользователь';
                 userData.username = user.username ? `@${user.username}` : '@user';
                 // Проверяем ID на соответствие ADMIN_ID
                 userData.isAdmin = user.id.toString() === ADMIN_ID; 
@@ -1065,17 +1136,17 @@
                 }
             }
             
-            // Встановлення зимової теми за замовчуванням
-            changeTheme('winter');
+            // ШАГ 2: Устанавливаем загруженную тему (или 'winter' по умолчанию)
+            changeTheme(currentTheme, false); // false, чтобы не сохранять тему сразу при загрузке
             updateUI();
         }
 
-        // Закриття привітального екрану
+        // Закрытие приветственного экрана
         function closeWelcome() {
             document.getElementById('welcomeScreen').classList.add('hidden');
         }
 
-        // Перемикання сторінок (виправлено неповний код)
+        // Переключение страниц
         function switchPage(page) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -1088,7 +1159,7 @@
                 navItem.classList.add('active');
             }
 
-            // Додаткові дії при перемиканні
+            // Дополнительные действия при переключении
             if (page === 'gallery') {
                  filterPosts();
             } else if (page === 'favorites') {
@@ -1096,15 +1167,15 @@
             }
         }
 
-        // Оновлення інтерфейсу (профіль, сховище)
+        // Обновление интерфейса (профиль, хранилище)
         function updateUI() {
-            // Оновлення профілю (просто демо-текст)
+            // Обновление профиля 
             document.getElementById('userLevel').textContent = userData.level;
             document.getElementById('currentExp').textContent = userData.exp;
             document.getElementById('neededExp').textContent = userData.level * 100;
             document.getElementById('levelFill').style.width = `${(userData.exp / (userData.level * 100)) * 100}%`;
             
-            // Оновлення сховища
+            // Обновление хранилища
             const usedMB = (userData.storageUsed / 1024 / 1024).toFixed(2);
             const maxMB = (MAX_STORAGE / 1024 / 1024).toFixed(0);
             const percentage = (userData.storageUsed / MAX_STORAGE) * 100;
@@ -1112,14 +1183,18 @@
             document.getElementById('storageText').textContent = `${usedMB} МБ / ${maxMB} МБ`;
             document.getElementById('storageFill').style.width = `${percentage}%`;
             
-            // Оновлення статистики
+            // Обновление статистики
             document.getElementById('postsCount').textContent = userData.posts.length;
             document.getElementById('likesCount').textContent = userData.likes;
             document.getElementById('favoritesCount').textContent = userData.favorites.length;
         }
         
-        // Зміна теми
-        function changeTheme(themeName) {
+        // Смена темы
+        /** * Изменяет тему и сохраняет выбор. 
+         * @param {string} themeName - Имя темы.
+         * @param {boolean} [save=true] - Сохранять ли в localStorage.
+         */
+        function changeTheme(themeName, save = true) {
             const theme = themes[themeName];
             if (!theme) return;
 
@@ -1130,16 +1205,27 @@
                 }
             }
             
-            // Оновлення емодзі на body
+            // Обновление эмодзи на body
             document.body.style.setProperty('--emoji', `'${theme.emoji}'`);
-            document.body.querySelector('style').textContent = document.body.querySelector('style').textContent.replace(/content: '.*';/g, `content: '${theme.emoji}';`);
             
-            // Оновлення активної кнопки теми
+            // Заменяем эмодзи в CSS, чтобы он обновился
+            const styleElement = document.querySelector('style');
+            let styleContent = styleElement.textContent;
+            styleContent = styleContent.replace(/body::before\s*{[^}]*content:\s*'[^']*';/g, `body::before { content: '${theme.emoji}';`);
+            styleElement.textContent = styleContent;
+            
+            // Обновление активной кнопки темы
             document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelector(`.theme-btn[onclick="changeTheme('${themeName}')"]`).classList.add('active');
+            
+            currentTheme = themeName; // Обновляем глобальную переменную
+            
+            if (save) {
+                saveData(); // Сохраняем выбранную тему
+            }
         }
 
-        // Функції відкриття/закриття модальних вікон
+        // Функции открытия/закрытия модальных окон
         function openCreateModal() {
             document.getElementById('createModal').classList.add('active');
         }
@@ -1166,12 +1252,12 @@
                     ${post.fileType.startsWith('image') ? `<img src="${post.fileUrl}" style="width: 100%; border-radius: 10px;"/>` : `<video src="${post.fileUrl}" controls style="width: 100%; border-radius: 10px;"></video>`}
                 </div>
                 <p style="font-size: 16px; margin-bottom: 10px;">${post.description}</p>
-                <p style="font-size: 14px; color: var(--text-primary); margin-bottom: 15px;">Хештеги: ${post.hashtags}</p>
+                <p style="font-size: 14px; color: var(--text-primary); margin-bottom: 15px;">Хэштеги: ${post.hashtags}</p>
                 <div style="display: flex; justify-content: space-between; font-size: 12px; color: #999;">
                     <span>Автор: ${post.authorName}</span>
                     <span>${post.date}</span>
                 </div>
-                <button class="submit-btn" style="margin-top: 20px;" onclick="toggleFavorite(${postId})">${userData.favorites.includes(postId) ? '⭐ В обраному' : '⭐ Додати в обране'}</button>
+                <button class="submit-btn" style="margin-top: 20px;" onclick="toggleFavorite(${postId})">${userData.favorites.includes(postId) ? '⭐ В избранном' : '⭐ Добавить в избранное'}</button>
             `;
             
             document.getElementById('viewContent').innerHTML = content;
@@ -1182,27 +1268,27 @@
              document.getElementById('viewModal').classList.remove('active');
         }
         
-        // Перемикання обраного
+        // Переключение избранного
         function toggleFavorite(postId) {
             const index = userData.favorites.indexOf(postId);
             if (index > -1) {
                 userData.favorites.splice(index, 1);
-                tg.showPopup({message: 'Видалено з обраного!'});
+                tg.showPopup({message: 'Удалено из избранного!'});
             } else {
                 userData.favorites.push(postId);
-                tg.showPopup({message: 'Додано в обране!'});
+                tg.showPopup({message: 'Добавлено в избранное!'});
             }
+            
+            saveData(); // Сохраняем изменение в избранном
             updateUI();
             closeViewModal();
-            // Повторне відкриття модалки, щоб оновити кнопку
-            if (document.getElementById('galleryPage').classList.contains('active')) {
-                // openViewModal(postId);
-            } else if (document.getElementById('favoritesPage').classList.contains('active')) {
+            // Повторная отрисовка нужной страницы, если она активна
+             if (document.getElementById('favoritesPage').classList.contains('active')) {
                 renderFavorites();
             }
         }
         
-        // Відображення одного посту
+        // Отображение одной карточки поста
         function createPostCard(post) {
             const isFavorite = userData.favorites.includes(post.id);
             return `
@@ -1222,15 +1308,15 @@
             `;
         }
         
-        // Відображення постів галереї
+        // Отображение постов галереи
         function renderPosts(postList, targetId) {
             const grid = document.getElementById(targetId);
             grid.innerHTML = '';
             
             if (postList.length === 0) {
                  grid.innerHTML = targetId === 'postsGrid' 
-                    ? `<div class="empty-state"><div class="empty-state-icon">⛷️</div><div class="empty-state-text">Поки що немає публікацій. Додайте свій перший пост!</div></div>`
-                    : `<div class="empty-state"><div class="empty-state-icon">⭐</div><div class="empty-state-text">Немає обраних постів</div></div>`;
+                    ? `<div class="empty-state"><div class="empty-state-icon">⛷️</div><div class="empty-state-text">Пока нет публикаций. Добавьте свой первый пост!</div></div>`
+                    : `<div class="empty-state"><div class="empty-state-icon">⭐</div><div class="empty-state-text">Нет избранных постов</div></div>`;
                 return;
             }
 
@@ -1239,33 +1325,33 @@
             });
         }
         
-        // Фільтрація постів (просто заглушка)
+        // Фильтрация постов (просто заглушка)
         function filterPosts() {
             const filterValue = document.getElementById('dateFilter').value;
             let filteredPosts = posts;
             
-            // Тут має бути логіка фільтрації
+            // Здесь должна быть логика фильтрации
             
             renderPosts(filteredPosts, 'postsGrid');
         }
         
-        // Відображення обраного
+        // Отображение избранного
         function renderFavorites() {
             const favoritePosts = posts.filter(p => userData.favorites.includes(p.id));
             renderPosts(favoritePosts, 'favoritesGrid');
         }
 
-        // --- ОБНОВЛЕННАЯ Обробка форми створення посту ---
+        // --- Обработка формы создания поста (с Cloudinary) ---
         document.getElementById('createPostForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             if (!selectedFile) {
-                tg.showAlert('Будь ласка, виберіть файл!');
+                tg.showAlert('Пожалуйста, выберите файл!');
                 return;
             }
             
             if (userData.storageUsed + selectedFile.size > MAX_STORAGE) {
-                tg.showAlert('Перевищено ліміт сховища (500 МБ)!');
+                tg.showAlert('Превышен лимит хранилища (500 МБ)!');
                 return;
             }
 
@@ -1277,25 +1363,26 @@
             submitBtn.disabled = true;
 
             try {
-                // ШАГ 1: Загрузка файла на Cloudinary 
+                // ШАГ 1: Загрузка файла на Cloudinary (файлы сохраняются в облаке)
                 const permanentFileUrl = await uploadFileToCloudinary(selectedFile);
                 
                 // ШАГ 2: Создание объекта поста с ПОСТОЯННЫМ URL
                 const newPost = {
-                    id: posts.length + 1,
+                    // ID поста генерируем на основе текущего количества постов
+                    id: posts.length + 1, 
                     authorId: userData.id,
                     authorName: userData.firstName,
-                    description: description || 'Без опису',
-                    hashtags: hashtags || 'Без хештегів',
-                    fileUrl: permanentFileUrl, // Используем ПОСТОЯННУЮ ссылку
+                    description: description || 'Без описания',
+                    hashtags: hashtags || 'Без хэштегов',
+                    fileUrl: permanentFileUrl, // Используем ПОСТОЯННУЮ ссылку Cloudinary
                     fileType: selectedFile.type,
                     fileSize: selectedFile.size,
                     likes: Math.floor(Math.random() * 50), 
-                    date: new Date().toLocaleDateString('uk-UA')
+                    date: new Date().toLocaleDateString('ru-RU') // Дата на русском
                 };
                 
-                // ШАГ 3: Обновление локальных данных
-                posts.unshift(newPost);
+                // ШАГ 3: Обновление локальных данных (прогресс пользователя)
+                posts.unshift(newPost); // Добавляем новый пост в начало общего списка
                 userData.posts.push(newPost.id);
                 userData.storageUsed += newPost.fileSize;
                 userData.exp += 10;
@@ -1303,21 +1390,24 @@
                     userData.level++;
                     userData.exp = 0;
                 }
+                
+                // ШАГ 4: Сохранение данных (Сохраняем весь прогресс локально)
+                saveData(); 
 
                 updateUI();
                 filterPosts();
                 closeCreateModal();
-                tg.showPopup({message: 'Публікацію успішно створено!'});
+                tg.showPopup({message: 'Публикация успешно создана!'});
                 
             } catch (error) {
-                console.error('Не вдалося створити пост через помилку завантаження.', error);
-                // Помилка вже оброблена в uploadFileToCloudinary
+                console.error('Не удалось создать пост из-за ошибки загрузки.', error);
+                // Ошибка уже обработана в uploadFileToCloudinary
             } finally {
-                submitBtn.disabled = false; // Вмикаємо кнопку назад
+                submitBtn.disabled = false; // Включаем кнопку назад
             }
         });
         
-        // Обробка вибору файлу
+        // Обработка выбора файла
         document.getElementById('fileInput').addEventListener('change', function(e) {
             const file = e.target.files[0];
             const filePreview = document.getElementById('filePreview');
@@ -1331,12 +1421,12 @@
                 const fileSizeMB = (file.size / 1024 / 1024).toFixed(2);
 
                 if (file.size > MAX_FILE_SIZE) {
-                    fileInfo.textContent = `Файл завеликий: ${fileSizeMB} МБ (макс. 100 МБ)`;
+                    fileInfo.textContent = `Файл слишком большой: ${fileSizeMB} МБ (макс. 100 МБ)`;
                     selectedFile = null;
                     return;
                 }
                 
-                fileInfo.textContent = `Вибрано: ${file.name} (${fileSizeMB} МБ)`;
+                fileInfo.textContent = `Выбрано: ${file.name} (${fileSizeMB} МБ)`;
 
                 if (file.type.startsWith('image/')) {
                     const img = document.createElement('img');
@@ -1355,17 +1445,18 @@
             }
         });
 
-        // Лічильник слів для опису
+        // Счетчик слов для описания
         document.getElementById('description').addEventListener('input', function() {
             const text = this.value.trim();
             const wordCount = text.split(/\s+/).filter(word => word.length > 0).length;
             document.getElementById('charCount').textContent = wordCount;
         });
 
+
         // Запуск
         init();
         
-        // Початкове відображення галереї
+        // Начальное отображение галереи
         filterPosts();
 
     </script>
