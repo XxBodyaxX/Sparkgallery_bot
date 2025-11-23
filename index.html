@@ -625,7 +625,7 @@
 
         .theme-options {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 10px;
         }
 
@@ -711,7 +711,7 @@
         <source src="" type="audio/mpeg">
     </audio>
 
-    <div id="currentTime" style="padding-top: 10px; text-align: center; color: var(--text-secondary);"></div>
+    <div id="currentTime"></div>
 
     <div class="welcome-screen" id="welcomeScreen">
         <div class="welcome-logo">❄️</div>
@@ -816,23 +816,23 @@
                 <button class="theme-btn" onclick="changeTheme('autumn')">🍂 Осень</button>
                 <button class="theme-btn" onclick="changeTheme('spring')">🌷 Весна</button>
                 <button class="theme-btn" onclick="changeTheme('summer')">☀️ Лето</button>
-                <button class="theme-btn" onclick="changeTheme('cyberpunk')">🤖 Киберпанк</button>
+                <button class="theme-btn" onclick="changeTheme('cyberpunk')">🌃 Киберпанк</button>
                 <button class="theme-btn" onclick="changeTheme('gothic')">🦇 Готика</button>
-                <button class="theme-btn" onclick="changeTheme('kotics')">🐈 С котиками</button>
+                <button class="theme-btn" onclick="changeTheme('cats')">🐈 С котиками</button>
             </div>
         </div>
 
         <div class="settings-section" id="adminMusic" style="display: none;">
             <h3 class="settings-title">🎵 Фоновая музыка (Админ)</h3>
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label class="form-label" for="musicLinkInput">Прямая ссылка на MP3:</label>
+                <input type="url" class="form-input" id="musicLinkInput" placeholder="https://example.com/music.mp3" onchange="saveMusicLink(this.value)">
+            </div>
             <div class="music-control">
-                <span>Включить музыку</span>
+                <span>Включить/Выключить</span>
                 <div class="toggle-switch" id="musicToggle" onclick="toggleMusic()">
                     <div class="toggle-slider"></div>
                 </div>
-            </div>
-            <div style="margin-top: 15px;">
-                <input type="text" class="form-input" id="musicLinkInput" placeholder="Ссылка на SoundCloud/YouTube/MP3" style="margin-bottom: 10px;">
-                <button class="submit-btn" style="padding: 10px; font-size: 14px;" onclick="saveExternalMusicLink()">Сохранить ссылку</button>
             </div>
         </div>
         
@@ -906,12 +906,9 @@
         // === JS из script.js ===
         // Отображение текущего времени
         function showTime() {
-            // Используем toLocaleString для отображения времени в часовом поясе пользователя
-            document.getElementById('currentTime').innerHTML = new Date().toLocaleString('ru-RU', { 
-                year: 'numeric', month: 'short', day: 'numeric', 
-                hour: '2-digit', minute: '2-digit', second: '2-digit', 
-                timeZoneName: 'short' 
-            });
+            // Отображаем время в локализованном формате (например, 15:01:00)
+            const options = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            document.getElementById('currentTime').innerHTML = new Date().toLocaleTimeString('ru-RU', options);
         }
         showTime();
         setInterval(function () {
@@ -985,24 +982,24 @@
                 '--border': '#fff9c4', '--gradient': 'linear-gradient(135deg, #ffc107 0%, #ffeb3b 100%)',
                 '--text-on-accent': '#333333', 'emoji': '☀️'
             },
-            // === НОВЫЕ ТЕМЫ ===
+            // НОВЫЕ ТЕМЫ
             'cyberpunk': { 
-                '--bg-primary': '#1c1c24', '--bg-secondary': '#2d2d39', '--bg-card': '#3a3a47', 
-                '--text-primary': '#00ffff', '--text-secondary': '#ff00ff', '--accent': '#00bfff', 
-                '--border': '#6a00ff', '--gradient': 'linear-gradient(135deg, #ff00ff 0%, #00ffff 100%)',
-                '--text-on-accent': '#ffffff', 'emoji': '🤖' 
+                '--bg-primary': '#11001c', '--bg-secondary': '#1e0030', '--bg-card': '#2a0045', 
+                '--text-primary': '#00ffff', '--text-secondary': '#ff005d', '--accent': '#00e0e0', 
+                '--border': '#ff005d', '--gradient': 'linear-gradient(135deg, #00ffff 0%, #ff005d 100%)',
+                '--text-on-accent': '#11001c', 'emoji': '🌃'
             },
             'gothic': { 
-                '--bg-primary': '#121212', '--bg-secondary': '#1e1e1e', '--bg-card': '#2a2a2a', 
-                '--text-primary': '#b71c1c', '--text-secondary': '#cfd8dc', '--accent': '#9e9e9e', 
-                '--border': '#424242', '--gradient': 'linear-gradient(135deg, #424242 0%, #b71c1c 100%)',
+                '--bg-primary': '#000000', '--bg-secondary': '#1c1c1c', '--bg-card': '#2a2a2a', 
+                '--text-primary': '#8b0000', '--text-secondary': '#b0b0b0', '--accent': '#8b0000', 
+                '--border': '#505050', '--gradient': 'linear-gradient(135deg, #440000 0%, #8b0000 100%)',
                 '--text-on-accent': '#ffffff', 'emoji': '🦇'
             },
-            'kotics': { 
-                '--bg-primary': '#fff8e1', '--bg-secondary': '#ffffff', '--bg-card': '#ffecb3', 
-                '--text-primary': '#ff9800', '--text-secondary': '#e65100', '--accent': '#ffa726', 
-                '--border': '#ffcc80', '--gradient': 'linear-gradient(135deg, #ffb74d 0%, #ff9800 100%)',
-                '--text-on-accent': '#333333', 'emoji': '🐈'
+            'cats': { 
+                '--bg-primary': '#ffe0f0', '--bg-secondary': '#ffffff', '--bg-card': '#f8bbd0', 
+                '--text-primary': '#e91e63', '--text-secondary': '#4a148c', '--accent': '#f48fb1', 
+                '--border': '#f06292', '--gradient': 'linear-gradient(135deg, #f48fb1 0%, #e91e63 100%)',
+                '--text-on-accent': '#ffffff', 'emoji': '🐈'
             },
         };
 
@@ -1103,16 +1100,9 @@
         }
         
         // --- Функции управления музыкой ---
-        
-        /** Сохраняет ссылку на музыку из поля ввода. */
-        function saveExternalMusicLink() {
-            const link = document.getElementById('musicLinkInput').value.trim();
-            if (link) {
-                localStorage.setItem('musicLink', link); 
-                tg.showPopup({message: 'Ссылка на музыку сохранена! Обновите Web App.'});
-            } else {
-                tg.showAlert('Пожалуйста, введите ссылку.');
-            }
+        function saveMusicLink(link) {
+            localStorage.setItem('musicLink', link); 
+            tg.showPopup({message: 'Ссылка на музыку сохранена!'});
         }
 
         function toggleMusic() {
@@ -1120,23 +1110,29 @@
             const music = document.getElementById('bgMusic');
             let savedMusicLink = localStorage.getItem('musicLink');
             
-            // Если нет сохраненной ссылки, используем дефолтную для Web App
             if (!savedMusicLink) {
-                 music.src = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'; 
+                // Если нет ссылки, используем демо-ссылку для всех или требуем ввода от админа
+                if (userData.isAdmin) {
+                    tg.showAlert('Пожалуйста, вставьте прямую ссылку на MP3-файл в поле выше!');
+                    return;
+                } else {
+                    // Используем демо-ссылку, если нет сохраненной
+                    music.src = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'; 
+                }
             } else {
-                 music.src = savedMusicLink; 
+                 music.src = savedMusicLink;
             }
             
-
             if (toggle.classList.contains('active')) {
                 toggle.classList.remove('active');
                 music.pause();
                 tg.showPopup({message: 'Музыка выключена'});
             } else {
                 toggle.classList.add('active');
+                music.load(); // Обновляем источник
                 music.play().catch(e => {
                     console.error("Ошибка воспроизведения:", e);
-                    tg.showAlert('Музыка не запустилась автоматически. Web App требует взаимодействия. Нажмите кнопку еще раз.');
+                    tg.showAlert('Музыка не запустилась автоматически. Нажмите кнопку еще раз, если она не играет.');
                 });
                 tg.showPopup({message: 'Музыка включена'});
             }
@@ -1161,10 +1157,11 @@
 
                 if (userData.isAdmin) {
                     document.getElementById('adminMusic').style.display = 'block';
-                    // Загружаем сохраненную ссылку в поле ввода для админа
-                    const savedMusicLink = localStorage.getItem('musicLink');
-                    if (savedMusicLink) {
-                         document.getElementById('musicLinkInput').value = savedMusicLink;
+                    // Загружаем сохраненную ссылку в поле ввода
+                    const savedLink = localStorage.getItem('musicLink');
+                    const musicInput = document.getElementById('musicLinkInput');
+                    if (savedLink && musicInput) {
+                        musicInput.value = savedLink;
                     }
                 }
             }
@@ -1244,12 +1241,17 @@
             // Заменяем эмодзи в CSS, чтобы он обновился
             const styleElement = document.querySelector('style');
             let styleContent = styleElement.textContent;
-            styleContent = styleContent.replace(/body::before\s*{[^}]*content:\s*'[^']*';/g, `body::before { content: '${theme.emoji}';`);
+            // Используем RegExp для поиска и замены только нужного блока
+            styleContent = styleContent.replace(/body::before\s*\{([^}]*content:\s*')([^']*)('[^}]*)/, (match, p1, p2, p3) => {
+                return `body::before {${p1}${theme.emoji}${p3}`;
+            });
             styleElement.textContent = styleContent;
             
             // Обновление активной кнопки темы
             document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelector(`.theme-btn[onclick="changeTheme('${themeName}')"]`).classList.add('active');
+            // Находим кнопку по onclick
+            const activeBtn = document.querySelector(`.theme-btn[onclick="changeTheme('${themeName}')"]`);
+            if(activeBtn) activeBtn.classList.add('active');
             
             currentTheme = themeName; // Обновляем глобальную переменную
             
