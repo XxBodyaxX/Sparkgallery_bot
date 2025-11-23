@@ -272,12 +272,6 @@
             z-index: 1;
             color: var(--text-primary);
             font-weight: bold;
-            /* НОВЫЕ СТИЛИ ДЛЯ ИЗОБРАЖЕНИЯ/GIF */
-            background-size: cover; 
-            background-position: center;
-            background-repeat: no-repeat;
-            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5); 
-            cursor: pointer;
         }
 
         .profile-rank {
@@ -631,7 +625,7 @@
 
         .theme-options {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
             gap: 10px;
         }
 
@@ -752,10 +746,7 @@
         </div>
 
         <div class="profile-header">
-            <div class="profile-avatar" id="profileAvatar" onclick="document.getElementById('avatarInput').click()" style="cursor: pointer;">?</div>
-            
-            <input type="file" id="avatarInput" class="file-input" accept="image/png, image/jpeg, image/gif">
-            
+            <div class="profile-avatar" id="profileAvatar">?</div>
             <div class="profile-name" id="profileName">Загрузка...</div>
             <div class="profile-username" id="profileUsername">@username</div>
             <div class="profile-rank" id="profileRank">☃️ Новичок</div>
@@ -825,6 +816,9 @@
                 <button class="theme-btn" onclick="changeTheme('autumn')">🍂 Осень</button>
                 <button class="theme-btn" onclick="changeTheme('spring')">🌷 Весна</button>
                 <button class="theme-btn" onclick="changeTheme('summer')">☀️ Лето</button>
+                <button class="theme-btn" onclick="changeTheme('cyberpunk')">🤖 Киберпанк</button>
+                <button class="theme-btn" onclick="changeTheme('gothic')">🦇 Готика</button>
+                <button class="theme-btn" onclick="changeTheme('kotics')">🐈 С котиками</button>
             </div>
         </div>
 
@@ -835,6 +829,10 @@
                 <div class="toggle-switch" id="musicToggle" onclick="toggleMusic()">
                     <div class="toggle-slider"></div>
                 </div>
+            </div>
+            <div style="margin-top: 15px;">
+                <input type="text" class="form-input" id="musicLinkInput" placeholder="Ссылка на SoundCloud/YouTube/MP3" style="margin-bottom: 10px;">
+                <button class="submit-btn" style="padding: 10px; font-size: 14px;" onclick="saveExternalMusicLink()">Сохранить ссылку</button>
             </div>
         </div>
         
@@ -908,7 +906,12 @@
         // === JS из script.js ===
         // Отображение текущего времени
         function showTime() {
-            document.getElementById('currentTime').innerHTML = new Date().toUTCString();
+            // Используем toLocaleString для отображения времени в часовом поясе пользователя
+            document.getElementById('currentTime').innerHTML = new Date().toLocaleString('ru-RU', { 
+                year: 'numeric', month: 'short', day: 'numeric', 
+                hour: '2-digit', minute: '2-digit', second: '2-digit', 
+                timeZoneName: 'short' 
+            });
         }
         showTime();
         setInterval(function () {
@@ -926,13 +929,13 @@
 
         // =========================================================
         // !!! ДАННЫЕ CLOUDINARY !!!
-        // !!! ОБЯЗАТЕЛЬНО ЗАМЕНИТЕ ЭТИ ДАННЫЕ НА ВАШИ РЕАЛЬНЫЕ !!!
         // =========================================================
-        const CLOUDINARY_CLOUD_NAME = 'ВАШ_CLOUD_NAME'; // <--- ЗАМЕНИТЕ НА ВАШ Cloud Name
-        const CLOUDINARY_UPLOAD_PRESET = 'ВАШ_UNSIGNED_PRESET'; // <--- ЗАМЕНИТЕ НА ВАШ Unsigned Upload Preset
+        const CLOUDINARY_CLOUD_NAME = 'ddjfgk8a0'; 
+        const CLOUDINARY_UPLOAD_PRESET = 'Sparkgallery'; 
         // =========================================================
         
         // --- КЛЮЧИ ДЛЯ ЛОКАЛЬНОГО ХРАНИЛИЩА (localStorage) ---
+        // Эти ключи используются для сохранения ПРОГРЕССА пользователя (уровень, XP, избранное, тема)
         const STORAGE_KEY_USER_DATA = 'galleryUserData';
         const STORAGE_KEY_POSTS = 'galleryPosts';
         const STORAGE_KEY_THEME = 'galleryTheme';
@@ -949,8 +952,7 @@
             favorites: [], // Список ID избранных постов
             storageUsed: 0,
             warnings: 0,
-            banned: false,
-            avatarUrl: null // ДОБАВЛЕНО: URL аватара
+            banned: false
         };
 
         let posts = []; // Список всех постов галереи
@@ -983,25 +985,46 @@
                 '--border': '#fff9c4', '--gradient': 'linear-gradient(135deg, #ffc107 0%, #ffeb3b 100%)',
                 '--text-on-accent': '#333333', 'emoji': '☀️'
             },
+            // === НОВЫЕ ТЕМЫ ===
+            'cyberpunk': { 
+                '--bg-primary': '#1c1c24', '--bg-secondary': '#2d2d39', '--bg-card': '#3a3a47', 
+                '--text-primary': '#00ffff', '--text-secondary': '#ff00ff', '--accent': '#00bfff', 
+                '--border': '#6a00ff', '--gradient': 'linear-gradient(135deg, #ff00ff 0%, #00ffff 100%)',
+                '--text-on-accent': '#ffffff', 'emoji': '🤖' 
+            },
+            'gothic': { 
+                '--bg-primary': '#121212', '--bg-secondary': '#1e1e1e', '--bg-card': '#2a2a2a', 
+                '--text-primary': '#b71c1c', '--text-secondary': '#cfd8dc', '--accent': '#9e9e9e', 
+                '--border': '#424242', '--gradient': 'linear-gradient(135deg, #424242 0%, #b71c1c 100%)',
+                '--text-on-accent': '#ffffff', 'emoji': '🦇'
+            },
+            'kotics': { 
+                '--bg-primary': '#fff8e1', '--bg-secondary': '#ffffff', '--bg-card': '#ffecb3', 
+                '--text-primary': '#ff9800', '--text-secondary': '#e65100', '--accent': '#ffa726', 
+                '--border': '#ffcc80', '--gradient': 'linear-gradient(135deg, #ffb74d 0%, #ff9800 100%)',
+                '--text-on-accent': '#333333', 'emoji': '🐈'
+            },
         };
 
         // --- ФУНКЦИИ СОХРАНЕНИЯ/ЗАГРУЗКИ ДАННЫХ (LOCAL STORAGE) ---
         
-        /** Сохраняет данные пользователя (уровень, XP, избранное, тема) и список постов в localStorage. */
+        /** Сохраняет данные пользователя (уровень, XP, избранное, тема) и список постов в localStorage. 
+         * Это обеспечивает сохранение прогресса пользователя при закрытии Web App. */
         function saveData() {
             try {
+                // userData содержит только те данные, которые нужно сохранять между сессиями
                 const dataToSave = {
                     level: userData.level,
                     exp: userData.exp,
                     likes: userData.likes,
                     favorites: userData.favorites,
                     storageUsed: userData.storageUsed,
-                    posts: userData.posts, // Список ID постов пользователя
-                    avatarUrl: userData.avatarUrl // ДОБАВЛЕНО
+                    posts: userData.posts // Список ID постов пользователя
                 };
                 localStorage.setItem(STORAGE_KEY_USER_DATA, JSON.stringify(dataToSave));
                 localStorage.setItem(STORAGE_KEY_POSTS, JSON.stringify(posts));
                 localStorage.setItem(STORAGE_KEY_THEME, currentTheme);
+                // console.log('Данные сохранены локально.'); // Отладочная информация
             } catch (e) {
                 console.error('Ошибка сохранения данных в localStorage:', e);
             }
@@ -1016,13 +1039,13 @@
 
                 if (savedUserData) {
                     const loadedData = JSON.parse(savedUserData);
+                    // Перезаписываем только изменяемые данные, сохраняя ID из Telegram
                     userData.level = loadedData.level || 1;
                     userData.exp = loadedData.exp || 0;
                     userData.likes = loadedData.likes || 0;
                     userData.favorites = loadedData.favorites || [];
                     userData.storageUsed = loadedData.storageUsed || 0;
                     userData.posts = loadedData.posts || [];
-                    userData.avatarUrl = loadedData.avatarUrl || null; // ДОБАВЛЕНО
                 }
 
                 if (savedPosts) {
@@ -1034,9 +1057,11 @@
                 } else {
                     currentTheme = 'winter';
                 }
+                // console.log('Данные загружены локально.'); // Отладочная информация
 
             } catch (e) {
                 console.error('Ошибка загрузки данных из localStorage:', e);
+                // В случае ошибки, используем дефолтные значения
                 posts = [];
                 currentTheme = 'winter';
             }
@@ -1047,9 +1072,10 @@
             const url = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/upload`;
             const formData = new FormData();
             
+            // Отправляем файл и имя пресета (для Unsigned Upload)
             formData.append('file', file);
             formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-            formData.append('tags', 'tma_gallery_post'); 
+            formData.append('tags', 'tma_gallery_post'); // Дополнительный тег
 
             tg.showPopup({message: 'Загрузка файла... Пожалуйста, подождите.'});
             
@@ -1060,12 +1086,12 @@
                 });
                 
                 if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    throw new Error(`Cloudinary вернул ошибку: ${response.status} - ${errorData.error ? errorData.error.message : response.statusText}`);
+                    throw new Error(`Cloudinary вернул ошибку: ${response.statusText}`);
                 }
                 
                 const data = await response.json();
                 
+                // data.secure_url - это ПОСТОЯННАЯ HTTPS-ссылка на ваш файл в облаке
                 tg.showPopup({message: 'Файл успешно загружен на Cloudinary!'});
                 return data.secure_url; 
                 
@@ -1077,9 +1103,16 @@
         }
         
         // --- Функции управления музыкой ---
-        function saveMusicLink(link) {
-            localStorage.setItem('musicLink', link); 
-            tg.showPopup({message: 'Ссылка на музыку сохранена!'});
+        
+        /** Сохраняет ссылку на музыку из поля ввода. */
+        function saveExternalMusicLink() {
+            const link = document.getElementById('musicLinkInput').value.trim();
+            if (link) {
+                localStorage.setItem('musicLink', link); 
+                tg.showPopup({message: 'Ссылка на музыку сохранена! Обновите Web App.'});
+            } else {
+                tg.showAlert('Пожалуйста, введите ссылку.');
+            }
         }
 
         function toggleMusic() {
@@ -1087,23 +1120,14 @@
             const music = document.getElementById('bgMusic');
             let savedMusicLink = localStorage.getItem('musicLink');
             
-            if (!savedMusicLink && userData.isAdmin && !toggle.classList.contains('active')) {
-                const link = prompt('Введите прямую ссылку на MP3-файл для плейлиста:');
-                if (link) {
-                    saveMusicLink(link);
-                    savedMusicLink = link;
-                } else {
-                    tg.showAlert('Ссылка не указана.');
-                    return;
-                }
-            }
-            
-            if (savedMusicLink) {
-                music.src = savedMusicLink;
-            } else {
+            // Если нет сохраненной ссылки, используем дефолтную для Web App
+            if (!savedMusicLink) {
                  music.src = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'; 
+            } else {
+                 music.src = savedMusicLink; 
             }
             
+
             if (toggle.classList.contains('active')) {
                 toggle.classList.remove('active');
                 music.pause();
@@ -1112,7 +1136,7 @@
                 toggle.classList.add('active');
                 music.play().catch(e => {
                     console.error("Ошибка воспроизведения:", e);
-                    tg.showAlert('Музыка не запустилась автоматически. Нажмите кнопку еще раз, если она не играет.');
+                    tg.showAlert('Музыка не запустилась автоматически. Web App требует взаимодействия. Нажмите кнопку еще раз.');
                 });
                 tg.showPopup({message: 'Музыка включена'});
             }
@@ -1120,6 +1144,7 @@
         
         // Инициализация
         function init() {
+            // ШАГ 1: Загружаем все сохраненные данные (уровень, избранное, посты, тема)
             loadData(); 
 
             const user = tg.initDataUnsafe.user;
@@ -1127,18 +1152,26 @@
                 userData.id = user.id;
                 userData.firstName = user.first_name || 'Пользователь';
                 userData.username = user.username ? `@${user.username}` : '@user';
+                // Проверяем ID на соответствие ADMIN_ID
                 userData.isAdmin = user.id.toString() === ADMIN_ID; 
 
                 document.getElementById('profileName').textContent = userData.firstName;
                 document.getElementById('profileUsername').textContent = userData.username;
-                
+                document.getElementById('profileAvatar').textContent = userData.firstName.charAt(0).toUpperCase();
+
                 if (userData.isAdmin) {
                     document.getElementById('adminMusic').style.display = 'block';
+                    // Загружаем сохраненную ссылку в поле ввода для админа
+                    const savedMusicLink = localStorage.getItem('musicLink');
+                    if (savedMusicLink) {
+                         document.getElementById('musicLinkInput').value = savedMusicLink;
+                    }
                 }
             }
             
-            changeTheme(currentTheme, false); 
-            updateUI(); // Вызываем updateUI, чтобы обновить аватар
+            // ШАГ 2: Устанавливаем загруженную тему (или 'winter' по умолчанию)
+            changeTheme(currentTheme, false); // false, чтобы не сохранять тему сразу при загрузке
+            updateUI();
         }
 
         // Закрытие приветственного экрана
@@ -1159,6 +1192,7 @@
                 navItem.classList.add('active');
             }
 
+            // Дополнительные действия при переключении
             if (page === 'gallery') {
                  filterPosts();
             } else if (page === 'favorites') {
@@ -1166,7 +1200,7 @@
             }
         }
 
-        // Обновление интерфейса (профиль, хранилище, АВАТАР)
+        // Обновление интерфейса (профиль, хранилище)
         function updateUI() {
             // Обновление профиля 
             document.getElementById('userLevel').textContent = userData.level;
@@ -1186,25 +1220,13 @@
             document.getElementById('postsCount').textContent = userData.posts.length;
             document.getElementById('likesCount').textContent = userData.likes;
             document.getElementById('favoritesCount').textContent = userData.favorites.length;
-            
-            // НОВЫЙ БЛОК: Обновление аватара (GIF/ИЗОБРАЖЕНИЕ)
-            const avatarElement = document.getElementById('profileAvatar');
-            if (userData.avatarUrl) {
-                // Если есть URL, используем его (для GIF/Image)
-                avatarElement.textContent = ''; 
-                avatarElement.style.backgroundImage = `url('${userData.avatarUrl}')`;
-                avatarElement.style.backgroundColor = 'transparent'; 
-                avatarElement.style.color = 'transparent'; 
-            } else {
-                // Если нет URL, показываем первую букву (дефолтное состояние)
-                avatarElement.textContent = userData.firstName.charAt(0).toUpperCase();
-                avatarElement.style.backgroundImage = 'none';
-                avatarElement.style.backgroundColor = 'rgba(255, 255, 255, 0.5)';
-                avatarElement.style.color = 'var(--text-primary)';
-            }
         }
         
         // Смена темы
+        /** * Изменяет тему и сохраняет выбор. 
+         * @param {string} themeName - Имя темы.
+         * @param {boolean} [save=true] - Сохранять ли в localStorage.
+         */
         function changeTheme(themeName, save = true) {
             const theme = themes[themeName];
             if (!theme) return;
@@ -1216,18 +1238,23 @@
                 }
             }
             
+            // Обновление эмодзи на body
+            document.body.style.setProperty('--emoji', `'${theme.emoji}'`);
+            
+            // Заменяем эмодзи в CSS, чтобы он обновился
             const styleElement = document.querySelector('style');
             let styleContent = styleElement.textContent;
             styleContent = styleContent.replace(/body::before\s*{[^}]*content:\s*'[^']*';/g, `body::before { content: '${theme.emoji}';`);
             styleElement.textContent = styleContent;
             
+            // Обновление активной кнопки темы
             document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelector(`.theme-btn[onclick="changeTheme('${themeName}')"]`).classList.add('active');
             
-            currentTheme = themeName; 
+            currentTheme = themeName; // Обновляем глобальную переменную
             
             if (save) {
-                saveData();
+                saveData(); // Сохраняем выбранную тему
             }
         }
 
@@ -1285,9 +1312,10 @@
                 tg.showPopup({message: 'Добавлено в избранное!'});
             }
             
-            saveData(); 
+            saveData(); // Сохраняем изменение в избранном
             updateUI();
             closeViewModal();
+            // Повторная отрисовка нужной страницы, если она активна
              if (document.getElementById('favoritesPage').classList.contains('active')) {
                 renderFavorites();
             }
@@ -1296,15 +1324,12 @@
         // Отображение одной карточки поста
         function createPostCard(post) {
             const isFavorite = userData.favorites.includes(post.id);
-            // Если это видео, добавляем #t=0.1, чтобы получить превью
-            const posterAttr = post.fileType.startsWith('video') ? `poster="${post.fileUrl}#t=0.1"` : '';
-            
             return `
                 <div class="post-card" onclick="openViewModal(${post.id})">
                     <div class="post-actions">
                         <button class="post-action-btn ${isFavorite ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavorite(${post.id})">⭐</button>
                     </div>
-                    ${post.fileType.startsWith('image') ? `<img class="post-media" src="${post.fileUrl}" alt="Пост">` : `<video class="post-media" src="${post.fileUrl}" ${posterAttr}></video>`}
+                    ${post.fileType.startsWith('image') ? `<img class="post-media" src="${post.fileUrl}" alt="Пост">` : `<video class="post-media" src="${post.fileUrl}" poster="${post.fileType.startsWith('video') ? post.fileUrl + '#t=0.1' : ''}"></video>`}
                     <div class="post-content">
                         <p class="post-description">${post.description}</p>
                         <div class="post-meta">
@@ -1366,6 +1391,7 @@
             const description = document.getElementById('description').value;
             const hashtags = document.getElementById('hashtags').value;
             
+            // Отключаем кнопку, чтобы избежать повторных нажатий во время загрузки
             const submitBtn = this.querySelector('.submit-btn');
             submitBtn.disabled = true;
 
@@ -1375,6 +1401,7 @@
                 
                 // ШАГ 2: Создание объекта поста с ПОСТОЯННЫМ URL
                 const newPost = {
+                    // ID поста генерируем на основе текущего количества постов
                     id: posts.length + 1, 
                     authorId: userData.id,
                     authorName: userData.firstName,
@@ -1384,11 +1411,11 @@
                     fileType: selectedFile.type,
                     fileSize: selectedFile.size,
                     likes: Math.floor(Math.random() * 50), 
-                    date: new Date().toLocaleDateString('ru-RU') 
+                    date: new Date().toLocaleDateString('ru-RU') // Дата на русском
                 };
                 
-                // ШАГ 3: Обновление локальных данных
-                posts.unshift(newPost); 
+                // ШАГ 3: Обновление локальных данных (прогресс пользователя)
+                posts.unshift(newPost); // Добавляем новый пост в начало общего списка
                 userData.posts.push(newPost.id);
                 userData.storageUsed += newPost.fileSize;
                 userData.exp += 10;
@@ -1397,7 +1424,7 @@
                     userData.exp = 0;
                 }
                 
-                // ШАГ 4: Сохранение данных 
+                // ШАГ 4: Сохранение данных (Сохраняем весь прогресс локально)
                 saveData(); 
 
                 updateUI();
@@ -1407,8 +1434,9 @@
                 
             } catch (error) {
                 console.error('Не удалось создать пост из-за ошибки загрузки.', error);
+                // Ошибка уже обработана в uploadFileToCloudinary
             } finally {
-                submitBtn.disabled = false; 
+                submitBtn.disabled = false; // Включаем кнопку назад
             }
         });
         
@@ -1455,43 +1483,6 @@
             const text = this.value.trim();
             const wordCount = text.split(/\s+/).filter(word => word.length > 0).length;
             document.getElementById('charCount').textContent = wordCount;
-        });
-
-        // --- НОВЫЙ ОБРАБОТЧИК: Загрузка аватара (GIF/Image) ---
-        document.getElementById('avatarInput').addEventListener('change', async function(e) {
-            const file = e.target.files[0];
-            
-            // Ограничение размера аватара
-            const MAX_AVATAR_SIZE = 5 * 1024 * 1024; 
-
-            if (file) {
-                if (!file.type.startsWith('image/')) {
-                    tg.showAlert('Для аватара разрешены только изображения (PNG, JPG, GIF).');
-                    e.target.value = ''; // Сброс
-                    return;
-                }
-                
-                if (file.size > MAX_AVATAR_SIZE) {
-                    tg.showAlert('Файл аватара не должен превышать 5 МБ.');
-                    e.target.value = ''; 
-                    return;
-                }
-                
-                try {
-                    // Используем ту же функцию загрузки Cloudinary
-                    tg.showPopup({message: 'Загрузка аватара...'});
-                    const avatarUrl = await uploadFileToCloudinary(file);
-                    
-                    userData.avatarUrl = avatarUrl;
-                    saveData();
-                    updateUI();
-                    tg.showPopup({message: 'Аватар успешно обновлен!'});
-                } catch (error) {
-                    console.error('Не удалось загрузить аватар:', error);
-                    tg.showAlert('Ошибка загрузки аватара. Проверьте Cloud Name и Preset Cloudinary.');
-                }
-            }
-            e.target.value = ''; // Сбрасываем значение input
         });
 
 
