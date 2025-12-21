@@ -3,79 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Галерея Pro - Зима 2025</title>
+    <title>Галерея Pro - Времена года</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        /* === Динамические переменные для темы === */
+        /* === Динамические переменные === */
         :root {
-            --bg-primary: #f0f4f8; /* Светло-серо-голубой (снежный) */
-            --bg-secondary: #ffffff; /* Чистый белый */
-            --bg-card: #e3f2fd; /* Очень светло-голубой */
-            --text-primary: #03a9f4; /* Ярко-голубой (лед/небо) */
-            --text-secondary: #546e7a; /* Серо-синий */
-            --accent: #29b6f6; /* Средне-голубой */
-            --border: #bbdefb; /* Светло-голубой */
-            --gradient: linear-gradient(135deg, #4fc3f7 0%, #03a9f4 100%); /* Голубой градиент */
+            --bg-primary: #f0f4f8;
+            --bg-secondary: rgba(255, 255, 255, 0.7); /* Полупрозрачность для эффекта глубины */
+            --bg-card: rgba(227, 242, 253, 0.8);
+            --text-primary: #03a9f4;
+            --text-secondary: #546e7a;
+            --accent: #29b6f6;
+            --border: #bbdefb;
+            --gradient: linear-gradient(135deg, #4fc3f7 0%, #03a9f4 100%);
             --text-on-accent: #ffffff;
-            
-            /* Переменные для динамической анимации частиц */
             --particle-color: #ffffff;
-            --particle-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
         }
 
-        /* === Базовые стили === */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, system-ui, sans-serif;
             background: var(--bg-primary);
-            color: #333; /* Темный текст на светлом фоне */
+            color: #333;
             min-height: 100vh;
             padding-bottom: 70px;
-            padding-top: 10px; /* Отступ сверху для времени */
-            transition: background-color 0.3s ease;
-            /* Зимний фон: едва заметные снежинки */
-            background-image: 
-                radial-gradient(circle at 10% 90%, rgba(179, 229, 252, 0.2) 0%, transparent 50%),
-                radial-gradient(circle at 90% 10%, rgba(179, 229, 252, 0.2) 0%, transparent 50%);
+            transition: background 0.5s ease;
+            position: relative;
         }
 
-        /* Эмодзи на фоне */
-        body::before {
-            content: var(--emoji-content); 
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            font-size: 30px;
-            z-index: 1;
-            animation: float 3s ease-in-out infinite;
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-5px) rotate(2deg); }
-        }
-
-        .title {
-            color: var(--text-primary);
-            margin-bottom: 20px;
-            font-size: 24px;
-        }
-        
-        /* Стиль для отображения текущего времени */
-        #currentTime {
-            font-size: 14px;
-            color: var(--text-secondary);
-            text-align: center;
-            padding-top: 10px;
-            margin-bottom: 10px;
-        }
-
-        /* === Анимация частиц (НОВАЯ СИСТЕМА) === */
+        /* === НОВАЯ СИСТЕМА СЛОЕВ ЧАСТИЦ (ЗА ФОНОМ) === */
         #particleOverlay {
             position: fixed;
             top: 0;
@@ -83,223 +40,26 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
-            z-index: 50; 
+            z-index: 0; /* Самый низкий слой */
             overflow: hidden;
-            display: block; 
-        }
-
-        .particle {
-            position: absolute;
-            opacity: 0;
-            pointer-events: none;
-            will-change: transform, opacity;
-            color: var(--particle-color); 
-            text-shadow: var(--particle-shadow);
-        }
-
-        /* Общие ключевые кадры для движения */
-        
-        /* Прямое падение (Снег, Дождь, Весна) */
-        @keyframes fall-straight {
-            0% { transform: translate(var(--x), -5vh) rotate(0deg); opacity: 0; }
-            5% { opacity: 1; }
-            95% { opacity: 1; }
-            100% { transform: translate(var(--x), 105vh) rotate(360deg); opacity: 0; }
-        }
-        
-        /* Падение с покачиванием (Листья, Лапки, Кровь) */
-        @keyframes sway-fall {
-            0% { transform: translate(calc(var(--x) + 0vw), -5vh); opacity: 0; }
-            5% { opacity: 1; }
-            50% { transform: translate(calc(var(--x) + var(--sway)), 50vh) rotate(180deg); }
-            95% { opacity: 1; }
-            100% { transform: translate(calc(var(--x) + 0vw), 105vh) rotate(360deg); opacity: 0; }
-        }
-
-        /* Статический глитч (Киберпанк) */
-        @keyframes glitch-static {
-            0%, 100% { opacity: 0.9; transform: translate(var(--x), var(--y)); }
-            20% { transform: translate(calc(var(--x) + 5px), calc(var(--y) - 5px)); filter: blur(1px) brightness(2); }
-            40% { transform: translate(calc(var(--x) - 5px), calc(var(--y) + 5px)); filter: blur(0px) brightness(1); }
-            60% { transform: translate(calc(var(--x) + 2px), calc(var(--y) - 2px)); filter: contrast(1.5); }
-            80% { transform: translate(calc(var(--x) - 2px), calc(var(--y) + 2px)); filter: contrast(1); }
-        }
-
-
-        /* === Приветственный экран === */
-        .welcome-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: var(--bg-primary);
-            z-index: 3000;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 30px;
-        }
-
-        .welcome-screen.hidden {
-            display: none;
-        }
-
-        .welcome-logo {
-            font-size: 80px;
-            margin-bottom: 20px;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-
-        .welcome-title {
-            font-size: 32px;
-            font-weight: bold;
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 15px;
-        }
-
-        .welcome-rules {
-            background: var(--bg-card);
-            padding: 25px;
-            border-radius: 15px;
-            margin: 20px 0;
-            max-width: 400px;
-            border: 2px solid var(--border);
-            color: #333;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .welcome-rules h3 {
-            color: var(--text-primary);
-            margin-bottom: 15px;
-            font-size: 18px;
-        }
-
-        .welcome-rules ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .welcome-rules li {
-            padding: 8px 0;
-            padding-left: 25px;
-            position: relative;
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-
-        .welcome-rules li::before {
-            content: '☃️'; /* Зимний эмодзи */
-            position: absolute;
-            left: 0;
-        }
-
-        .welcome-btn {
-            padding: 16px 40px;
-            background: var(--gradient);
-            color: var(--text-on-accent);
-            border: none;
-            border-radius: 12px;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 20px;
-            box-shadow: 0 4px 20px rgba(3, 169, 244, 0.4);
-            transition: transform 0.2s;
-        }
-
-        .welcome-btn:active {
-            transform: scale(0.95);
-        }
-
-        /* === Хранилище (Storage) === */
-        .storage-bar {
-            background: var(--bg-secondary);
-            padding: 12px 20px;
-            margin: -20px -20px 20px -20px;
-            border-bottom: 2px solid var(--border);
-        }
-
-        .storage-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 13px;
-            margin-bottom: 8px;
-            color: var(--text-secondary);
-        }
-
-        .storage-progress {
-            height: 6px;
-            background: var(--bg-card);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .storage-fill {
-            height: 100%;
-            background: var(--gradient);
-            transition: width 0.3s;
-        }
-
-        /* === Навигация (Navbar) === */
-        .navbar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--bg-secondary);
-            display: flex;
-            justify-content: space-around;
-            padding: 8px 0;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-            border-top: 1px solid var(--border);
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            cursor: pointer;
-            padding: 8px 10px;
-            border-radius: 12px;
-            transition: all 0.3s;
-            color: var(--text-secondary);
-        }
-
-        .nav-item.active {
-            background: var(--gradient);
-            color: var(--text-on-accent);
-        }
-
-        .nav-icon {
-            font-size: 24px;
-        }
-
-        .nav-label {
-            font-size: 10px;
-            font-weight: 500;
-            margin-top: -2px;
-            color: inherit;
         }
 
         .page {
+            position: relative;
+            z-index: 10; /* Контент выше частиц */
             display: none;
             padding: 20px;
         }
 
-        .page.active {
-            display: block;
+        .page.active { display: block; }
+
+        /* Эффект матового стекла для карточек, чтобы видеть частицы сзади */
+        .stat-card, .post-card, .settings-section, .storage-bar {
+            background: var(--bg-secondary);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 15px;
         }
 
         /* === Профиль === */
@@ -311,1305 +71,254 @@
             color: var(--text-on-accent);
             margin: -20px -20px 20px -20px;
             position: relative;
-            overflow: hidden;
-        }
-
-        .profile-header::before {
-            content: '⛷️🏂⛸️';
-            position: absolute;
-            top: 10px;
-            left: 0;
-            right: 0;
-            font-size: 20px;
-            opacity: 0.3;
+            z-index: 20;
         }
 
         .profile-avatar {
-            width: 100px;
-            height: 100px;
+            width: 100px; height: 100px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background: rgba(255, 255, 255, 0.3);
+            display: flex; align-items: center; justify-content: center;
             font-size: 48px;
             margin: 0 auto 15px;
             border: 4px solid var(--text-on-accent);
-            position: relative;
-            z-index: 1;
-            color: var(--text-primary);
-            font-weight: bold;
+            color: white;
         }
 
-        .profile-rank {
-            display: inline-block;
-            background: rgba(0, 0, 0, 0.1);
-            padding: 6px 15px;
-            border-radius: 20px;
-            font-size: 14px;
-            margin-top: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .profile-name, .profile-username {
-            color: var(--text-on-accent);
-        }
-
-        .profile-level {
-            margin-top: 15px;
-        }
-
-        .level-info {
-            display: flex;
-            justify-content: space-between;
-            font-size: 13px;
-            margin-bottom: 5px;
-            color: rgba(255, 255, 255, 0.9);
-        }
-
-        .level-bar {
-            height: 8px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .level-fill {
-            height: 100%;
-            background: var(--text-on-accent);
-            transition: width 0.3s;
-        }
-
-        .profile-stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .stat-card {
+        /* === Навигация === */
+        .navbar {
+            position: fixed; bottom: 0; left: 0; right: 0;
             background: var(--bg-secondary);
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-            border: 1px solid var(--border);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(15px);
+            display: flex; justify-content: space-around;
+            padding: 10px 0;
+            z-index: 1000;
+            border-top: 1px solid var(--border);
         }
 
-        .stat-value {
-            font-size: 24px;
-            font-weight: bold;
-            color: var(--text-primary);
-            margin-bottom: 5px;
-        }
-        
-        .stat-label {
-             color: var(--text-secondary);
-        }
+        .nav-item { text-align: center; cursor: pointer; opacity: 0.6; transition: 0.3s; }
+        .nav-item.active { opacity: 1; color: var(--text-primary); }
+        .nav-icon { font-size: 24px; }
+        .nav-label { font-size: 10px; }
 
-
-        /* === Галерея и Посты === */
-        .gallery-controls {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            align-items: center;
-        }
-
-        .filter-select {
-            flex: 1;
-            padding: 12px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            color: #333;
-            font-size: 14px;
-            appearance: none;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="%23546e7a" d="M7 10l5 5 5-5z"/></svg>');
-            background-repeat: no-repeat;
-            background-position: right 10px center;
-        }
-
-        .add-post-btn {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: var(--gradient);
-            color: var(--text-on-accent);
-            border: none;
-            font-size: 28px;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(3, 169, 244, 0.4);
-            transition: transform 0.2s;
-        }
-
-        .add-post-btn:active {
-            transform: scale(0.9);
-        }
-
-        .posts-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-        }
-
-        .post-card {
-            background: var(--bg-secondary);
-            border-radius: 15px;
-            overflow: hidden;
-            border: 1px solid var(--border);
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            position: relative;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-        }
-
-        .post-card:active {
-            transform: scale(0.98);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .post-media {
-            width: 100%;
-            height: 150px; /* Уменьшил высоту для компактности */
-            object-fit: cover;
-            background: var(--bg-card);
-        }
-
-        .post-actions {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            display: flex;
-            gap: 8px;
-        }
-
-        .post-action-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: rgba(0, 0, 0, 0.4);
-            color: var(--text-on-accent);
-            border: none;
-            font-size: 16px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .post-action-btn.active {
-            background: var(--gradient);
-        }
-
-        .post-content {
-            padding: 10px;
-        }
-
-        .post-description {
-            font-size: 13px;
-            color: #666;
-            margin-bottom: 8px;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .post-meta {
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-top: 5px;
-        }
-
-        .post-date {
-            font-size: 11px;
-            color: var(--text-primary);
-            font-weight: 500;
-        }
-
-        /* === Модальные окна (Modal) === */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 2000;
-            padding: 20px;
-            overflow-y: auto;
-        }
-
-        .modal.active {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-content {
-            background: var(--bg-secondary);
-            border-radius: 20px;
-            padding: 25px;
-            width: 100%;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
-            border: 2px solid var(--border);
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .modal-title {
-            font-size: 22px;
-            font-weight: bold;
-            color: var(--text-primary);
-        }
-
-        .close-btn {
-            font-size: 28px;
-            color: var(--text-secondary);
-            cursor: pointer;
-            background: none;
-            border: none;
-            padding: 5px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
-        }
-
-        .file-input-wrapper {
-            border: 2px dashed var(--text-primary);
-            background: var(--bg-card);
-            border-radius: 12px;
-            padding: 30px;
-            text-align: center;
-            cursor: pointer;
-            transition: background 0.3s;
-            color: var(--text-secondary);
-        }
-
-        .file-input-wrapper:hover {
-            background: var(--border);
-        }
-
-        .file-input {
-            display: none;
-        }
-
-        .file-preview {
-            margin-top: 15px;
-            border-radius: 12px;
-            overflow: hidden;
-            display: none;
-            border: 1px solid var(--border);
-        }
-
-        .file-preview img,
-        .file-preview video {
-            width: 100%;
-            max-height: 300px;
-            object-fit: cover;
-        }
-
-        .form-input,
-        .form-textarea {
-            width: 100%;
-            padding: 12px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            font-size: 14px;
-            color: #333;
-            font-family: inherit;
-        }
-
-        .form-textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        .char-counter {
-            text-align: right;
-            font-size: 12px;
-            color: #999;
-            margin-top: 5px;
-        }
-
-        .submit-btn {
-            width: 100%;
-            padding: 16px;
-            background: var(--gradient);
-            color: var(--text-on-accent);
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(3, 169, 244, 0.4);
-            transition: opacity 0.2s;
-        }
-
-        .submit-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        /* === Настройки === */
-        .settings-section {
-            background: var(--bg-secondary);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 15px;
-            border: 1px solid var(--border);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-        }
-
-        .settings-title {
-            font-size: 18px;
-            color: var(--text-primary);
-            margin-bottom: 15px;
-            font-weight: 600;
-        }
-
-        .theme-options {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-        }
-
+        /* === Кнопки и формы === */
+        .theme-options { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
         .theme-btn {
-            padding: 15px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            color: #333;
-            cursor: pointer;
-            transition: all 0.3s;
+            padding: 12px; border-radius: 10px; border: 1px solid var(--border);
+            background: var(--bg-card); cursor: pointer; transition: 0.3s;
         }
+        .theme-btn.active { background: var(--gradient); color: white; }
 
-        .theme-btn.active {
-            border-color: var(--text-primary);
-            background: var(--gradient);
-            color: var(--text-on-accent);
-        }
-
-        .music-control {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            background: var(--bg-card);
-            border-radius: 10px;
-            border: 1px solid var(--border);
-            color: #333;
-        }
-
-        .toggle-switch {
-            width: 50px;
-            height: 26px;
-            background: #bdbdbd;
-            border-radius: 13px;
-            position: relative;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .toggle-switch.active {
-            background: var(--text-primary);
-        }
-
-        .toggle-slider {
+        .particle {
             position: absolute;
-            width: 22px;
-            height: 22px;
-            background: white;
+            top: -20px;
+            will-change: transform;
+        }
+
+        /* Плеер */
+        .music-control-panel {
+            background: var(--bg-card);
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .play-pause-btn {
+            background: var(--gradient);
+            border: none;
+            width: 40px; height: 40px;
             border-radius: 50%;
-            top: 2px;
-            left: 2px;
-            transition: transform 0.3s;
+            color: white;
+            cursor: pointer;
         }
 
-        .toggle-switch.active .toggle-slider {
-            transform: translateX(24px);
-        }
-
-        /* === Пустое состояние (Empty State) === */
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #999;
-        }
-
-        .empty-state-icon {
-            font-size: 64px;
-            margin-bottom: 15px;
+        /* Анимации */
+        @keyframes fall {
+            to { transform: translateY(105vh) rotate(360deg); }
         }
     </style>
 </head>
 <body>
     <audio id="bgMusic" loop>
-        <source src="" type="audio/mpeg">
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
     </audio>
     
     <div id="particleOverlay"></div>
 
-    <div id="currentTime"></div>
-
-    <div class="welcome-screen" id="welcomeScreen">
-        <div class="welcome-logo">❄️</div>
-        <h1 class="welcome-title">Галерея Pro</h1>
-        <p style="color: var(--text-secondary); text-align: center; margin-bottom: 20px;">
-            Зимнее издание 2025
-        </p>
-        
-        <div class="welcome-rules">
-            <h3>📋 Правила сообщества</h3>
-            <ul>
-                <li>Запрещена публикация контента 18+</li>
-                <li>Купальники разрешены с цензурой</li>
-                <li>Будьте уважительны к другим</li>
-                <li>2 нарушения = бан аккаунта</li>
-                <li>За спам - предупреждение</li>
-            </ul>
-        </div>
-
-        <button class="welcome-btn" onclick="closeWelcome()">Начать</button>
-    </div>
-
     <div class="page active" id="profilePage">
-        <div class="storage-bar">
-            <div class="storage-info">
-                <span>Хранилище</span>
-                <span id="storageText">0 МБ / 500 МБ</span>
-            </div>
-            <div class="storage-progress">
-                <div class="storage-fill" id="storageFill" style="width: 0%"></div>
-            </div>
-        </div>
-
         <div class="profile-header">
-            <div class="profile-avatar" id="profileAvatar">?</div>
-            <div class="profile-name" id="profileName">Загрузка...</div>
-            <div class="profile-username" id="profileUsername">@demo</div>
-            <div class="profile-rank" id="profileRank">☃️ Новичок</div>
-            
-            <div class="profile-level">
-                <div class="level-info">
-                    <span>Уровень <span id="userLevel">1</span></span>
-                    <span><span id="currentExp">0</span>/<span id="neededExp">100</span> XP</span>
-                </div>
-                <div class="level-bar">
-                    <div class="level-fill" id="levelFill" style="width: 0%"></div>
-                </div>
-            </div>
+            <div class="profile-avatar" id="profileAvatar">👤</div>
+            <h2 id="profileName">Загрузка...</h2>
+            <p id="profileUsername">@user</p>
+            <div style="margin-top: 10px; font-weight: bold;" id="profileRank">☃️ Новичок</div>
         </div>
 
-        <div class="profile-stats">
-            <div class="stat-card">
-                <div class="stat-value" id="postsCount">0</div>
-                <div class="stat-label">Постов</div>
+        <div class="profile-stats" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+            <div class="stat-card" style="padding: 15px; text-align: center;">
+                <div id="postsCount" style="font-size: 20px; font-weight: bold; color: var(--text-primary);">0</div>
+                <div style="font-size: 12px;">Постов</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-value" id="likesCount">0</div>
-                <div class="stat-label">Лайков</div>
+            <div class="stat-card" style="padding: 15px; text-align: center;">
+                <div id="likesCount" style="font-size: 20px; font-weight: bold; color: var(--text-primary);">0</div>
+                <div style="font-size: 12px;">Лайков</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-value" id="favoritesCount">0</div>
-                <div class="stat-label">Избранное</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="page" id="galleryPage">
-        <h2 class="title">🖼️ Галерея</h2>
-        <div class="gallery-controls">
-            <select class="filter-select" id="dateFilter" onchange="filterPosts()">
-                <option value="all">Все посты</option>
-                <option value="today">Сегодня</option>
-                <option value="week">Эта неделя</option>
-                <option value="month">Этот месяц</option>
-            </select>
-            <button class="add-post-btn" onclick="openCreateModal()">+</button>
-        </div>
-
-        <div class="posts-grid" id="postsGrid">
-            <div class="empty-state">
-                <div class="empty-state-icon">⛷️</div>
-                <div class="empty-state-text">Пока нет публикаций. Добавьте свой первый пост!</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="page" id="favoritesPage">
-        <h2 class="title">⭐ Избранное</h2>
-        <div class="posts-grid" id="favoritesGrid">
-            <div class="empty-state">
-                <div class="empty-state-icon">⭐</div>
-                <div class="empty-state-text">Нет избранных постов</div>
+            <div class="stat-card" style="padding: 15px; text-align: center;">
+                <div id="favoritesCount" style="font-size: 20px; font-weight: bold; color: var(--text-primary);">0</div>
+                <div style="font-size: 12px;">Избранное</div>
             </div>
         </div>
     </div>
 
     <div class="page" id="settingsPage">
-        <div class="settings-section">
-            <h3 class="settings-title">🎨 Темы оформления</h3>
+        <div class="settings-section" style="padding: 15px; margin-bottom: 20px;">
+            <h3 style="margin-bottom: 10px; color: var(--text-primary);">🎵 Музыкальный плеер</h3>
+            <div class="music-control-panel">
+                <span id="trackName" style="font-size: 14px;">Relaxing Season Mix</span>
+                <button class="play-pause-btn" onclick="toggleMusic()" id="musicBtn">▶</button>
+            </div>
+            <input type="text" id="musicUrl" placeholder="Вставьте ссылку на MP3" 
+                   style="width: 100%; margin-top: 10px; padding: 8px; border-radius: 5px; border: 1px solid var(--border);">
+        </div>
+
+        <div class="settings-section" style="padding: 15px;">
+            <h3 style="margin-bottom: 15px; color: var(--text-primary);">🎨 Смена сезона</h3>
             <div class="theme-options">
-                <button class="theme-btn active" onclick="changeTheme('winter')">❄️ Зима</button>
-                <button class="theme-btn" onclick="changeTheme('autumn')">🍂 Осень</button>
-                <button class="theme-btn" onclick="changeTheme('spring')">🌷 Весна</button>
-                <button class="theme-btn" onclick="changeTheme('summer')">☀️ Лето</button>
-                <button class="theme-btn" onclick="changeTheme('cyberpunk')">🌃 Киберпанк</button>
-                <button class="theme-btn" onclick="changeTheme('gothic')">🦇 Готика</button>
-                <button class="theme-btn" onclick="changeTheme('cats')">🐈 С котиками</button>
+                <button class="theme-btn active" onclick="setTheme('winter')">❄️ Зима</button>
+                <button class="theme-btn" onclick="setTheme('spring')">🌸 Весна</button>
+                <button class="theme-btn" onclick="setTheme('summer')">☀️ Лето</button>
+                <button class="theme-btn" onclick="setTheme('autumn')">🍂 Осень</button>
             </div>
         </div>
-
-        <div class="settings-section" id="adminMusic" style="display: none;">
-            <h3 class="settings-title">🎵 Фоновая музыка (Админ)</h3>
-            <div class="form-group" style="margin-bottom: 15px;">
-                <label class="form-label" for="musicLinkInput">Прямая ссылка на MP3:</label>
-                <input type="url" class="form-input" id="musicLinkInput" placeholder="https://example.com/music.mp3" onchange="saveMusicLink(this.value)">
-            </div>
-            <div class="music-control">
-                <span>Включить/Выключить</span>
-                <div class="toggle-switch" id="musicToggle" onclick="toggleMusic()">
-                    <div class="toggle-slider"></div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="settings-section">
-            <h3 class="settings-title">⚙️ Дополнительно</h3>
-            <button class="submit-btn" style="background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);" onclick="alert('Функция удаления не реализована в демо')">Удалить аккаунт</button>
-        </div>
-    </div>
-
-    <div class="modal" id="createModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Новая публикация</h2>
-                <button class="close-btn" onclick="closeCreateModal()">×</button>
-            </div>
-
-            <form id="createPostForm">
-                <div class="form-group">
-                    <label class="form-label">Фото или видео (до 100 МБ)</label>
-                    <div class="file-input-wrapper" onclick="document.getElementById('fileInput').click()">
-                        <div style="font-size: 24px; margin-bottom: 10px;">📁</div>
-                        <div style="color: var(--text-secondary);">Выберите файл</div>
-                        <input type="file" id="fileInput" class="file-input" accept="image/*,video/*">
-                        <div class="file-info" id="fileInfo" style="margin-top: 10px; color: var(--text-primary);"></div>
-                    </div>
-                    <div class="file-preview" id="filePreview"></div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Описание</label>
-                    <textarea class="form-textarea" id="description" placeholder="Расскажите о вашей публикации..."></textarea>
-                    <div class="char-counter">
-                        <span id="charCount">0</span> / 150 слов
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Хэштеги</label>
-                    <input type="text" class="form-input" id="hashtags" placeholder="#зима #горы #лыжи">
-                </div>
-
-                <button type="submit" class="submit-btn">Опубликовать</button>
-            </form>
-        </div>
-    </div>
-
-    <div class="modal" id="viewModal">
-        <div class="modal-content" id="viewContent"></div>
     </div>
 
     <div class="navbar">
-        <div class="nav-item active" data-page="profile" onclick="switchPage('profile')">
+        <div class="nav-item active" onclick="showPage('profile')">
             <div class="nav-icon">👤</div>
             <div class="nav-label">Профиль</div>
         </div>
-        <div class="nav-item" data-page="gallery" onclick="switchPage('gallery')">
-            <div class="nav-icon">🖼️</div>
-            <div class="nav-label">Галерея</div>
-        </div>
-        <div class="nav-item" data-page="favorites" onclick="switchPage('favorites')">
-            <div class="nav-icon">⭐</div>
-            <div class="nav-label">Избранное</div>
-        </div>
-        <div class="nav-item" data-page="settings" onclick="switchPage('settings')">
+        <div class="nav-item" onclick="showPage('settings')">
             <div class="nav-icon">⚙️</div>
             <div class="nav-label">Настройки</div>
         </div>
     </div>
 
     <script>
-        // === JS из script.js ===
-        // Отображение текущего времени
-        function showTime() {
-            // Отображаем время в локализованном формате (например, 15:01:00)
-            const options = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
-            document.getElementById('currentTime').innerHTML = new Date().toLocaleTimeString('ru-RU', options);
-        }
-        showTime();
-        setInterval(function () {
-            showTime();
-        }, 1000);
-        
-        // === ОСНОВНАЯ ЛОГИКА ===
         const tg = window.Telegram.WebApp;
         tg.ready();
-        tg.expand();
 
-        const MAX_FILE_SIZE = 100 * 1024 * 1024;
-        const MAX_STORAGE = 500 * 1024 * 1024;
-        const ADMIN_ID = '6918933194'; // ID администратора
+        let currentSeason = 'winter';
+        const particleOverlay = document.getElementById('particleOverlay');
+        const audio = document.getElementById('bgMusic');
 
-        // =========================================================
-        // !!! ДАННЫЕ CLOUDINARY !!!
-        // =========================================================
-        const CLOUDINARY_CLOUD_NAME = 'ddjfgk8a0'; 
-        const CLOUDINARY_UPLOAD_PRESET = 'Sparkgallery'; 
-        // =========================================================
-        
-        // --- КЛЮЧИ ДЛЯ ЛОКАЛЬНОГО ХРАНИЛИЩА (localStorage) ---
-        const STORAGE_KEY_USER_DATA = 'galleryUserData';
-        const STORAGE_KEY_POSTS = 'galleryPosts';
-        const STORAGE_KEY_THEME = 'galleryTheme';
-        const root = document.documentElement.style; // Для легкого доступа к CSS-переменным
-
-        let userData = {
-            id: null,
-            firstName: 'Пользователь',
-            username: '@demo',
-            isAdmin: false,
-            level: 1,
-            exp: 0,
-            posts: [], 
-            likes: 0,
-            favorites: [], 
-            storageUsed: 0,
-            warnings: 0,
-            banned: false
+        const seasons = {
+            winter: { 
+                chars: ['❄', '❅', '❆'], 
+                color: '#ffffff', 
+                bg: '#f0f4f8', 
+                grad: 'linear-gradient(135deg, #4fc3f7 0%, #03a9f4 100%)',
+                primary: '#03a9f4'
+            },
+            spring: { 
+                chars: ['🌸', '🌷', '🌱'], 
+                color: '#ffc0cb', 
+                bg: '#f1f8e9', 
+                grad: 'linear-gradient(135deg, #aed581 0%, #689f38 100%)',
+                primary: '#4caf50'
+            },
+            summer: { 
+                chars: ['☀️', '🌻', '🦋'], 
+                color: '#ffeb3b', 
+                bg: '#fffde7', 
+                grad: 'linear-gradient(135deg, #ffc107 0%, #fbc02d 100%)',
+                primary: '#fbc02d'
+            },
+            autumn: { 
+                chars: ['🍂', '🍁', '🍄'], 
+                color: '#ff9800', 
+                bg: '#fff3e0', 
+                grad: 'linear-gradient(135deg, #ff6b00 0%, #e64a19 100%)',
+                primary: '#e64a19'
+            }
         };
 
-        let posts = []; 
-        let selectedFile = null;
-        let currentTheme = 'winter'; 
-
-        // Темы (добавлены настройки для анимации)
-        const themes = {
-            'winter': { 
-                '--bg-primary': '#f0f4f8', '--bg-secondary': '#ffffff', '--bg-card': '#e3f2fd', 
-                '--text-primary': '#03a9f4', '--text-secondary': '#546e7a', '--accent': '#29b6f6', 
-                '--border': '#bbdefb', '--gradient': 'linear-gradient(135deg, #4fc3f7 0%, #03a9f4 100%)',
-                '--text-on-accent': '#ffffff', 'emoji-content': '❄️',
-                'particle-char': '❄️', 'particle-color': '#ffffff',
-                'particle-shadow': '0 0 5px rgba(255, 255, 255, 0.8)',
-                'particle-animation': 'fall-straight',
-                'particle-speed': 15000,
-                'particle-count': 25
-            },
-            'autumn': { 
-                '--bg-primary': '#2d2d2d', '--bg-secondary': '#3a3a3a', '--bg-card': '#4a4a4a', 
-                '--text-primary': '#ff6b00', '--text-secondary': '#ffb366', '--accent': '#ff8533', 
-                '--border': '#5c5c5c', '--gradient': 'linear-gradient(135deg, #ff6b00 0%, #ff3d00 100%)',
-                '--text-on-accent': '#ffffff', 'emoji-content': '🍂',
-                'particle-char': '🍁', 'particle-color': '#ffb366',
-                'particle-shadow': '0 0 3px #ff6b00',
-                'particle-animation': 'sway-fall',
-                'particle-speed': 20000,
-                'particle-count': 20
-            },
-            'spring': { 
-                '--bg-primary': '#f4f9f4', '--bg-secondary': '#ffffff', '--bg-card': '#e8f5e9', 
-                '--text-primary': '#4caf50', '--text-secondary': '#66bb6a', '--accent': '#81c784', 
-                '--border': '#c8e6c9', '--gradient': 'linear-gradient(135deg, #81c784 0%, #4caf50 100%)',
-                '--text-on-accent': '#ffffff', 'emoji-content': '🌷',
-                'particle-char': '🌸', 'particle-color': '#ffc0cb',
-                'particle-shadow': '0 0 5px #4caf50',
-                'particle-animation': 'fall-straight',
-                'particle-speed': 18000,
-                'particle-count': 20
-            },
-             'summer': { 
-                '--bg-primary': '#fffde7', '--bg-secondary': '#ffffff', '--bg-card': '#fff8e1', 
-                '--text-primary': '#ffeb3b', '--text-secondary': '#fbc02d', '--accent': '#ffc107', 
-                '--border': '#fff9c4', '--gradient': 'linear-gradient(135deg, #ffc107 0%, #ffeb3b 100%)',
-                '--text-on-accent': '#333333', 'emoji-content': '☀️',
-                'particle-char': '✨', 'particle-color': '#ffeb3b',
-                'particle-shadow': '0 0 10px #ffc107',
-                'particle-animation': 'fall-straight',
-                'particle-speed': 12000,
-                'particle-count': 15
-            },
-            'cyberpunk': { 
-                '--bg-primary': '#11001c', '--bg-secondary': '#1e0030', '--bg-card': '#2a0045', 
-                '--text-primary': '#00ffff', '--text-secondary': '#ff005d', '--accent': '#00e0e0', 
-                '--border': '#ff005d', '--gradient': 'linear-gradient(135deg, #00ffff 0%, #ff005d 100%)',
-                '--text-on-accent': '#11001c', 'emoji-content': '🌃',
-                'particle-char': '█', 'particle-color': '#00ffff',
-                'particle-shadow': '0 0 5px #ff005d',
-                'particle-animation': 'glitch-static',
-                'particle-speed': 500, 
-                'particle-count': 40
-            },
-            'gothic': { 
-                '--bg-primary': '#000000', '--bg-secondary': '#1c1c1c', '--bg-card': '#2a2a2a', 
-                '--text-primary': '#8b0000', '--text-secondary': '#b0b0b0', '--accent': '#8b0000', 
-                '--border': '#505050', '--gradient': 'linear-gradient(135deg, #440000 0%, #8b0000 100%)',
-                '--text-on-accent': '#ffffff', 'emoji-content': '🦇',
-                'particle-char': '🩸', 'particle-color': '#8b0000',
-                'particle-shadow': '0 0 5px #ff0000',
-                'particle-animation': 'sway-fall',
-                'particle-speed': 25000,
-                'particle-count': 15
-            },
-            'cats': { 
-                '--bg-primary': '#ffe0f0', '--bg-secondary': '#ffffff', '--bg-card': '#f8bbd0', 
-                '--text-primary': '#e91e63', '--text-secondary': '#4a148c', '--accent': '#f48fb1', 
-                '--border': '#f06292', '--gradient': 'linear-gradient(135deg, #f48fb1 0%, #e91e63 100%)',
-                '--text-on-accent': '#ffffff', 'emoji-content': '🐈',
-                'particle-char': '🐾', 'particle-color': '#f48fb1',
-                'particle-shadow': '0 0 5px #e91e63',
-                'particle-animation': 'sway-fall',
-                'particle-speed': 17000,
-                'particle-count': 20
-            },
-        };
-
-        // --- ФУНКЦИИ СОХРАНЕНИЯ/ЗАГРУЗКИ ДАННЫХ (LOCAL STORAGE) ---
-        
-        function saveData() {
-            try {
-                const dataToSave = {
-                    level: userData.level, exp: userData.exp, likes: userData.likes,
-                    favorites: userData.favorites, storageUsed: userData.storageUsed,
-                    posts: userData.posts 
-                };
-                localStorage.setItem(STORAGE_KEY_USER_DATA, JSON.stringify(dataToSave));
-                localStorage.setItem(STORAGE_KEY_POSTS, JSON.stringify(posts));
-                localStorage.setItem(STORAGE_KEY_THEME, currentTheme);
-            } catch (e) {
-                console.error('Ошибка сохранения данных в localStorage:', e);
-            }
-        }
-
-        function loadData() {
-            try {
-                const savedUserData = localStorage.getItem(STORAGE_KEY_USER_DATA);
-                const savedPosts = localStorage.getItem(STORAGE_KEY_POSTS);
-                const savedTheme = localStorage.getItem(STORAGE_KEY_THEME);
-
-                if (savedUserData) {
-                    const loadedData = JSON.parse(savedUserData);
-                    userData.level = loadedData.level || 1;
-                    userData.exp = loadedData.exp || 0;
-                    userData.likes = loadedData.likes || 0;
-                    userData.favorites = loadedData.favorites || [];
-                    userData.storageUsed = loadedData.storageUsed || 0;
-                    userData.posts = loadedData.posts || [];
-                }
-
-                if (savedPosts) {
-                    posts = JSON.parse(savedPosts);
-                }
-                
-                if (savedTheme && themes[savedTheme]) {
-                    currentTheme = savedTheme;
-                } else {
-                    currentTheme = 'winter';
-                }
-
-            } catch (e) {
-                console.error('Ошибка загрузки данных из localStorage:', e);
-                posts = [];
-                currentTheme = 'winter';
-            }
-        }
-        
-        // --- ФУНКЦИЯ ЗАГРУЗКИ НА CLOUDINARY ---
-        async function uploadFileToCloudinary(file) {
-            const url = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/upload`;
-            const formData = new FormData();
+        // Логика частиц
+        function createParticle() {
+            const config = seasons[currentSeason];
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.innerText = config.chars[Math.floor(Math.random() * config.chars.length)];
             
-            formData.append('file', file);
-            formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-            formData.append('tags', 'tma_gallery_post'); 
+            const startX = Math.random() * window.innerWidth;
+            const size = Math.random() * 20 + 10;
+            const duration = Math.random() * 5 + 5;
 
-            tg.showPopup({message: 'Загрузка файла... Пожалуйста, подождите.'});
+            p.style.left = startX + 'px';
+            p.style.fontSize = size + 'px';
+            p.style.color = config.color;
+            p.style.opacity = Math.random() * 0.7 + 0.3;
+            p.style.animation = `fall ${duration}s linear infinite`;
             
-            try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`Cloudinary вернул ошибку: ${response.statusText}`);
-                }
-                
-                const data = await response.json();
-                
-                tg.showPopup({message: 'Файл успешно загружен на Cloudinary!'});
-                return data.secure_url; 
-                
-            } catch (error) {
-                console.error('Ошибка загрузки в Cloudinary:', error);
-                tg.showAlert(`Ошибка загрузки: ${error.message}. Проверьте Cloud Name и Preset.`);
-                throw error; 
-            }
-        }
-        
-        // --- Функции управления музыкой ---
-        function saveMusicLink(link) {
-            localStorage.setItem('musicLink', link); 
-            tg.showPopup({message: 'Ссылка на музыку сохранена!'});
+            particleOverlay.appendChild(p);
+            setTimeout(() => p.remove(), duration * 1000);
         }
 
-        function toggleMusic() {
-            const toggle = document.getElementById('musicToggle');
-            const music = document.getElementById('bgMusic');
-            let savedMusicLink = localStorage.getItem('musicLink');
+        setInterval(createParticle, 300);
+
+        // Переключение тем
+        function setTheme(season) {
+            currentSeason = season;
+            const s = seasons[season];
+            const root = document.documentElement;
+
+            root.style.setProperty('--bg-primary', s.bg);
+            root.style.setProperty('--gradient', s.grad);
+            root.style.setProperty('--text-primary', s.primary);
             
-            if (!savedMusicLink) {
-                if (userData.isAdmin) {
-                    tg.showAlert('Пожалуйста, вставьте прямую ссылку на MP3-файл в поле выше!');
-                    return;
-                } else {
-                    music.src = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'; 
-                }
-            } else {
-                 music.src = savedMusicLink;
-            }
-            
-            if (toggle.classList.contains('active')) {
-                toggle.classList.remove('active');
-                music.pause();
-                tg.showPopup({message: 'Музыка выключена'});
-            } else {
-                toggle.classList.add('active');
-                music.load(); 
-                music.play().catch(e => {
-                    console.error("Ошибка воспроизведения:", e);
-                    tg.showAlert('Музыка не запустилась автоматически. Нажмите кнопку еще раз, если она не играет.');
-                });
-                tg.showPopup({message: 'Музыка включена'});
-            }
-        }
-        
-        // Инициализация
-        function init() {
-            loadData(); 
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.innerText.toLowerCase().includes(season === 'winter' ? 'зима' : season === 'spring' ? 'весна' : season === 'summer' ? 'лето' : 'осень'));
+            });
 
-            const user = tg.initDataUnsafe.user;
-            if (user) {
-                userData.id = user.id;
-                userData.firstName = user.first_name || 'Пользователь';
-                userData.username = user.username ? `@${user.username}` : '@user';
-                userData.isAdmin = user.id.toString() === ADMIN_ID; 
-
-                document.getElementById('profileName').textContent = userData.firstName;
-                document.getElementById('profileUsername').textContent = userData.username;
-                document.getElementById('profileAvatar').textContent = userData.firstName.charAt(0).toUpperCase();
-
-                if (userData.isAdmin) {
-                    document.getElementById('adminMusic').style.display = 'block';
-                    const savedLink = localStorage.getItem('musicLink');
-                    const musicInput = document.getElementById('musicLinkInput');
-                    if (savedLink && musicInput) {
-                        musicInput.value = savedLink;
-                    }
-                }
-            }
-            
-            changeTheme(currentTheme, false);
-            updateUI();
-        }
-
-        // Закрытие приветственного экрана
-        function closeWelcome() {
-            document.getElementById('welcomeScreen').classList.add('hidden');
+            particleOverlay.innerHTML = ''; // Очистить старые частицы
         }
 
         // Переключение страниц
-        function switchPage(page) {
+        function showPage(pageId) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-
-            const pageElement = document.getElementById(page + 'Page');
-            const navItem = document.querySelector(`.nav-item[data-page="${page}"]`);
-
-            if (pageElement && navItem) {
-                pageElement.classList.add('active');
-                navItem.classList.add('active');
-            }
-
-            if (page === 'gallery') {
-                 filterPosts();
-            } else if (page === 'favorites') {
-                renderFavorites();
-            }
+            
+            document.getElementById(pageId + 'Page').classList.add('active');
+            event.currentTarget.classList.add('active');
         }
 
-        // Обновление интерфейса (профиль, хранилище)
-        function updateUI() {
-            // Обновление профиля 
-            document.getElementById('userLevel').textContent = userData.level;
-            document.getElementById('currentExp').textContent = userData.exp;
-            document.getElementById('neededExp').textContent = userData.level * 100;
-            document.getElementById('levelFill').style.width = `${(userData.exp / (userData.level * 100)) * 100}%`;
-            
-            // Обновление хранилища
-            const usedMB = (userData.storageUsed / 1024 / 1024).toFixed(2);
-            const maxMB = (MAX_STORAGE / 1024 / 1024).toFixed(0);
-            const percentage = (userData.storageUsed / MAX_STORAGE) * 100;
+        // Плеер
+        function toggleMusic() {
+            const btn = document.getElementById('musicBtn');
+            const urlInput = document.getElementById('musicUrl').value;
 
-            document.getElementById('storageText').textContent = `${usedMB} МБ / ${maxMB} МБ`;
-            document.getElementById('storageFill').style.width = `${percentage}%`;
-            
-            // Обновление статистики
-            document.getElementById('postsCount').textContent = userData.posts.length;
-            document.getElementById('likesCount').textContent = userData.likes;
-            document.getElementById('favoritesCount').textContent = userData.favorites.length;
-        }
-        
-        // НОВАЯ ФУНКЦИЯ: Генерация и запуск анимации частиц
-        function generateParticles(theme) {
-            const overlay = document.getElementById('particleOverlay');
-            overlay.innerHTML = ''; // Очищаем предыдущие частицы
-            
-            // Установка цвета и тени для всех частиц
-            root.setProperty('--particle-color', theme['particle-color']);
-            root.setProperty('--particle-shadow', theme['particle-shadow']);
-            
-            if (theme['particle-animation'] === 'glitch-static') {
-                 // Логика для статического мерцания (Киберпанк)
-                for (let i = 0; i < theme['particle-count']; i++) {
-                    const particle = document.createElement('span');
-                    particle.className = 'particle';
-                    particle.textContent = theme['particle-char'];
-                    
-                    const duration = theme['particle-speed'] * (Math.random() * 0.5 + 0.7);
-                    const size = Math.random() * 12 + 8; 
+            if (urlInput && audio.src !== urlInput) {
+                audio.src = urlInput;
+            }
 
-                    particle.style.cssText = `
-                        font-size: ${size}px;
-                        left: ${Math.random() * 100}%;
-                        top: ${Math.random() * 100}%;
-                        opacity: ${Math.random() * 0.5 + 0.4};
-                        animation: ${theme['particle-animation']} ${duration}ms infinite ease-in-out;
-                        animation-delay: ${Math.random() * 500}ms; 
-                        --x: ${particle.style.left};
-                        --y: ${particle.style.top};
-                    `;
-                    overlay.appendChild(particle);
-                }
+            if (audio.paused) {
+                audio.play();
+                btn.innerText = '⏸';
+                tg.showPopup({ message: "Музыка играет" });
             } else {
-                // Логика для падающих частиц (Все остальные темы)
-                for (let i = 0; i < theme['particle-count']; i++) {
-                    const particle = document.createElement('span');
-                    particle.className = 'particle';
-                    particle.textContent = theme['particle-char'];
-                    
-                    const duration = theme['particle-speed'] * (Math.random() * 0.5 + 0.7); 
-                    const size = Math.random() * 12 + 8; 
-                    const sway = Math.random() * 20 - 10; 
-
-                    particle.style.cssText = `
-                        font-size: ${size}px;
-                        left: ${Math.random() * 100}%;
-                        animation: ${theme['particle-animation']} ${duration}ms infinite linear;
-                        animation-delay: ${Math.random() * duration}ms;
-                        --x: ${particle.style.left};
-                        --sway: ${sway}vw;
-                    `;
-                    
-                    overlay.appendChild(particle);
-                }
-            }
-        }
-        
-        // Смена темы
-        function changeTheme(themeName, save = true) {
-            const theme = themes[themeName];
-            if (!theme) return;
-
-            for (const key in theme) {
-                if (key.startsWith('--')) {
-                    root.setProperty(key, theme[key]);
-                }
-            }
-            
-            // Обновление эмодзи
-            root.setProperty('--emoji-content', `'${theme['emoji-content']}'`);
-            
-            // Запуск анимации частиц
-            generateParticles(theme);
-
-            // Обновление активной кнопки темы
-            document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
-            const activeBtn = document.querySelector(`.theme-btn[onclick="changeTheme('${themeName}')"]`);
-            if(activeBtn) activeBtn.classList.add('active');
-            
-            currentTheme = themeName; 
-            
-            if (save) {
-                saveData(); 
+                audio.pause();
+                btn.innerText = '▶';
             }
         }
 
-        // Функции открытия/закрытия модальных окон
-        function openCreateModal() {
-            document.getElementById('createModal').classList.add('active');
+        // Инициализация данных пользователя
+        const user = tg.initDataUnsafe.user;
+        if (user) {
+            document.getElementById('profileName').innerText = user.first_name;
+            document.getElementById('profileUsername').innerText = user.username ? '@' + user.username : '';
+            document.getElementById('profileAvatar').innerText = user.first_name.charAt(0);
         }
-
-        function closeCreateModal() {
-            document.getElementById('createModal').classList.remove('active');
-            document.getElementById('createPostForm').reset();
-            document.getElementById('filePreview').innerHTML = ''; 
-            document.getElementById('filePreview').style.display = 'none';
-            document.getElementById('fileInfo').textContent = '';
-            selectedFile = null;
-        }
-        
-        function openViewModal(postId) {
-            const post = posts.find(p => p.id === postId);
-            if (!post) return;
-            
-            const content = `
-                <div class="modal-header">
-                    <h2 class="modal-title">${post.description.substring(0, 30)}...</h2>
-                    <button class="close-btn" onclick="closeViewModal()">×</button>
-                </div>
-                <div style="margin-bottom: 20px;">
-                    ${post.fileType.startsWith('image') ? `<img src="${post.fileUrl}" style="width: 100%; border-radius: 10px;"/>` : `<video src="${post.fileUrl}" controls style="width: 100%; border-radius: 10px;"></video>`}
-                </div>
-                <p style="font-size: 16px; margin-bottom: 10px;">${post.description}</p>
-                <p style="font-size: 14px; color: var(--text-primary); margin-bottom: 15px;">Хэштеги: ${post.hashtags}</p>
-                <div style="display: flex; justify-content: space-between; font-size: 12px; color: #999;">
-                    <span>Автор: ${post.authorName}</span>
-                    <span>${post.date}</span>
-                </div>
-                <button class="submit-btn" style="margin-top: 20px;" onclick="toggleFavorite(${postId})">${userData.favorites.includes(postId) ? '⭐ В избранном' : '⭐ Добавить в избранное'}</button>
-            `;
-            
-            document.getElementById('viewContent').innerHTML = content;
-            document.getElementById('viewModal').classList.add('active');
-        }
-
-        function closeViewModal() {
-             document.getElementById('viewModal').classList.remove('active');
-        }
-        
-        // Переключение избранного
-        function toggleFavorite(postId) {
-            const index = userData.favorites.indexOf(postId);
-            if (index > -1) {
-                userData.favorites.splice(index, 1);
-                tg.showPopup({message: 'Удалено из избранного!'});
-            } else {
-                userData.favorites.push(postId);
-                tg.showPopup({message: 'Добавлено в избранное!'});
-            }
-            
-            saveData(); 
-            updateUI();
-            closeViewModal();
-            // Повторная отрисовка нужной страницы, если она активна
-             if (document.getElementById('favoritesPage').classList.contains('active')) {
-                renderFavorites();
-            }
-        }
-        
-        // Отображение одной карточки поста
-        function createPostCard(post) {
-            const isFavorite = userData.favorites.includes(post.id);
-            return `
-                <div class="post-card" onclick="openViewModal(${post.id})">
-                    <div class="post-actions">
-                        <button class="post-action-btn ${isFavorite ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavorite(${post.id})">⭐</button>
-                    </div>
-                    ${post.fileType.startsWith('image') ? `<img class="post-media" src="${post.fileUrl}" alt="Пост">` : `<video class="post-media" src="${post.fileUrl}" poster="${post.fileType.startsWith('video') ? post.fileUrl + '#t=0.1' : ''}"></video>`}
-                    <div class="post-content">
-                        <p class="post-description">${post.description}</p>
-                        <div class="post-meta">
-                            <span>❤️ ${post.likes}</span>
-                            <span class="post-date">${post.date}</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-        
-        // Отображение постов галереи
-        function renderPosts(postList, targetId) {
-            const grid = document.getElementById(targetId);
-            grid.innerHTML = '';
-            
-            if (postList.length === 0) {
-                 grid.innerHTML = targetId === 'postsGrid' 
-                    ? `<div class="empty-state"><div class="empty-state-icon">⛷️</div><div class="empty-state-text">Пока нет публикаций. Добавьте свой первый пост!</div></div>`
-                    : `<div class="empty-state"><div class="empty-state-icon">⭐</div><div class="empty-state-text">Нет избранных постов</div></div>`;
-                return;
-            }
-
-            postList.forEach(post => {
-                grid.innerHTML += createPostCard(post);
-            });
-        }
-        
-        // Фильтрация постов (просто заглушка)
-        function filterPosts() {
-            const filterValue = document.getElementById('dateFilter').value;
-            let filteredPosts = posts;
-            
-            // Здесь должна быть логика фильтрации
-            
-            renderPosts(filteredPosts, 'postsGrid');
-        }
-        
-        // Отображение избранного
-        function renderFavorites() {
-            const favoritePosts = posts.filter(p => userData.favorites.includes(p.id));
-            renderPosts(favoritePosts, 'favoritesGrid');
-        }
-
-        // --- Обработка формы создания поста (с Cloudinary) ---
-        document.getElementById('createPostForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            if (!selectedFile) {
-                tg.showAlert('Пожалуйста, выберите файл!');
-                return;
-            }
-            
-            if (userData.storageUsed + selectedFile.size > MAX_STORAGE) {
-                tg.showAlert('Превышен лимит хранилища (500 МБ)!');
-                return;
-            }
-
-            const description = document.getElementById('description').value;
-            const hashtags = document.getElementById('hashtags').value;
-            
-            const submitBtn = this.querySelector('.submit-btn');
-            submitBtn.disabled = true;
-
-            try {
-                // ШАГ 1: Загрузка файла на Cloudinary
-                const permanentFileUrl = await uploadFileToCloudinary(selectedFile);
-                
-                // ШАГ 2: Создание объекта поста с ПОСТОЯННЫМ URL
-                const newPost = {
-                    id: posts.length + 1, 
-                    authorId: userData.id,
-                    authorName: userData.firstName,
-                    description: description || 'Без описания',
-                    hashtags: hashtags || 'Без хэштегов',
-                    fileUrl: permanentFileUrl, 
-                    fileType: selectedFile.type,
-                    fileSize: selectedFile.size,
-                    likes: Math.floor(Math.random() * 50), 
-                    date: new Date().toLocaleDateString('ru-RU')
-                };
-                
-                // ШАГ 3: Обновление локальных данных
-                posts.unshift(newPost); 
-                userData.posts.push(newPost.id);
-                userData.storageUsed += newPost.fileSize;
-                userData.exp += 10;
-                if (userData.exp >= userData.level * 100) {
-                    userData.level++;
-                    userData.exp = 0;
-                }
-                
-                // ШАГ 4: Сохранение данных
-                saveData(); 
-
-                updateUI();
-                filterPosts();
-                closeCreateModal();
-                tg.showPopup({message: 'Публикация успешно создана!'});
-                
-            } catch (error) {
-                console.error('Не удалось создать пост из-за ошибки загрузки.', error);
-            } finally {
-                submitBtn.disabled = false;
-            }
-        });
-        
-        // Обработка выбора файла
-        document.getElementById('fileInput').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            const filePreview = document.getElementById('filePreview');
-            const fileInfo = document.getElementById('fileInfo');
-            selectedFile = null;
-            filePreview.innerHTML = '';
-            filePreview.style.display = 'none';
-
-            if (file) {
-                selectedFile = file;
-                const fileSizeMB = (file.size / 1024 / 1024).toFixed(2);
-
-                if (file.size > MAX_FILE_SIZE) {
-                    fileInfo.textContent = `Файл слишком большой: ${fileSizeMB} МБ (макс. 100 МБ)`;
-                    selectedFile = null;
-                    return;
-                }
-                
-                fileInfo.textContent = `Выбрано: ${file.name} (${fileSizeMB} МБ)`;
-
-                if (file.type.startsWith('image/')) {
-                    const img = document.createElement('img');
-                    img.src = URL.createObjectURL(file);
-                    filePreview.appendChild(img);
-                    filePreview.style.display = 'block';
-                } else if (file.type.startsWith('video/')) {
-                    const video = document.createElement('video');
-                    video.src = URL.createObjectURL(file);
-                    video.controls = true;
-                    filePreview.appendChild(video);
-                    filePreview.style.display = 'block';
-                }
-            } else {
-                fileInfo.textContent = '';
-            }
-        });
-
-        // Счетчик слов для описания
-        document.getElementById('description').addEventListener('input', function() {
-            const text = this.value.trim();
-            const wordCount = text.split(/\s+/).filter(word => word.length > 0).length;
-            document.getElementById('charCount').textContent = wordCount;
-        });
-
-
-        // Запуск
-        init();
-        
-        // Начальное отображение галереи
-        filterPosts();
-
     </script>
 </body>
 </html>
