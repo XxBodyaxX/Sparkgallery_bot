@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Галерея Pro Ultimate</title>
+    <title>Галерея Pro & Game</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
@@ -25,52 +25,41 @@
         body.cats { --bg: #efebe9; --accent: #795548; --grad: linear-gradient(135deg, #d7ccc8, #a1887f); }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); transition: 0.5s; padding-bottom: 90px; overflow-x: hidden; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); transition: 0.5s; padding-bottom: 100px; overflow-x: hidden; }
 
-        /* КАРТОЧКА ПРОФИЛЯ */
-        .profile-card { 
-            margin: 15px; padding: 30px 15px; border-radius: 25px; 
-            background: var(--grad); color: var(--header-text); 
-            position: relative; overflow: hidden; text-align: center;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.25);
-        }
+        /* ПРОФИЛЬ */
+        .profile-card { margin: 15px; padding: 25px 15px; border-radius: 25px; background: var(--grad); color: var(--header-text); position: relative; overflow: hidden; text-align: center; box-shadow: 0 8px 30px rgba(0,0,0,0.25); }
+        .profile-content { position: relative; z-index: 5; background: rgba(0,0,0,0.3); backdrop-filter: blur(8px); padding: 20px; border-radius: 22px; border: 1px solid rgba(255,255,255,0.2); }
         
-        .profile-content { 
-            position: relative; z-index: 5; 
-            background: rgba(0,0,0,0.3); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-            padding: 20px; border-radius: 22px; border: 1px solid rgba(255,255,255,0.2);
-        }
+        .emoji-particle { position: absolute; top: -60px; animation: fall linear infinite; pointer-events: none; z-index: 1; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.4)); }
+        @keyframes fall { 0% { transform: translateY(0) rotate(0deg); opacity: 0; } 15% { opacity: 1; } 100% { transform: translateY(500px) rotate(360deg); opacity: 0; } }
 
-        /* ЭМОДЗИ (падают везде в профиле) */
-        .emoji-particle { 
-            position: absolute; top: -60px; animation: fall linear infinite; pointer-events: none; z-index: 1; 
-            filter: drop-shadow(0 3px 6px rgba(0,0,0,0.4));
-        }
-        @keyframes fall { 
-            0% { transform: translateY(0) rotate(0deg); opacity: 0; } 
-            15% { opacity: 1; } 85% { opacity: 1; } 
-            100% { transform: translateY(500px) rotate(360deg); opacity: 0; } 
-        }
-
-        /* ГАЛЕРЕЯ */
+        /* ГАЛЕРЕЯ (ТОЛЬКО ФОТО) */
         .posts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 15px; }
-        .post-card { background: var(--card); border-radius: 18px; overflow: hidden; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.08); color: var(--text); }
-        .post-media { width: 100%; height: 160px; object-fit: cover; }
+        .post-card { background: var(--card); border-radius: 18px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
+        .post-media { width: 100%; height: 160px; object-fit: cover; display: block; }
 
-        /* СКРЫТЫЙ ПЛЕЕР */
-        #hiddenPlayerContainer { position: absolute; width: 1px; height: 1px; opacity: 0.01; pointer-events: none; }
+        /* ИГРА */
+        .game-container { text-align: center; padding: 20px; }
+        .tree-box { font-size: 100px; position: relative; display: inline-block; margin: 20px 0; }
+        .decorations-layer { position: absolute; inset: 0; font-size: 20px; pointer-events: none; }
+        .xp-bar-bg { width: 100%; height: 20px; background: #ddd; border-radius: 10px; overflow: hidden; margin: 10px 0; }
+        #xpBarFill { height: 100%; background: #4caf50; width: 0%; transition: 0.3s; }
 
-        /* КНОПКА ЗВУКА */
-        #muteToggle { position: fixed; left: 20px; bottom: 100px; width: 50px; height: 50px; background: rgba(0,0,0,0.6); color: white; border-radius: 50%; display: none; align-items: center; justify-content: center; z-index: 1001; border: 2px solid white; cursor: pointer; }
+        /* ПЛЕЕР (БЕЗ ВИДЕО) */
+        #hiddenPlayerContainer { position: absolute; width: 1px; height: 1px; opacity: 0.01; overflow: hidden; }
+        #muteToggle { position: fixed; left: 20px; bottom: 110px; width: 55px; height: 55px; background: rgba(0,0,0,0.7); color: white; border-radius: 50%; display: none; align-items: center; justify-content: center; z-index: 1001; border: 2px solid white; font-size: 24px; }
 
-        /* НАВИГАЦИЯ */
-        .nav { position: fixed; bottom: 0; width: 100%; background: var(--card); display: flex; padding: 14px 0; border-top: 1px solid rgba(0,0,0,0.1); z-index: 1000; }
-        .nav-item { flex: 1; text-align: center; font-size: 11px; color: #888; }
-        .nav-item.active { color: var(--accent); font-weight: bold; }
+        /* НАВИГАЦИЯ (КРУПНЫЙ ТЕКСТ) */
+        .nav { position: fixed; bottom: 0; width: 100%; background: var(--card); display: flex; padding: 15px 0; border-top: 1px solid #ddd; z-index: 1000; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
+        .nav-item { flex: 1; text-align: center; font-size: 14px; color: #888; font-weight: 500; }
+        .nav-item.active { color: var(--accent); font-weight: 700; }
+        
         .page { display: none; } .page.active { display: block; }
-        .btn { width: 100%; padding: 14px; border-radius: 14px; border: none; background: var(--accent); color: #fff; font-weight: bold; cursor: pointer; }
-        input, textarea, select { width: 100%; padding: 14px; margin: 10px 0; border-radius: 14px; border: 1px solid #ddd; background: var(--card); color: inherit; }
-        .fab { position: fixed; right: 20px; bottom: 100px; width: 65px; height: 65px; background: var(--grad); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; border: none; box-shadow: 0 6px 25px rgba(0,0,0,0.4); z-index: 900; }
+        .btn { width: 100%; padding: 14px; border-radius: 14px; border: none; background: var(--accent); color: #fff; font-weight: bold; margin-top: 10px; font-size: 16px; }
+        .fab { position: fixed; right: 20px; bottom: 110px; width: 65px; height: 65px; background: var(--grad); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 900; }
+        
+        input, select, textarea { width: 100%; padding: 14px; margin: 10px 0; border-radius: 14px; border: 1px solid #ddd; font-size: 15px; }
     </style>
 </head>
 <body class="winter">
@@ -81,33 +70,53 @@
     <div class="page active" id="profilePage">
         <div class="profile-card" id="headerBox">
             <div class="profile-content">
-                <div id="userAvatar" style="width:70px; height:70px; background:rgba(255,255,255,0.2); border-radius:50%; margin:0 auto 10px; display:flex; align-items:center; justify-content:center; font-size:30px; border:2px solid #fff;">👤</div>
-                <h2 id="userName" style="text-shadow: 0 2px 4px rgba(0,0,0,0.5);">Загрузка...</h2>
-                <div id="musicStatus" style="font-size: 11px; margin-top: 8px; opacity: 0.8;">🔕 Музыка не играет</div>
+                <div style="width:75px; height:75px; background:rgba(255,255,255,0.2); border-radius:50%; margin:0 auto 10px; display:flex; align-items:center; justify-content:center; font-size:35px; border:2px solid #fff;">👤</div>
+                <h2 id="userName" style="font-size: 24px;">Пользователь</h2>
+                <div id="musicStatus" style="font-size: 12px; margin-top: 10px; opacity: 0.9;">🔕 Музыка не играет</div>
             </div>
         </div>
         <div style="padding: 0 25px;">
-            <div style="font-size:12px; margin-bottom:8px; display:flex; justify-content:space-between;">
-                <span>Хранилище</span> <span id="storageSize">0</span> / 500 МБ
-            </div>
-            <div style="height:8px; background:rgba(0,0,0,0.1); border-radius:4px; overflow:hidden;"><div id="storageBar" style="width:0%; height:100%; background:var(--accent); transition:0.5s;"></div></div>
+            <div style="font-size:14px; display:flex; justify-content:space-between; margin-bottom: 5px;"><span>Память</span> <span id="storageSize">0</span> / 500 МБ</div>
+            <div class="xp-bar-bg" style="height: 10px;"><div id="storageBar" style="height:100%; background:var(--accent); width:0%; transition: 0.5s;"></div></div>
         </div>
     </div>
 
     <div class="page" id="galleryPage">
-        <div style="padding:15px 15px 0;">
+        <div style="padding: 10px 15px;">
             <select id="dateFilter" onchange="renderPosts()">
-                <option value="all">Все посты</option>
-                <option value="today">За сегодня</option>
+                <option value="all">📅 Все фотографии</option>
+                <option value="today">🕒 За сегодня</option>
             </select>
         </div>
         <div class="posts-grid" id="postsGrid"></div>
         <button class="fab" onclick="document.getElementById('uploadModal').style.display='flex'">+</button>
     </div>
 
+    <div class="page" id="gamePage">
+        <div class="game-container">
+            <h3 style="font-size: 22px; margin-bottom: 10px;">Уровень <span id="levelNum">1</span></h3>
+            <div class="xp-bar-bg"><div id="xpBarFill"></div></div>
+            <div style="font-size: 13px; color: #666; margin-bottom: 15px;">Опыт: <span id="xpCurrent">0</span> / <span id="xpNeeded">100</span></div>
+            
+            <div class="tree-box">
+                🎄
+                <div id="decorations" class="decorations-layer"></div>
+            </div>
+            
+            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 0 10px;">
+                <button class="btn" onclick="decorate('🍎')">🍎</button>
+                <button class="btn" onclick="decorate('⭐')">⭐</button>
+                <button class="btn" onclick="decorate('🎁')">🎁</button>
+                <button class="btn" onclick="decorate('🔔')">🔔</button>
+                <button class="btn" onclick="decorate('❄️')">❄️</button>
+                <button class="btn" onclick="decorate('🕯️')">🕯️</button>
+            </div>
+        </div>
+    </div>
+
     <div class="page" id="settingsPage">
-        <div style="padding:25px;">
-            <h3>Атмосфера</h3>
+        <div style="padding: 25px;">
+            <h3 style="margin-bottom: 15px;">Выбор темы</h3>
             <select id="themePicker" onchange="setTheme(this.value)">
                 <option value="winter">❄️ Зима</option>
                 <option value="spring">🌱 Весна</option>
@@ -120,73 +129,94 @@
                 <option value="matrix">📟 Матрица</option>
                 <option value="cats">🐾 Коты</option>
             </select>
-
-            <div id="adminPanel" style="display:none; margin-top:30px; border-top:1px solid #ddd; padding-top:20px;">
-                <h4 style="color:var(--accent)">🔊 Управление фоновой музыкой</h4>
-                <input type="text" id="adminMusicUrl" placeholder="Ссылка на YouTube/SoundCloud/Spotify">
-                <button class="btn" onclick="broadcastMusic(true)">Включить поток для всех</button>
-                <button class="btn" style="background:#ff5252; margin-top:5px;" onclick="broadcastMusic(false)">Выключить у всех</button>
+            
+            <div id="adminPanel" style="display:none; border-top:2px solid var(--accent); margin-top:30px; padding-top:20px;">
+                <h4 style="color:var(--accent); margin-bottom: 10px;">Управление звуком 24/7</h4>
+                <input type="text" id="adminMusicUrl" placeholder="Ссылка (YouTube/SoundCloud)">
+                <button class="btn" onclick="broadcastMusic(true)">Включить поток</button>
+                <button class="btn" style="background:#ff5252;" onclick="broadcastMusic(false)">Выключить звук</button>
             </div>
-        </div>
-    </div>
-
-    <div id="uploadModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:2000; align-items:center; justify-content:center; padding:20px;">
-        <div style="background:var(--card); padding:25px; border-radius:25px; width:100%;">
-            <h3>Выложить пост</h3>
-            <input type="file" id="fileInput" accept="image/*,video/*">
-            <textarea id="postDesc" placeholder="Описание..."></textarea>
-            <button class="btn" id="uploadBtn" onclick="handleUpload()">Опубликовать</button>
-            <button class="btn" style="background:#888; margin-top:5px;" onclick="document.getElementById('uploadModal').style.display='none'">Отмена</button>
         </div>
     </div>
 
     <div class="nav">
         <div class="nav-item active" onclick="nav('profile', this)">👤 Профиль</div>
-        <div class="nav-item" onclick="nav('gallery', this)">🖼️ Галерея</div>
-        <div class="nav-item" onclick="nav('settings', this)">⚙️ Настройки</div>
+        <div class="nav-item" onclick="nav('gallery', this)">🖼️ Фото</div>
+        <div class="nav-item" onclick="nav('game', this)">🎄 Игра</div>
+        <div class="nav-item" onclick="nav('settings', this)">⚙️ Настр.</div>
+    </div>
+
+    <div id="uploadModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:2000; align-items:center; justify-content:center; padding:20px;">
+        <div style="background:#fff; padding:30px; border-radius:30px; width:100%; max-width:400px;">
+            <h3 style="margin-bottom: 15px;">Новое фото</h3>
+            <input type="file" id="fileInput" accept="image/*">
+            <textarea id="postDesc" placeholder="Описание..." rows="3"></textarea>
+            <button class="btn" id="uploadBtn" onclick="handleUpload()">Выложить</button>
+            <button class="btn" style="background:#888;" onclick="document.getElementById('uploadModal').style.display='none'">Отмена</button>
+        </div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
-        const ADMIN_ID = '6918933194'; // ЗАМЕНИТЕ НА ВАШ ID
+        const ADMIN_ID = '6918933194'; 
         const CLOUDINARY_URL = 'https://api.cloudinary.com/v1_1/ddjfgk8a0/upload';
         const UPLOAD_PRESET = 'Sparkgallery';
 
-        let posts = JSON.parse(localStorage.getItem('posts_v6') || '[]');
-        let storageUsed = parseInt(localStorage.getItem('storage_v6') || '0');
+        let xp = parseInt(localStorage.getItem('tree_xp') || '0');
+        let level = parseInt(localStorage.getItem('tree_lv') || '1');
+        let posts = JSON.parse(localStorage.getItem('posts_v8') || '[]');
+        let storageUsed = parseInt(localStorage.getItem('storage_v8') || '0');
         let isMuted = true;
 
-        const themesData = {
-            winter: ['❄️', '☃️', '🧤'], spring: ['🌸', '🦋', '🌷'], summer: ['☀️', '🌊', '🍦'], autumn: ['🍂', '🍁', '🍄'],
-            cyberpunk: ['⚡', '👾', '🤖'], gothic: ['🦇', '💀', '🕯️'], 'stained-glass': ['💎', '✨', '🎨'],
-            anime: ['🍥', '🎀', '🌸'], matrix: ['🔢', '📟', '💻'], cats: ['🐱', '🐾', '🧶']
-        };
-
         function init() {
-            tg.ready();
-            tg.expand();
+            tg.ready(); tg.expand();
             const user = tg.initDataUnsafe?.user;
             if (user) {
                 document.getElementById('userName').textContent = user.first_name;
                 if (user.id.toString() === ADMIN_ID) document.getElementById('adminPanel').style.display = 'block';
             }
+            updateGameUI();
             setTheme(localStorage.getItem('theme') || 'winter');
-            updateStorageUI();
             renderPosts();
+            updateStorageUI();
             checkGlobalMusic();
         }
 
-        // --- МУЗЫКА 24/7 ---
+        // --- ИГРА ---
+        function decorate(emoji) {
+            const dec = document.getElementById('decorations');
+            const item = document.createElement('div');
+            item.textContent = emoji;
+            item.style.position = 'absolute';
+            item.style.left = (Math.random() * 60 + 20) + '%';
+            item.style.top = (Math.random() * 60 + 20) + '%';
+            dec.appendChild(item);
+            if(dec.children.length > 20) dec.children[0].remove();
+
+            let gain = level <= 5 ? (30 - level * 3) : 6;
+            xp += gain;
+            const needed = level <= 5 ? (level * 100) : (500 + level * 50);
+            
+            if (xp >= needed) { xp = 0; level++; tg.HapticFeedback.notificationOccurred('success'); }
+            localStorage.setItem('tree_xp', xp); localStorage.setItem('tree_lv', level);
+            updateGameUI();
+        }
+
+        function updateGameUI() {
+            document.getElementById('levelNum').textContent = level;
+            document.getElementById('xpCurrent').textContent = xp;
+            const needed = level <= 5 ? (level * 100) : (500 + level * 50);
+            document.getElementById('xpNeeded').textContent = needed;
+            document.getElementById('xpBarFill').style.width = (xp / needed * 100) + '%';
+        }
+
+        // --- МУЗЫКА (БЕЗ ВИЗУАЛА) ---
         function broadcastMusic(state) {
             if (state) {
                 const url = document.getElementById('adminMusicUrl').value.trim();
-                if (!url) return tg.showAlert("Введите ссылку!");
+                if(!url) return;
                 localStorage.setItem('global_music_url', url);
-                tg.showAlert("Музыка включена для всех!");
-            } else {
-                localStorage.removeItem('global_music_url');
-                tg.showAlert("Музыка выключена");
-            }
+            } else { localStorage.removeItem('global_music_url'); }
             checkGlobalMusic();
         }
 
@@ -195,85 +225,43 @@
             const container = document.getElementById('hiddenPlayerContainer');
             const toggle = document.getElementById('muteToggle');
             const status = document.getElementById('musicStatus');
-
             if (url) {
-                let embed = '';
-                if (url.includes('youtube.com') || url.includes('youtu.be')) {
-                    const id = url.includes('v=') ? url.split('v=')[1].split('&')[0] : url.split('/').pop();
-                    embed = `<iframe src="https://www.youtube.com/embed/${id}?autoplay=1&mute=0" allow="autoplay"></iframe>`;
-                } else if (url.includes('soundcloud.com')) {
-                    embed = `<iframe src="https://w.soundcloud.com/player/?url=${encodeURIComponent(url)}&auto_play=true"></iframe>`;
-                } else {
-                    embed = `<audio src="${url}" autoplay loop></audio>`;
-                }
-                container.innerHTML = embed;
+                let id = url.includes('v=') ? url.split('v=')[1].split('&')[0] : url.split('/').pop();
+                container.innerHTML = `<iframe src="https://www.youtube.com/embed/${id}?autoplay=1&mute=0" allow="autoplay"></iframe>`;
                 toggle.style.display = 'flex';
-                status.innerHTML = '🎶 Поток активен (нажмите 🔇)';
+                status.textContent = '🎵 Поток активен';
             } else {
-                container.innerHTML = '';
-                toggle.style.display = 'none';
-                status.innerHTML = '🔕 Музыка не играет';
+                container.innerHTML = ''; toggle.style.display = 'none';
+                status.textContent = '🔕 Музыка не играет';
             }
         }
 
         function toggleMute() {
-            const player = document.querySelector('#hiddenPlayerContainer iframe, #hiddenPlayerContainer audio');
-            const toggle = document.getElementById('muteToggle');
-            if (isMuted) {
-                // Браузеры требуют взаимодействия для включения звука
-                document.getElementById('hiddenPlayerContainer').style.opacity = '1';
-                toggle.innerHTML = '🔊';
-                toggle.style.background = 'var(--accent)';
-                isMuted = false;
-                tg.showAlert("Звук включен!");
-            } else {
-                checkGlobalMusic(); // Перезапуск для сброса
-                toggle.innerHTML = '🔇';
-                toggle.style.background = 'rgba(0,0,0,0.6)';
-                isMuted = true;
-            }
+            isMuted = !isMuted;
+            document.getElementById('muteToggle').innerHTML = isMuted ? '🔇' : '🔊';
+            document.getElementById('hiddenPlayerContainer').style.opacity = isMuted ? '0.01' : '1';
         }
 
-        // --- ОСТАЛЬНАЯ ЛОГИКА ---
-        function setTheme(theme) {
-            document.body.className = theme;
-            localStorage.setItem('theme', theme);
-            const container = document.getElementById('headerBox');
-            container.querySelectorAll('.emoji-particle').forEach(p => p.remove());
-            const emojis = themesData[theme];
-            for (let i = 0; i < 15; i++) {
-                const p = document.createElement('div');
-                p.className = 'emoji-particle';
-                p.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-                p.style.left = Math.random() * 100 + '%';
-                p.style.fontSize = '25px';
-                p.style.animationDuration = (Math.random() * 3 + 4) + 's';
-                p.style.animationDelay = '-' + (Math.random() * 5) + 's';
-                container.appendChild(p);
-            }
-        }
-
+        // --- ГАЛЕРЕЯ (ФОТО) ---
         async function handleUpload() {
             const file = document.getElementById('fileInput').files[0];
             if (!file) return;
             const btn = document.getElementById('uploadBtn');
-            btn.disabled = true; btn.textContent = 'Загрузка...';
+            btn.disabled = true; btn.textContent = '...';
             const formData = new FormData();
             formData.append('file', file);
             formData.append('upload_preset', UPLOAD_PRESET);
-
             try {
                 const res = await fetch(CLOUDINARY_URL, { method: 'POST', body: formData });
                 const data = await res.json();
-                posts.unshift({ id: Date.now(), url: data.secure_url, type: file.type, desc: document.getElementById('postDesc').value, date: new Date().toLocaleDateString() });
+                posts.unshift({ id: Date.now(), url: data.secure_url, desc: document.getElementById('postDesc').value, date: new Date().toLocaleDateString() });
                 storageUsed += file.size;
-                localStorage.setItem('posts_v6', JSON.stringify(posts));
-                localStorage.setItem('storage_v6', storageUsed);
-                renderPosts();
-                updateStorageUI();
+                localStorage.setItem('posts_v8', JSON.stringify(posts));
+                localStorage.setItem('storage_v8', storageUsed);
+                renderPosts(); updateStorageUI();
                 document.getElementById('uploadModal').style.display = 'none';
             } catch (e) { tg.showAlert("Ошибка!"); }
-            finally { btn.disabled = false; btn.textContent = 'Опубликовать'; }
+            finally { btn.disabled = false; btn.textContent = 'Выложить'; }
         }
 
         function renderPosts() {
@@ -283,8 +271,8 @@
             const filtered = posts.filter(p => filter === 'all' || p.date === today);
             container.innerHTML = filtered.map(p => `
                 <div class="post-card">
-                    ${p.type.startsWith('image') ? `<img src="${p.url}" class="post-media">` : `<video src="${p.url}" class="post-media" controls></video>`}
-                    <div style="padding:10px; font-size:12px;"><b>${p.desc || ''}</b><br><span style="color:#888">${p.date}</span></div>
+                    <img src="${p.url}" class="post-media" loading="lazy">
+                    <div style="padding:12px; font-size:13px;"><b>${p.desc || ''}</b><br><small style="color:#888">${p.date}</small></div>
                 </div>
             `).join('');
         }
@@ -295,10 +283,24 @@
             document.getElementById('storageBar').style.width = Math.min((mb / 500) * 100, 100) + '%';
         }
 
+        function setTheme(t) {
+            document.body.className = t; localStorage.setItem('theme', t);
+            const h = document.getElementById('headerBox');
+            h.querySelectorAll('.emoji-particle').forEach(e => e.remove());
+            const emojis = themesData[t] || ['✨','⭐','🌟'];
+            for(let i=0; i<15; i++) {
+                const p = document.createElement('div'); p.className='emoji-particle';
+                p.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+                p.style.left = Math.random()*100+'%'; p.style.fontSize='25px';
+                p.style.animationDuration = (Math.random()*3+4)+'s';
+                h.appendChild(p);
+            }
+        }
+
         function nav(id, el) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById(id + 'Page').classList.add('active');
+            document.getElementById(id+'Page').classList.add('active');
             el.classList.add('active');
         }
 
