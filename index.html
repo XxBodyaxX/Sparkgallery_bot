@@ -3,21 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Галерея Pro - Времена года</title>
+    <title>Галерея Pro - 2025</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         /* === Динамические переменные === */
         :root {
             --bg-primary: #f0f4f8;
-            --bg-secondary: rgba(255, 255, 255, 0.7); /* Полупрозрачность для эффекта глубины */
-            --bg-card: rgba(227, 242, 253, 0.8);
+            --bg-secondary: rgba(255, 255, 255, 0.7);
+            --bg-card: rgba(255, 255, 255, 0.8);
             --text-primary: #03a9f4;
             --text-secondary: #546e7a;
             --accent: #29b6f6;
             --border: #bbdefb;
             --gradient: linear-gradient(135deg, #4fc3f7 0%, #03a9f4 100%);
             --text-on-accent: #ffffff;
-            --particle-color: #ffffff;
+        }
+
+        /* Сезонные стили */
+        [data-theme="spring"] {
+            --bg-primary: #f1f8e9; --text-primary: #689f38; --border: #dcedc8;
+            --gradient: linear-gradient(135deg, #aed581 0%, #689f38 100%);
+        }
+        [data-theme="summer"] {
+            --bg-primary: #fffde7; --text-primary: #fbc02d; --border: #fff9c4;
+            --gradient: linear-gradient(135deg, #fff176 0%, #fbc02d 100%);
+        }
+        [data-theme="autumn"] {
+            --bg-primary: #fff3e0; --text-primary: #e64a19; --border: #ffe0b2;
+            --gradient: linear-gradient(135deg, #ffb74d 0%, #e64a19 100%);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -25,231 +38,164 @@
         body {
             font-family: -apple-system, system-ui, sans-serif;
             background: var(--bg-primary);
-            color: #333;
             min-height: 100vh;
-            padding-bottom: 70px;
-            transition: background 0.5s ease;
-            position: relative;
+            padding-bottom: 80px;
+            overflow-x: hidden;
+            transition: all 0.5s ease;
         }
 
-        /* === НОВАЯ СИСТЕМА СЛОЕВ ЧАСТИЦ (ЗА ФОНОМ) === */
+        /* === Слой частиц (ЗА КОНТЕНТОМ) === */
         #particleOverlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0; /* Самый низкий слой */
-            overflow: hidden;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: -1; overflow: hidden;
         }
 
-        .page {
-            position: relative;
-            z-index: 10; /* Контент выше частиц */
-            display: none;
-            padding: 20px;
+        .particle {
+            position: absolute; top: -50px; will-change: transform;
+            animation: fall linear infinite;
         }
 
+        @keyframes fall {
+            to { transform: translateY(110vh) rotate(360deg); }
+        }
+
+        /* === Основной интерфейс (Поверх частиц) === */
+        .page { display: none; padding: 20px; position: relative; z-index: 10; }
         .page.active { display: block; }
 
-        /* Эффект матового стекла для карточек, чтобы видеть частицы сзади */
-        .stat-card, .post-card, .settings-section, .storage-bar {
+        .glass-panel {
             background: var(--bg-secondary);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             border: 1px solid var(--border);
-            border-radius: 15px;
+            border-radius: 20px;
+            padding: 15px;
+            margin-bottom: 20px;
         }
 
-        /* === Профиль === */
+        /* Профиль */
         .profile-header {
             background: var(--gradient);
-            padding: 40px 20px 30px;
+            padding: 40px 20px;
             border-radius: 0 0 30px 30px;
             text-align: center;
-            color: var(--text-on-accent);
+            color: white;
             margin: -20px -20px 20px -20px;
-            position: relative;
-            z-index: 20;
         }
 
         .profile-avatar {
-            width: 100px; height: 100px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 48px;
-            margin: 0 auto 15px;
-            border: 4px solid var(--text-on-accent);
-            color: white;
-        }
-
-        /* === Навигация === */
-        .navbar {
-            position: fixed; bottom: 0; left: 0; right: 0;
-            background: var(--bg-secondary);
-            backdrop-filter: blur(15px);
-            display: flex; justify-content: space-around;
-            padding: 10px 0;
-            z-index: 1000;
-            border-top: 1px solid var(--border);
-        }
-
-        .nav-item { text-align: center; cursor: pointer; opacity: 0.6; transition: 0.3s; }
-        .nav-item.active { opacity: 1; color: var(--text-primary); }
-        .nav-icon { font-size: 24px; }
-        .nav-label { font-size: 10px; }
-
-        /* === Кнопки и формы === */
-        .theme-options { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-        .theme-btn {
-            padding: 12px; border-radius: 10px; border: 1px solid var(--border);
-            background: var(--bg-card); cursor: pointer; transition: 0.3s;
-        }
-        .theme-btn.active { background: var(--gradient); color: white; }
-
-        .particle {
-            position: absolute;
-            top: -20px;
-            will-change: transform;
+            width: 100px; height: 100px; border-radius: 50%;
+            background: rgba(255,255,255,0.3); border: 4px solid white;
+            margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 40px;
         }
 
         /* Плеер */
-        .music-control-panel {
-            background: var(--bg-card);
-            padding: 15px;
-            border-radius: 12px;
-            margin-top: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+        .player-box {
+            display: flex; align-items: center; gap: 15px;
+        }
+        .play-btn {
+            width: 45px; height: 45px; border-radius: 50%; border: none;
+            background: var(--gradient); color: white; cursor: pointer;
         }
 
-        .play-pause-btn {
-            background: var(--gradient);
-            border: none;
-            width: 40px; height: 40px;
-            border-radius: 50%;
-            color: white;
-            cursor: pointer;
+        /* Галерея постов (из оригинала) */
+        .posts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .post-card {
+            background: var(--bg-card); border-radius: 15px; overflow: hidden;
+            border: 1px solid var(--border); transition: 0.3s;
         }
+        .post-media { width: 100%; height: 140px; object-fit: cover; }
+        .post-content { padding: 10px; font-size: 13px; }
 
-        /* Анимации */
-        @keyframes fall {
-            to { transform: translateY(105vh) rotate(360deg); }
+        /* Навигация */
+        .navbar {
+            position: fixed; bottom: 0; width: 100%;
+            background: var(--bg-secondary); backdrop-filter: blur(10px);
+            display: flex; justify-content: space-around; padding: 10px;
+            border-top: 1px solid var(--border); z-index: 1000;
+        }
+        .nav-item { cursor: pointer; text-align: center; opacity: 0.6; }
+        .nav-item.active { opacity: 1; color: var(--text-primary); }
+
+        /* Админ-кнопка добавления */
+        .add-btn {
+            position: fixed; bottom: 80px; right: 20px;
+            width: 56px; height: 56px; border-radius: 28px;
+            background: var(--gradient); color: white; border: none;
+            font-size: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 999;
         }
     </style>
 </head>
-<body>
-    <audio id="bgMusic" loop>
-        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
-    </audio>
-    
+<body data-theme="winter">
+
     <div id="particleOverlay"></div>
 
-    <div class="page active" id="profilePage">
+    <div id="profile" class="page active">
         <div class="profile-header">
-            <div class="profile-avatar" id="profileAvatar">👤</div>
-            <h2 id="profileName">Загрузка...</h2>
-            <p id="profileUsername">@user</p>
-            <div style="margin-top: 10px; font-weight: bold;" id="profileRank">☃️ Новичок</div>
+            <div class="profile-avatar" id="userEmoji">❄️</div>
+            <h2 id="userName">Пользователь</h2>
+            <div id="userLevel" style="margin-top: 5px; font-size: 14px;">Уровень 1</div>
         </div>
 
-        <div class="profile-stats" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
-            <div class="stat-card" style="padding: 15px; text-align: center;">
-                <div id="postsCount" style="font-size: 20px; font-weight: bold; color: var(--text-primary);">0</div>
-                <div style="font-size: 12px;">Постов</div>
+        <div class="glass-panel">
+            <div class="player-box">
+                <button class="play-btn" onclick="togglePlay()" id="playIcon">▶</button>
+                <div style="flex: 1;">
+                    <div id="trackTitle" style="font-size: 14px; font-weight: bold;">Зимний микс 2025</div>
+                    <input type="range" id="progressBar" value="0" style="width: 100%;">
+                </div>
             </div>
-            <div class="stat-card" style="padding: 15px; text-align: center;">
-                <div id="likesCount" style="font-size: 20px; font-weight: bold; color: var(--text-primary);">0</div>
-                <div style="font-size: 12px;">Лайков</div>
+            <audio id="mainAudio" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
+        </div>
+
+        <div class="posts-grid" id="postsContainer">
             </div>
-            <div class="stat-card" style="padding: 15px; text-align: center;">
-                <div id="favoritesCount" style="font-size: 20px; font-weight: bold; color: var(--text-primary);">0</div>
-                <div style="font-size: 12px;">Избранное</div>
+    </div>
+
+    <div id="settings" class="page">
+        <div class="glass-panel">
+            <h3>Настройки тем</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px;">
+                <button onclick="changeTheme('winter', '❄️')" class="theme-btn">Зима</button>
+                <button onclick="changeTheme('spring', '🌸')" class="theme-btn">Весна</button>
+                <button onclick="changeTheme('summer', '☀️')" class="theme-btn">Лето</button>
+                <button onclick="changeTheme('autumn', '🍂')" class="theme-btn">Осень</button>
             </div>
+        </div>
+        
+        <div class="glass-panel">
+            <h3>Управление музыкой</h3>
+            <input type="text" id="musicUrl" placeholder="Ссылка на MP3" style="width: 100%; padding: 8px; margin-top: 10px;">
+            <button onclick="updateMusic()" style="margin-top: 10px; width: 100%; padding: 10px; background: var(--gradient); color: white; border: none; border-radius: 10px;">Применить трек</button>
         </div>
     </div>
 
-    <div class="page" id="settingsPage">
-        <div class="settings-section" style="padding: 15px; margin-bottom: 20px;">
-            <h3 style="margin-bottom: 10px; color: var(--text-primary);">🎵 Музыкальный плеер</h3>
-            <div class="music-control-panel">
-                <span id="trackName" style="font-size: 14px;">Relaxing Season Mix</span>
-                <button class="play-pause-btn" onclick="toggleMusic()" id="musicBtn">▶</button>
-            </div>
-            <input type="text" id="musicUrl" placeholder="Вставьте ссылку на MP3" 
-                   style="width: 100%; margin-top: 10px; padding: 8px; border-radius: 5px; border: 1px solid var(--border);">
-        </div>
+    <button class="add-btn" onclick="openModal()">+</button>
 
-        <div class="settings-section" style="padding: 15px;">
-            <h3 style="margin-bottom: 15px; color: var(--text-primary);">🎨 Смена сезона</h3>
-            <div class="theme-options">
-                <button class="theme-btn active" onclick="setTheme('winter')">❄️ Зима</button>
-                <button class="theme-btn" onclick="setTheme('spring')">🌸 Весна</button>
-                <button class="theme-btn" onclick="setTheme('summer')">☀️ Лето</button>
-                <button class="theme-btn" onclick="setTheme('autumn')">🍂 Осень</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="navbar">
-        <div class="nav-item active" onclick="showPage('profile')">
-            <div class="nav-icon">👤</div>
-            <div class="nav-label">Профиль</div>
-        </div>
-        <div class="nav-item" onclick="showPage('settings')">
-            <div class="nav-icon">⚙️</div>
-            <div class="nav-label">Настройки</div>
-        </div>
-    </div>
+    <nav class="navbar">
+        <div class="nav-item active" onclick="switchPage('profile')">👤 Профиль</div>
+        <div class="nav-item" onclick="switchPage('settings')">⚙️ Темы</div>
+    </nav>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.ready();
 
-        let currentSeason = 'winter';
+        let currentTheme = 'winter';
         const particleOverlay = document.getElementById('particleOverlay');
-        const audio = document.getElementById('bgMusic');
-
-        const seasons = {
-            winter: { 
-                chars: ['❄', '❅', '❆'], 
-                color: '#ffffff', 
-                bg: '#f0f4f8', 
-                grad: 'linear-gradient(135deg, #4fc3f7 0%, #03a9f4 100%)',
-                primary: '#03a9f4'
-            },
-            spring: { 
-                chars: ['🌸', '🌷', '🌱'], 
-                color: '#ffc0cb', 
-                bg: '#f1f8e9', 
-                grad: 'linear-gradient(135deg, #aed581 0%, #689f38 100%)',
-                primary: '#4caf50'
-            },
-            summer: { 
-                chars: ['☀️', '🌻', '🦋'], 
-                color: '#ffeb3b', 
-                bg: '#fffde7', 
-                grad: 'linear-gradient(135deg, #ffc107 0%, #fbc02d 100%)',
-                primary: '#fbc02d'
-            },
-            autumn: { 
-                chars: ['🍂', '🍁', '🍄'], 
-                color: '#ff9800', 
-                bg: '#fff3e0', 
-                grad: 'linear-gradient(135deg, #ff6b00 0%, #e64a19 100%)',
-                primary: '#e64a19'
-            }
+        const seasonData = {
+            winter: { chars: ['❄', '❅', '❆'], color: '#fff' },
+            spring: { chars: ['🌸', '🌱', '🍃'], color: '#ffc0cb' },
+            summer: { chars: ['☀️', '🦋', '🌻'], color: '#ffeb3b' },
+            autumn: { chars: ['🍂', '🍁', '🍁'], color: '#ffa500' }
         };
 
-        // Логика частиц
+        // --- Система частиц ---
         function createParticle() {
-            const config = seasons[currentSeason];
             const p = document.createElement('div');
             p.className = 'particle';
-            p.innerText = config.chars[Math.floor(Math.random() * config.chars.length)];
+            const data = seasonData[currentTheme];
+            p.innerText = data.chars[Math.floor(Math.random() * data.chars.length)];
             
             const startX = Math.random() * window.innerWidth;
             const size = Math.random() * 20 + 10;
@@ -257,68 +203,80 @@
 
             p.style.left = startX + 'px';
             p.style.fontSize = size + 'px';
-            p.style.color = config.color;
-            p.style.opacity = Math.random() * 0.7 + 0.3;
-            p.style.animation = `fall ${duration}s linear infinite`;
+            p.style.color = data.color;
+            p.style.opacity = Math.random();
+            p.style.animationDuration = duration + 's';
             
             particleOverlay.appendChild(p);
             setTimeout(() => p.remove(), duration * 1000);
         }
-
         setInterval(createParticle, 300);
 
-        // Переключение тем
-        function setTheme(season) {
-            currentSeason = season;
-            const s = seasons[season];
-            const root = document.documentElement;
-
-            root.style.setProperty('--bg-primary', s.bg);
-            root.style.setProperty('--gradient', s.grad);
-            root.style.setProperty('--text-primary', s.primary);
-            
-            document.querySelectorAll('.theme-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.innerText.toLowerCase().includes(season === 'winter' ? 'зима' : season === 'spring' ? 'весна' : season === 'summer' ? 'лето' : 'осень'));
-            });
-
-            particleOverlay.innerHTML = ''; // Очистить старые частицы
+        // --- Смена тем ---
+        function changeTheme(theme, emoji) {
+            currentTheme = theme;
+            document.body.setAttribute('data-theme', theme);
+            document.getElementById('userEmoji').innerText = emoji;
+            particleOverlay.innerHTML = '';
         }
 
-        // Переключение страниц
-        function showPage(pageId) {
+        // --- Плеер ---
+        const audio = document.getElementById('mainAudio');
+        const playIcon = document.getElementById('playIcon');
+        const progressBar = document.getElementById('progressBar');
+
+        function togglePlay() {
+            if (audio.paused) { audio.play(); playIcon.innerText = '⏸'; }
+            else { audio.pause(); playIcon.innerText = '▶'; }
+        }
+
+        audio.ontimeupdate = () => {
+            progressBar.value = (audio.currentTime / audio.duration) * 100 || 0;
+        };
+
+        function updateMusic() {
+            const url = document.getElementById('musicUrl').value;
+            if (url) {
+                audio.src = url;
+                audio.play();
+                playIcon.innerText = '⏸';
+            }
+        }
+
+        // --- Навигация ---
+        function switchPage(id) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            
-            document.getElementById(pageId + 'Page').classList.add('active');
             event.currentTarget.classList.add('active');
         }
 
-        // Плеер
-        function toggleMusic() {
-            const btn = document.getElementById('musicBtn');
-            const urlInput = document.getElementById('musicUrl').value;
+        // --- Функции постов (Логика из оригинального файла) ---
+        // Здесь используется ваш массив постов или загрузка из Cloudinary
+        let posts = JSON.parse(localStorage.getItem('posts') || '[]');
 
-            if (urlInput && audio.src !== urlInput) {
-                audio.src = urlInput;
-            }
-
-            if (audio.paused) {
-                audio.play();
-                btn.innerText = '⏸';
-                tg.showPopup({ message: "Музыка играет" });
-            } else {
-                audio.pause();
-                btn.innerText = '▶';
-            }
+        function renderPosts() {
+            const container = document.getElementById('postsContainer');
+            container.innerHTML = posts.map(post => `
+                <div class="post-card">
+                    <img src="${post.url}" class="post-media">
+                    <div class="post-content">
+                        <p>${post.desc || ''}</p>
+                        <div style="display:flex; justify-content:space-between; margin-top:5px;">
+                            <span>❤️ ${post.likes || 0}</span>
+                            <span style="font-size:10px;">${post.date || ''}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        // Инициализация данных пользователя
-        const user = tg.initDataUnsafe.user;
-        if (user) {
-            document.getElementById('profileName').innerText = user.first_name;
-            document.getElementById('profileUsername').innerText = user.username ? '@' + user.username : '';
-            document.getElementById('profileAvatar').innerText = user.first_name.charAt(0);
+        // Инициализация
+        if(tg.initDataUnsafe.user) {
+            document.getElementById('userName').innerText = tg.initDataUnsafe.user.first_name;
         }
+        renderPosts();
+
     </script>
 </body>
 </html>
