@@ -2,85 +2,78 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CYBER PLAYER WEB APP</title>
-    <script src="https://tgram.github.io/webapp-apps/js/telegram-web-app.js"></script>
+    <title>ПЛЕЕР</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;800&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --tg-bg: var(--tg-theme-bg-color, #05080a);
-            --tg-btn: var(--tg-theme-button-color, #00f2ff);
-            --tg-btn-text: var(--tg-theme-button-text-color, #000);
-            --neon: #00f2ff; 
-            --bg: var(--tg-bg); 
-            --panel: rgba(10, 16, 20, 0.9);
-            --border: rgba(0, 242, 255, 0.4); 
-            --text: var(--tg-theme-text-color, #cffafe);
+            --neon: #00f2ff; --bg: #05080a; --panel: rgba(10, 16, 20, 0.95);
+            --border: rgba(0, 242, 255, 0.4); --text: #cffafe;
         }
+        body.theme-cyber { --neon: #00f2ff; --bg: #05080a; --border: #00f2ff66; --text: #cffafe; }
+        body.theme-winter { --neon: #a0e9ff; --bg: #0a141a; --border: #ffffff55; --text: #f0faff; }
+        body.theme-gothic { --neon: #ff0000; --bg: #0a0000; --border: #330000; --text: #ffcccc; }
+        body.theme-steampunk { --neon: #ffaa00; --bg: #1a0f00; --border: #553300; --text: #ffe0b3; }
+        body.theme-biopunk { --neon: #39ff14; --bg: #040d04; --border: #1a4d00; --text: #d0ffd0; }
+        body.theme-retro { --neon: #ff00ff; --bg: #120024; --border: #ff00ff66; --text: #ffccff; }
+        body.theme-industrial { --neon: #999999; --bg: #111111; --border: #444444; --text: #eeeeee; }
 
-        body.theme-cyber { --neon: #00f2ff; }
-        body.theme-winter { --neon: #a0e9ff; }
-        body.theme-gothic { --neon: #ff0000; }
-        body.theme-retro { --neon: #ff00ff; }
-
-        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
-        
+        * { box-sizing: border-box; outline: none; }
         body {
             margin: 0; background: var(--bg); color: var(--text);
             font-family: 'Rajdhani', sans-serif; height: 100vh;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            overflow: hidden; transition: 0.5s;
+            display: flex; align-items: center; justify-content: center; overflow: hidden;
+            transition: 0.5s;
         }
 
-        #matrix-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; opacity: 0.3; pointer-events: none; }
+        #matrix-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; opacity: 0.4; pointer-events: none; }
 
         .main-deck {
-            position: relative; z-index: 10; width: 95%; max-width: 440px;
-            background: var(--panel); border: 1px solid var(--border);
-            border-radius: 20px; padding: 20px; backdrop-filter: blur(10px);
-            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            position: relative; z-index: 10; width: 440px;
+            background: var(--panel); border: 2px solid var(--border);
+            border-radius: 15px; padding: 25px; backdrop-filter: blur(15px);
         }
 
-        .search-bar { display: flex; gap: 5px; margin-bottom: 15px; background: rgba(0,0,0,0.4); padding: 5px; border-radius: 10px; border: 1px solid var(--border); }
-        .search-bar input { flex: 1; background: transparent; border: none; color: var(--neon); font-family: 'Orbitron'; padding: 10px; font-size: 0.9rem; }
-        .search-bar button { background: var(--tg-btn); border: none; color: var(--tg-btn-text); padding: 0 15px; cursor: pointer; font-family: 'Orbitron'; font-weight: bold; border-radius: 8px; }
+        .search-bar { display: flex; gap: 5px; margin-bottom: 20px; background: rgba(0,0,0,0.5); padding: 5px; border-radius: 5px; border: 1px solid var(--border); }
+        .search-bar input { flex: 1; background: transparent; border: none; color: var(--neon); font-family: 'Orbitron'; padding: 8px; font-size: 0.8rem; }
+        .search-bar button { background: var(--neon); border: none; color: #000; padding: 0 15px; cursor: pointer; font-family: 'Orbitron'; font-weight: bold; }
 
         .results-dropdown {
-            position: absolute; top: 70px; left: 20px; right: 20px; background: #000;
-            border: 1px solid var(--neon); max-height: 250px; overflow-y: auto;
-            display: none; z-index: 100; border-radius: 10px;
+            position: absolute; top: 75px; left: 25px; right: 25px; background: #000;
+            border: 1px solid var(--neon); max-height: 200px; overflow-y: auto;
+            display: none; z-index: 100;
         }
         .results-dropdown.active { display: block; }
         .res-card { display: flex; gap: 10px; padding: 10px; border-bottom: 1px solid #222; cursor: pointer; align-items: center; font-size: 0.8rem; }
 
         .display-container {
-            width: 100%; height: 200px; background: #000; border: 1px solid var(--border);
-            border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative;
+            width: 100%; height: 210px; background: #000; border: 1px solid var(--border);
+            border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative;
         }
         #yt-wrapper, #local-video { width: 100%; height: 100%; transition: transform 0.4s ease; display: none; object-fit: contain; }
         #yt-placeholder { width: 100%; height: 100%; }
         #cover-art { width: 100%; height: 100%; object-fit: cover; }
 
-        .track-info { text-align: center; margin: 10px 0; font-family: 'Orbitron'; font-size: 0.75rem; color: var(--neon); height: 18px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        .track-info { text-align: center; margin-top: 10px; font-family: 'Orbitron'; font-size: 0.8rem; color: var(--neon); height: 20px; overflow: hidden; }
+
+        .skip-control { display: flex; justify-content: center; align-items: center; gap: 8px; margin: 10px 0; font-size: 0.7rem; color: var(--neon); font-family: 'Orbitron'; }
+        .skip-control input { background: transparent; border: 1px solid var(--neon); color: var(--neon); width: 50px; text-align: center; border-radius: 3px; }
 
         .progress-block { width: 100%; margin-bottom: 10px; }
-        input[type="range"] { width: 100%; cursor: pointer; accent-color: var(--neon); }
-        .time-info { display: flex; justify-content: space-between; font-size: 0.65rem; font-family: 'Orbitron'; color: var(--neon); opacity: 0.8; }
+        input[type="range"] { width: 100%; cursor: pointer; }
+        .time-info { display: flex; justify-content: space-between; font-size: 0.65rem; font-family: 'Orbitron'; color: var(--neon); }
 
-        .btn-row { display: flex; justify-content: space-between; align-items: center; margin: 10px 0; }
-        .btn { background: none; border: none; color: var(--text); cursor: pointer; display: flex; flex-direction: column; align-items: center; transition: 0.2s; }
-        .btn:active { transform: scale(0.9); }
-        .btn svg { width: 32px; height: 32px; fill: currentColor; }
-        .btn-val { font-size: 0.55rem; margin-top: 4px; font-family: 'Orbitron'; color: var(--neon); }
+        .btn-row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+        .btn { background: none; border: none; color: var(--text); cursor: pointer; display: flex; flex-direction: column; align-items: center; }
+        .btn:hover { color: var(--neon); }
+        .btn svg { width: 28px; height: 28px; fill: currentColor; }
+        .btn-val { font-size: 0.55rem; margin-top: 2px; font-family: 'Orbitron'; }
         
-        .play-main { width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--border); color: var(--neon); display: flex; justify-content: center; align-items: center; box-shadow: 0 0 15px var(--border); }
+        .play-main { width: 55px; height: 55px; border-radius: 50%; border: 1px solid var(--border); color: var(--neon); display: flex; justify-content: center; align-items: center; }
 
-        .theme-selector { margin-top: 15px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
-        .theme-btn { font-size: 0.5rem; padding: 8px 2px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text); cursor: pointer; text-align: center; border-radius: 5px; }
+        .theme-selector { margin-top: 15px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+        .theme-btn { font-size: 0.55rem; padding: 6px 2px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: var(--text); cursor: pointer; text-align: center; border-radius: 2px; }
 
-        .footer { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; }
-        .file-lbl { cursor: pointer; color: var(--neon); font-size: 0.7rem; font-weight: bold; border: 1px dashed var(--neon); padding: 5px 10px; border-radius: 5px; }
-        .close-btn { color: #ff4444; font-size: 0.7rem; cursor: pointer; text-transform: uppercase; font-family: 'Orbitron'; }
+        .footer { display: flex; justify-content: center; margin-top: 15px; font-size: 0.65rem; }
     </style>
 </head>
 <body class="theme-cyber">
@@ -90,20 +83,26 @@
 <div class="main-deck">
     <div class="search-bar">
         <input type="text" id="searchInput" placeholder="ПОИСК...">
-        <button onclick="runSearch()">📡</button>
+        <button onclick="runSearch()">СКАН</button>
     </div>
     <div class="results-dropdown" id="resultsBox"></div>
 
     <div class="display-container">
         <div id="yt-wrapper"><div id="yt-placeholder"></div></div>
-        <video id="local-video" playsinline preload="metadata"></video>
-        <img id="cover-art" src="https://images.unsplash.com/photo-1614850523296-d8c1af93d400?w=500">
+        <video id="local-video"></video>
+        <img id="cover-art" src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=500">
     </div>
 
-    <div id="trackTitle" class="track-info">СИСТЕМА ГОТОВА</div>
+    <div id="trackTitle" class="track-info">ГОТОВ</div>
+
+    <div class="skip-control">
+        <span>ПРЫЖОК:</span>
+        <input type="number" id="skipStep" value="10" min="1" max="60" oninput="validateLimit(this)">
+        <span>СЕК.</span>
+    </div>
 
     <div class="progress-block">
-        <input type="range" id="progressBar" value="0" min="0">
+        <input type="range" id="progressBar" value="0">
         <div class="time-info">
             <span id="curTime">0:00</span>
             <span id="durTime">0:00</span>
@@ -113,12 +112,12 @@
     <div class="btn-row">
         <button class="btn" onclick="seekTrack(-1)">
             <svg viewBox="0 0 24 24"><path d="M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z" transform="rotate(180 12 12)"/></svg>
-            <span class="btn-val">-10s</span>
+            <span class="btn-val" id="lbl-back">-10с</span>
         </button>
 
         <button class="btn" onclick="rotateVideo()">
             <svg viewBox="0 0 24 24"><path d="M12 4V1l5 5-5 5V8c-3.31 0-6 2.69-6 6 0 1.01.25 1.97.7 2.8l-1.46 1.46C4.46 16.97 4 15.51 4 14c0-4.42 3.58-8 8-8z"/></svg>
-            <span class="btn-val">ROTATE</span>
+            <span class="btn-val">ПОВОРОТ</span>
         </button>
 
         <button class="btn play-main" onclick="togglePlay()">
@@ -127,20 +126,22 @@
 
         <button class="btn" onclick="seekTrack(1)">
             <svg viewBox="0 0 24 24"><path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/></svg>
-            <span class="btn-val">+10s</span>
+            <span class="btn-val" id="lbl-fwd">+10с</span>
         </button>
     </div>
 
     <div class="theme-selector">
         <div class="theme-btn" onclick="setTheme('cyber')">КИБЕР</div>
-        <div class="theme-btn" onclick="setTheme('winter')">ЛЕД</div>
-        <div class="theme-btn" onclick="setTheme('gothic')">ТЬМА</div>
-        <div class="theme-btn" onclick="setTheme('retro')">НЕОН</div>
+        <div class="theme-btn" onclick="setTheme('winter')">ЗИМА</div>
+        <div class="theme-btn" onclick="setTheme('gothic')">ГОТИКА</div>
+        <div class="theme-btn" onclick="setTheme('steampunk')">ПАРОВОЗ</div>
+        <div class="theme-btn" onclick="setTheme('biopunk')">БИОПАНК</div>
+        <div class="theme-btn" onclick="setTheme('retro')">РЕТРО</div>
+        <div class="theme-btn" onclick="setTheme('industrial')">ЗАВОД</div>
     </div>
 
     <div class="footer">
-        <label class="file-lbl" for="fileInput">ФАЙЛ</label>
-        <div class="close-btn" onclick="closeWebApp()">ЗАКРЫТЬ</div>
+        <label style="cursor:pointer; color:var(--neon)" for="fileInput">[ ВЫБРАТЬ ФАЙЛ ]</label>
     </div>
     <input type="file" id="fileInput" accept="video/*,audio/*" style="display:none">
 </div>
@@ -149,32 +150,68 @@
 <script src="https://www.youtube.com/iframe_api"></script>
 
 <script>
-    const tg = window.Telegram.WebApp;
-    tg.ready();
-    tg.expand();
+    let player, isYT = false, isVideoFile = false, skipSec = 10, currentRotation = 0;
+    const a = document.getElementById('local-audio'), v = document.getElementById('local-video');
+    const globalProxies = ["https://invidious.flokinet.to", "https://inv.vern.cc", "https://yewtu.be"];
+    let proxyIdx = 0;
 
-    let player, isYT = false, isVideoFile = false, currentRotation = 0;
-    const a = document.getElementById('local-audio');
-    const v = document.getElementById('local-video');
-    const proxies = ["https://inv.vern.cc", "https://invidious.flokinet.to", "https://yewtu.be", "https://inv.n8ms.com"];
-    let pIdx = 0;
-
-    function closeWebApp() { tg.close(); }
-
-    function setTheme(t) { 
-        document.body.className = 'theme-' + t; 
-        tg.HapticFeedback.selectionChanged();
+    function validateLimit(el) {
+        if (el.value > 60) el.value = 60;
+        skipSec = parseInt(el.value) || 10;
+        document.getElementById('lbl-back').innerText = `-${skipSec}с`;
+        document.getElementById('lbl-fwd').innerText = `+${skipSec}с`;
     }
 
-    // Сброс всех плееров и очистка памяти
+    function rotateVideo() {
+        currentRotation = (currentRotation + 90) % 360; 
+        const target = isYT ? document.getElementById('yt-wrapper') : (isVideoFile ? v : null);
+        if(target) {
+            let scale = (currentRotation === 90 || currentRotation === 270) ? 0.6 : 1;
+            target.style.transform = `rotate(${currentRotation}deg) scale(${scale})`;
+        }
+    }
+
+    function onYouTubeIframeAPIReady() {
+        player = new YT.Player('yt-placeholder', {
+            height: '100%', width: '100%',
+            playerVars: { 'controls': 0, 'rel': 0 },
+            events: { 'onStateChange': () => updatePlayIcon() }
+        });
+    }
+
+    async function runSearch() {
+        const q = document.getElementById('searchInput').value;
+        if(!q) return;
+        const box = document.getElementById('resultsBox');
+        box.innerHTML = '<div style="padding:10px">ПОИСК...</div>';
+        box.classList.add('active');
+        try {
+            const r = await fetch(`${globalProxies[proxyIdx]}/api/v1/search?q=${encodeURIComponent(q)}&type=video`);
+            const d = await r.json();
+            box.innerHTML = '';
+            d.slice(0, 10).forEach(i => {
+                const div = document.createElement('div');
+                div.className = 'res-card';
+                div.innerHTML = `<img src="${i.videoThumbnails[0].url}" width="50"> <span>${i.title}</span>`;
+                div.onclick = () => {
+                    resetAll(); isYT = true; box.classList.remove('active');
+                    document.getElementById('cover-art').style.display = 'none';
+                    document.getElementById('yt-wrapper').style.display = 'block';
+                    document.getElementById('trackTitle').innerText = i.title;
+                    player.loadVideoById(i.videoId);
+                };
+                box.appendChild(div);
+            });
+        } catch (e) {
+            proxyIdx = (proxyIdx + 1) % globalProxies.length;
+            runSearch();
+        }
+    }
+
     function resetAll() {
-        if (isYT && player && player.stopVideo) player.stopVideo();
-        if (v.src) { URL.revokeObjectURL(v.src); v.src = ""; }
-        if (a.src) { URL.revokeObjectURL(a.src); a.src = ""; }
-        
-        a.pause(); v.pause();
         isYT = false; isVideoFile = false; currentRotation = 0;
-        
+        try { player.stopVideo(); } catch(e){}
+        a.pause(); v.pause();
         v.style.display = 'none';
         v.style.transform = 'rotate(0deg) scale(1)';
         document.getElementById('yt-wrapper').style.display = 'none';
@@ -182,83 +219,13 @@
         document.getElementById('cover-art').style.display = 'block';
     }
 
-    // YouTube API
-    function onYouTubeIframeAPIReady() {
-        player = new YT.Player('yt-placeholder', {
-            height: '100%', width: '100%',
-            playerVars: { 'controls': 0, 'rel': 0, 'modestbranding': 1, 'playsinline': 1 },
-            events: { 'onStateChange': () => updatePlayIcon() }
-        });
-    }
-
-    // Поворот вправо
-    function rotateVideo() {
-        currentRotation = (currentRotation + 90) % 360;
-        const target = isYT ? document.getElementById('yt-wrapper') : (isVideoFile ? v : null);
-        if(target) {
-            let scale = (currentRotation === 90 || currentRotation === 270) ? 0.6 : 1;
-            target.style.transform = `rotate(${currentRotation}deg) scale(${scale})`;
-        }
-        tg.HapticFeedback.impactOccurred('light');
-    }
-
-    // Поиск
-    async function runSearch() {
-        const q = document.getElementById('searchInput').value;
-        if(!q) return;
-        const box = document.getElementById('resultsBox');
-        box.innerHTML = '<div style="padding:15px; color:var(--neon)">ПОИСК...</div>';
-        box.classList.add('active');
-
-        const tryFetch = async () => {
-            try {
-                const r = await fetch(`${proxies[pIdx]}/api/v1/search?q=${encodeURIComponent(q)}&type=video`);
-                const d = await r.json();
-                renderResults(d);
-            } catch (e) {
-                pIdx = (pIdx + 1) % proxies.length;
-                if (pIdx !== 0) tryFetch();
-                else box.innerHTML = '<div style="padding:15px">ОШИБКА СЕТИ</div>';
-            }
-        };
-        tryFetch();
-    }
-
-    function renderResults(data) {
-        const box = document.getElementById('resultsBox');
-        box.innerHTML = '';
-        data.slice(0, 10).forEach(i => {
-            const div = document.createElement('div');
-            div.className = 'res-card';
-            div.innerHTML = `
-                <img src="${i.videoThumbnails[0].url}" width="60" style="border-radius:5px"> 
-                <div style="overflow:hidden">
-                    <div style="white-space:nowrap; text-overflow:ellipsis; overflow:hidden">${i.title}</div>
-                    <div style="font-size:0.6rem; opacity:0.6">${i.author}</div>
-                </div>`;
-            div.onclick = () => {
-                resetAll(); isYT = true; box.classList.remove('active');
-                document.getElementById('cover-art').style.display = 'none';
-                document.getElementById('yt-wrapper').style.display = 'block';
-                document.getElementById('trackTitle').innerText = i.title;
-                player.loadVideoById(i.videoId);
-                tg.HapticFeedback.impactOccurred('medium');
-            };
-            box.appendChild(div);
-        });
-    }
-
-    // Управление
     function togglePlay() {
         if(isYT) {
             if(player.getPlayerState() === 1) player.pauseVideo(); else player.playVideo();
-        } else if(isVideoFile) {
-            v.paused ? v.play() : v.pause();
-        } else {
-            a.paused ? a.play() : a.pause();
         }
+        else if(isVideoFile) v.paused ? v.play() : v.pause();
+        else a.paused ? a.play() : a.pause();
         updatePlayIcon();
-        tg.HapticFeedback.impactOccurred('light');
     }
 
     function updatePlayIcon() {
@@ -268,14 +235,12 @@
     }
 
     function seekTrack(dir) {
-        let d = dir * 10;
-        if(isYT) player.seekTo(player.getCurrentTime() + d);
-        else if(isVideoFile) v.currentTime += d;
-        else a.currentTime += d;
-        tg.HapticFeedback.selectionChanged();
+        let delta = dir * skipSec;
+        if(isYT) player.seekTo(player.getCurrentTime() + delta);
+        else if(isVideoFile) v.currentTime += delta;
+        else a.currentTime += delta;
     }
 
-    // Прогресс
     setInterval(() => {
         let cur = 0, dur = 0;
         if(isYT) { try { cur = player.getCurrentTime(); dur = player.getDuration(); } catch(e){} }
@@ -294,7 +259,6 @@
         return `${m}:${sc < 10 ? '0'+sc : sc}`;
     }
 
-    // Файлы
     document.getElementById('fileInput').onchange = function(e) {
         const file = e.target.files[0];
         if(!file) return;
@@ -304,31 +268,33 @@
         if(file.type.startsWith('video')) {
             isVideoFile = true;
             document.getElementById('cover-art').style.display = 'none';
-            v.style.display = 'block'; v.src = url; v.play();
+            v.style.display = 'block';
+            v.src = url; v.play();
         } else {
             a.src = url; a.play();
         }
         updatePlayIcon();
     };
 
-    // Matrix Фон
+    function setTheme(t) { document.body.className = 'theme-' + t; }
+
     const canvas = document.getElementById('matrix-bg'), ctx = canvas.getContext('2d');
     let drops = [];
     function initM() {
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        drops = Array(Math.floor(canvas.width / 20)).fill(1);
+        drops = Array(Math.floor(canvas.width / 25)).fill(1);
     }
     function drawM() {
         ctx.fillStyle = "rgba(0, 0, 0, 0.1)"; ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--neon');
-        ctx.font = "14px monospace";
+        ctx.font = "15px monospace";
         drops.forEach((y, i) => {
-            ctx.fillText(String.fromCharCode(0x30A0 + Math.random() * 96), i * 20, y * 20);
-            if (y * 20 > canvas.height && Math.random() > 0.98) drops[i] = 0;
+            ctx.fillText(String.fromCharCode(0x30A0 + Math.random() * 96), i * 25, y * 25);
+            if (y * 25 > canvas.height && Math.random() > 0.98) drops[i] = 0;
             drops[i]++;
         });
     }
-    window.onresize = initM; initM(); setInterval(drawM, 50);
+    window.onresize = initM; initM(); setInterval(drawM, 60);
 </script>
 </body>
 </html>
