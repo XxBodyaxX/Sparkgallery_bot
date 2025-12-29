@@ -3,308 +3,332 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Галерея Pro & Game</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <title>CYBER PLAYER WEB APP</title>
+    <script src="https://tgram.github.io/webapp-apps/js/telegram-web-app.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;800&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #f0f4f8; --card: #ffffff; --text: #333; --accent: #03a9f4;
-            --grad: linear-gradient(135deg, #4fc3f7 0%, #03a9f4 100%);
-            --header-text: #ffffff;
+            --tg-bg: var(--tg-theme-bg-color, #05080a);
+            --tg-btn: var(--tg-theme-button-color, #00f2ff);
+            --tg-btn-text: var(--tg-theme-button-text-color, #000);
+            --neon: #00f2ff; 
+            --bg: var(--tg-bg); 
+            --panel: rgba(10, 16, 20, 0.9);
+            --border: rgba(0, 242, 255, 0.4); 
+            --text: var(--tg-theme-text-color, #cffafe);
         }
 
-        /* ТЕМЫ */
-        body.winter { --bg: #e1f5fe; --accent: #0288d1; --grad: linear-gradient(135deg, #b3e5fc, #0288d1); }
-        body.spring { --bg: #f1f8e9; --accent: #689f38; --grad: linear-gradient(135deg, #dcedc8, #689f38); }
-        body.summer { --bg: #fffde7; --accent: #fbc02d; --grad: linear-gradient(135deg, #fff9c4, #fbc02d); }
-        body.autumn { --bg: #fbe9e7; --accent: #e64a19; --grad: linear-gradient(135deg, #ffccbc, #e64a19); }
-        body.cyberpunk { --bg: #0d0221; --card: #241734; --text: #00ff41; --accent: #ff00ff; --grad: linear-gradient(135deg, #ff00ff, #00ffff); }
-        body.gothic { --bg: #000; --card: #1a1a1a; --text: #cfd8dc; --accent: #b71c1c; --grad: linear-gradient(135deg, #424242, #121212); }
-        body.stained-glass { --bg: #121212; --accent: #ffeb3b; --grad: linear-gradient(45deg, #f44336, #9c27b0, #2196f3, #4caf50, #ffeb3b); }
-        body.anime { --bg: #fce4ec; --accent: #ec407a; --grad: linear-gradient(135deg, #f8bbd0, #f06292); }
-        body.matrix { --bg: #000; --accent: #00ff41; --grad: linear-gradient(180deg, #003b00, #000); --text: #00ff41; }
-        body.cats { --bg: #efebe9; --accent: #795548; --grad: linear-gradient(135deg, #d7ccc8, #a1887f); }
+        body.theme-cyber { --neon: #00f2ff; }
+        body.theme-winter { --neon: #a0e9ff; }
+        body.theme-gothic { --neon: #ff0000; }
+        body.theme-retro { --neon: #ff00ff; }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); transition: 0.5s; padding-bottom: 100px; overflow-x: hidden; }
-
-        /* ПРОФИЛЬ */
-        .profile-card { margin: 15px; padding: 25px 15px; border-radius: 25px; background: var(--grad); color: var(--header-text); position: relative; overflow: hidden; text-align: center; box-shadow: 0 8px 30px rgba(0,0,0,0.25); }
-        .profile-content { position: relative; z-index: 5; background: rgba(0,0,0,0.3); backdrop-filter: blur(8px); padding: 20px; border-radius: 22px; border: 1px solid rgba(255,255,255,0.2); }
+        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
         
-        .emoji-particle { position: absolute; top: -60px; animation: fall linear infinite; pointer-events: none; z-index: 1; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.4)); }
-        @keyframes fall { 0% { transform: translateY(0) rotate(0deg); opacity: 0; } 15% { opacity: 1; } 100% { transform: translateY(500px) rotate(360deg); opacity: 0; } }
+        body {
+            margin: 0; background: var(--bg); color: var(--text);
+            font-family: 'Rajdhani', sans-serif; height: 100vh;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            overflow: hidden; transition: 0.5s;
+        }
 
-        /* ГАЛЕРЕЯ (ТОЛЬКО ФОТО) */
-        .posts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 15px; }
-        .post-card { background: var(--card); border-radius: 18px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
-        .post-media { width: 100%; height: 160px; object-fit: cover; display: block; }
+        #matrix-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; opacity: 0.3; pointer-events: none; }
 
-        /* ИГРА */
-        .game-container { text-align: center; padding: 20px; }
-        .tree-box { font-size: 100px; position: relative; display: inline-block; margin: 20px 0; }
-        .decorations-layer { position: absolute; inset: 0; font-size: 20px; pointer-events: none; }
-        .xp-bar-bg { width: 100%; height: 20px; background: #ddd; border-radius: 10px; overflow: hidden; margin: 10px 0; }
-        #xpBarFill { height: 100%; background: #4caf50; width: 0%; transition: 0.3s; }
+        .main-deck {
+            position: relative; z-index: 10; width: 95%; max-width: 440px;
+            background: var(--panel); border: 1px solid var(--border);
+            border-radius: 20px; padding: 20px; backdrop-filter: blur(10px);
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+        }
 
-        /* ПЛЕЕР (БЕЗ ВИДЕО) */
-        #hiddenPlayerContainer { position: absolute; width: 1px; height: 1px; opacity: 0.01; overflow: hidden; }
-        #muteToggle { position: fixed; left: 20px; bottom: 110px; width: 55px; height: 55px; background: rgba(0,0,0,0.7); color: white; border-radius: 50%; display: none; align-items: center; justify-content: center; z-index: 1001; border: 2px solid white; font-size: 24px; }
+        .search-bar { display: flex; gap: 5px; margin-bottom: 15px; background: rgba(0,0,0,0.4); padding: 5px; border-radius: 10px; border: 1px solid var(--border); }
+        .search-bar input { flex: 1; background: transparent; border: none; color: var(--neon); font-family: 'Orbitron'; padding: 10px; font-size: 0.9rem; }
+        .search-bar button { background: var(--tg-btn); border: none; color: var(--tg-btn-text); padding: 0 15px; cursor: pointer; font-family: 'Orbitron'; font-weight: bold; border-radius: 8px; }
 
-        /* НАВИГАЦИЯ (КРУПНЫЙ ТЕКСТ) */
-        .nav { position: fixed; bottom: 0; width: 100%; background: var(--card); display: flex; padding: 15px 0; border-top: 1px solid #ddd; z-index: 1000; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
-        .nav-item { flex: 1; text-align: center; font-size: 14px; color: #888; font-weight: 500; }
-        .nav-item.active { color: var(--accent); font-weight: 700; }
+        .results-dropdown {
+            position: absolute; top: 70px; left: 20px; right: 20px; background: #000;
+            border: 1px solid var(--neon); max-height: 250px; overflow-y: auto;
+            display: none; z-index: 100; border-radius: 10px;
+        }
+        .results-dropdown.active { display: block; }
+        .res-card { display: flex; gap: 10px; padding: 10px; border-bottom: 1px solid #222; cursor: pointer; align-items: center; font-size: 0.8rem; }
+
+        .display-container {
+            width: 100%; height: 200px; background: #000; border: 1px solid var(--border);
+            border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative;
+        }
+        #yt-wrapper, #local-video { width: 100%; height: 100%; transition: transform 0.4s ease; display: none; object-fit: contain; }
+        #yt-placeholder { width: 100%; height: 100%; }
+        #cover-art { width: 100%; height: 100%; object-fit: cover; }
+
+        .track-info { text-align: center; margin: 10px 0; font-family: 'Orbitron'; font-size: 0.75rem; color: var(--neon); height: 18px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
+        .progress-block { width: 100%; margin-bottom: 10px; }
+        input[type="range"] { width: 100%; cursor: pointer; accent-color: var(--neon); }
+        .time-info { display: flex; justify-content: space-between; font-size: 0.65rem; font-family: 'Orbitron'; color: var(--neon); opacity: 0.8; }
+
+        .btn-row { display: flex; justify-content: space-between; align-items: center; margin: 10px 0; }
+        .btn { background: none; border: none; color: var(--text); cursor: pointer; display: flex; flex-direction: column; align-items: center; transition: 0.2s; }
+        .btn:active { transform: scale(0.9); }
+        .btn svg { width: 32px; height: 32px; fill: currentColor; }
+        .btn-val { font-size: 0.55rem; margin-top: 4px; font-family: 'Orbitron'; color: var(--neon); }
         
-        .page { display: none; } .page.active { display: block; }
-        .btn { width: 100%; padding: 14px; border-radius: 14px; border: none; background: var(--accent); color: #fff; font-weight: bold; margin-top: 10px; font-size: 16px; }
-        .fab { position: fixed; right: 20px; bottom: 110px; width: 65px; height: 65px; background: var(--grad); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 900; }
-        
-        input, select, textarea { width: 100%; padding: 14px; margin: 10px 0; border-radius: 14px; border: 1px solid #ddd; font-size: 15px; }
+        .play-main { width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--border); color: var(--neon); display: flex; justify-content: center; align-items: center; box-shadow: 0 0 15px var(--border); }
+
+        .theme-selector { margin-top: 15px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+        .theme-btn { font-size: 0.5rem; padding: 8px 2px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text); cursor: pointer; text-align: center; border-radius: 5px; }
+
+        .footer { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; }
+        .file-lbl { cursor: pointer; color: var(--neon); font-size: 0.7rem; font-weight: bold; border: 1px dashed var(--neon); padding: 5px 10px; border-radius: 5px; }
+        .close-btn { color: #ff4444; font-size: 0.7rem; cursor: pointer; text-transform: uppercase; font-family: 'Orbitron'; }
     </style>
 </head>
-<body class="winter">
+<body class="theme-cyber">
 
-    <div id="hiddenPlayerContainer"></div>
-    <div id="muteToggle" onclick="toggleMute()">🔇</div>
+<canvas id="matrix-bg"></canvas>
 
-    <div class="page active" id="profilePage">
-        <div class="profile-card" id="headerBox">
-            <div class="profile-content">
-                <div style="width:75px; height:75px; background:rgba(255,255,255,0.2); border-radius:50%; margin:0 auto 10px; display:flex; align-items:center; justify-content:center; font-size:35px; border:2px solid #fff;">👤</div>
-                <h2 id="userName" style="font-size: 24px;">Пользователь</h2>
-                <div id="musicStatus" style="font-size: 12px; margin-top: 10px; opacity: 0.9;">🔕 Музыка не играет</div>
-            </div>
-        </div>
-        <div style="padding: 0 25px;">
-            <div style="font-size:14px; display:flex; justify-content:space-between; margin-bottom: 5px;"><span>Память</span> <span id="storageSize">0</span> / 500 МБ</div>
-            <div class="xp-bar-bg" style="height: 10px;"><div id="storageBar" style="height:100%; background:var(--accent); width:0%; transition: 0.5s;"></div></div>
-        </div>
+<div class="main-deck">
+    <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="ПОИСК...">
+        <button onclick="runSearch()">📡</button>
+    </div>
+    <div class="results-dropdown" id="resultsBox"></div>
+
+    <div class="display-container">
+        <div id="yt-wrapper"><div id="yt-placeholder"></div></div>
+        <video id="local-video" playsinline preload="metadata"></video>
+        <img id="cover-art" src="https://images.unsplash.com/photo-1614850523296-d8c1af93d400?w=500">
     </div>
 
-    <div class="page" id="galleryPage">
-        <div style="padding: 10px 15px;">
-            <select id="dateFilter" onchange="renderPosts()">
-                <option value="all">📅 Все фотографии</option>
-                <option value="today">🕒 За сегодня</option>
-            </select>
-        </div>
-        <div class="posts-grid" id="postsGrid"></div>
-        <button class="fab" onclick="document.getElementById('uploadModal').style.display='flex'">+</button>
-    </div>
+    <div id="trackTitle" class="track-info">СИСТЕМА ГОТОВА</div>
 
-    <div class="page" id="gamePage">
-        <div class="game-container">
-            <h3 style="font-size: 22px; margin-bottom: 10px;">Уровень <span id="levelNum">1</span></h3>
-            <div class="xp-bar-bg"><div id="xpBarFill"></div></div>
-            <div style="font-size: 13px; color: #666; margin-bottom: 15px;">Опыт: <span id="xpCurrent">0</span> / <span id="xpNeeded">100</span></div>
-            
-            <div class="tree-box">
-                🎄
-                <div id="decorations" class="decorations-layer"></div>
-            </div>
-            
-            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 0 10px;">
-                <button class="btn" onclick="decorate('🍎')">🍎</button>
-                <button class="btn" onclick="decorate('⭐')">⭐</button>
-                <button class="btn" onclick="decorate('🎁')">🎁</button>
-                <button class="btn" onclick="decorate('🔔')">🔔</button>
-                <button class="btn" onclick="decorate('❄️')">❄️</button>
-                <button class="btn" onclick="decorate('🕯️')">🕯️</button>
-            </div>
+    <div class="progress-block">
+        <input type="range" id="progressBar" value="0" min="0">
+        <div class="time-info">
+            <span id="curTime">0:00</span>
+            <span id="durTime">0:00</span>
         </div>
     </div>
 
-    <div class="page" id="settingsPage">
-        <div style="padding: 25px;">
-            <h3 style="margin-bottom: 15px;">Выбор темы</h3>
-            <select id="themePicker" onchange="setTheme(this.value)">
-                <option value="winter">❄️ Зима</option>
-                <option value="spring">🌱 Весна</option>
-                <option value="summer">☀️ Лето</option>
-                <option value="autumn">🍂 Осень</option>
-                <option value="cyberpunk">🌃 Киберпанк</option>
-                <option value="gothic">🦇 Готика</option>
-                <option value="stained-glass">🎨 Витраж</option>
-                <option value="anime">🌸 Аниме</option>
-                <option value="matrix">📟 Матрица</option>
-                <option value="cats">🐾 Коты</option>
-            </select>
-            
-            <div id="adminPanel" style="display:none; border-top:2px solid var(--accent); margin-top:30px; padding-top:20px;">
-                <h4 style="color:var(--accent); margin-bottom: 10px;">Управление звуком 24/7</h4>
-                <input type="text" id="adminMusicUrl" placeholder="Ссылка (YouTube/SoundCloud)">
-                <button class="btn" onclick="broadcastMusic(true)">Включить поток</button>
-                <button class="btn" style="background:#ff5252;" onclick="broadcastMusic(false)">Выключить звук</button>
-            </div>
-        </div>
+    <div class="btn-row">
+        <button class="btn" onclick="seekTrack(-1)">
+            <svg viewBox="0 0 24 24"><path d="M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z" transform="rotate(180 12 12)"/></svg>
+            <span class="btn-val">-10s</span>
+        </button>
+
+        <button class="btn" onclick="rotateVideo()">
+            <svg viewBox="0 0 24 24"><path d="M12 4V1l5 5-5 5V8c-3.31 0-6 2.69-6 6 0 1.01.25 1.97.7 2.8l-1.46 1.46C4.46 16.97 4 15.51 4 14c0-4.42 3.58-8 8-8z"/></svg>
+            <span class="btn-val">ROTATE</span>
+        </button>
+
+        <button class="btn play-main" onclick="togglePlay()">
+            <svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+
+        <button class="btn" onclick="seekTrack(1)">
+            <svg viewBox="0 0 24 24"><path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/></svg>
+            <span class="btn-val">+10s</span>
+        </button>
     </div>
 
-    <div class="nav">
-        <div class="nav-item active" onclick="nav('profile', this)">👤 Профиль</div>
-        <div class="nav-item" onclick="nav('gallery', this)">🖼️ Фото</div>
-        <div class="nav-item" onclick="nav('game', this)">🎄 Игра</div>
-        <div class="nav-item" onclick="nav('settings', this)">⚙️ Настр.</div>
+    <div class="theme-selector">
+        <div class="theme-btn" onclick="setTheme('cyber')">КИБЕР</div>
+        <div class="theme-btn" onclick="setTheme('winter')">ЛЕД</div>
+        <div class="theme-btn" onclick="setTheme('gothic')">ТЬМА</div>
+        <div class="theme-btn" onclick="setTheme('retro')">НЕОН</div>
     </div>
 
-    <div id="uploadModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:2000; align-items:center; justify-content:center; padding:20px;">
-        <div style="background:#fff; padding:30px; border-radius:30px; width:100%; max-width:400px;">
-            <h3 style="margin-bottom: 15px;">Новое фото</h3>
-            <input type="file" id="fileInput" accept="image/*">
-            <textarea id="postDesc" placeholder="Описание..." rows="3"></textarea>
-            <button class="btn" id="uploadBtn" onclick="handleUpload()">Выложить</button>
-            <button class="btn" style="background:#888;" onclick="document.getElementById('uploadModal').style.display='none'">Отмена</button>
-        </div>
+    <div class="footer">
+        <label class="file-lbl" for="fileInput">ФАЙЛ</label>
+        <div class="close-btn" onclick="closeWebApp()">ЗАКРЫТЬ</div>
     </div>
+    <input type="file" id="fileInput" accept="video/*,audio/*" style="display:none">
+</div>
 
-    <script>
-        const tg = window.Telegram.WebApp;
-        const ADMIN_ID = '6918933194'; 
-        const CLOUDINARY_URL = 'https://api.cloudinary.com/v1_1/ddjfgk8a0/upload';
-        const UPLOAD_PRESET = 'Sparkgallery';
+<audio id="local-audio"></audio>
+<script src="https://www.youtube.com/iframe_api"></script>
 
-        let xp = parseInt(localStorage.getItem('tree_xp') || '0');
-        let level = parseInt(localStorage.getItem('tree_lv') || '1');
-        let posts = JSON.parse(localStorage.getItem('posts_v8') || '[]');
-        let storageUsed = parseInt(localStorage.getItem('storage_v8') || '0');
-        let isMuted = true;
+<script>
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand();
 
-        function init() {
-            tg.ready(); tg.expand();
-            const user = tg.initDataUnsafe?.user;
-            if (user) {
-                document.getElementById('userName').textContent = user.first_name;
-                if (user.id.toString() === ADMIN_ID) document.getElementById('adminPanel').style.display = 'block';
-            }
-            updateGameUI();
-            setTheme(localStorage.getItem('theme') || 'winter');
-            renderPosts();
-            updateStorageUI();
-            checkGlobalMusic();
+    let player, isYT = false, isVideoFile = false, currentRotation = 0;
+    const a = document.getElementById('local-audio');
+    const v = document.getElementById('local-video');
+    const proxies = ["https://inv.vern.cc", "https://invidious.flokinet.to", "https://yewtu.be", "https://inv.n8ms.com"];
+    let pIdx = 0;
+
+    function closeWebApp() { tg.close(); }
+
+    function setTheme(t) { 
+        document.body.className = 'theme-' + t; 
+        tg.HapticFeedback.selectionChanged();
+    }
+
+    // Сброс всех плееров и очистка памяти
+    function resetAll() {
+        if (isYT && player && player.stopVideo) player.stopVideo();
+        if (v.src) { URL.revokeObjectURL(v.src); v.src = ""; }
+        if (a.src) { URL.revokeObjectURL(a.src); a.src = ""; }
+        
+        a.pause(); v.pause();
+        isYT = false; isVideoFile = false; currentRotation = 0;
+        
+        v.style.display = 'none';
+        v.style.transform = 'rotate(0deg) scale(1)';
+        document.getElementById('yt-wrapper').style.display = 'none';
+        document.getElementById('yt-wrapper').style.transform = 'rotate(0deg) scale(1)';
+        document.getElementById('cover-art').style.display = 'block';
+    }
+
+    // YouTube API
+    function onYouTubeIframeAPIReady() {
+        player = new YT.Player('yt-placeholder', {
+            height: '100%', width: '100%',
+            playerVars: { 'controls': 0, 'rel': 0, 'modestbranding': 1, 'playsinline': 1 },
+            events: { 'onStateChange': () => updatePlayIcon() }
+        });
+    }
+
+    // Поворот вправо
+    function rotateVideo() {
+        currentRotation = (currentRotation + 90) % 360;
+        const target = isYT ? document.getElementById('yt-wrapper') : (isVideoFile ? v : null);
+        if(target) {
+            let scale = (currentRotation === 90 || currentRotation === 270) ? 0.6 : 1;
+            target.style.transform = `rotate(${currentRotation}deg) scale(${scale})`;
         }
+        tg.HapticFeedback.impactOccurred('light');
+    }
 
-        // --- ИГРА ---
-        function decorate(emoji) {
-            const dec = document.getElementById('decorations');
-            const item = document.createElement('div');
-            item.textContent = emoji;
-            item.style.position = 'absolute';
-            item.style.left = (Math.random() * 60 + 20) + '%';
-            item.style.top = (Math.random() * 60 + 20) + '%';
-            dec.appendChild(item);
-            if(dec.children.length > 20) dec.children[0].remove();
+    // Поиск
+    async function runSearch() {
+        const q = document.getElementById('searchInput').value;
+        if(!q) return;
+        const box = document.getElementById('resultsBox');
+        box.innerHTML = '<div style="padding:15px; color:var(--neon)">ПОИСК...</div>';
+        box.classList.add('active');
 
-            let gain = level <= 5 ? (30 - level * 3) : 6;
-            xp += gain;
-            const needed = level <= 5 ? (level * 100) : (500 + level * 50);
-            
-            if (xp >= needed) { xp = 0; level++; tg.HapticFeedback.notificationOccurred('success'); }
-            localStorage.setItem('tree_xp', xp); localStorage.setItem('tree_lv', level);
-            updateGameUI();
-        }
-
-        function updateGameUI() {
-            document.getElementById('levelNum').textContent = level;
-            document.getElementById('xpCurrent').textContent = xp;
-            const needed = level <= 5 ? (level * 100) : (500 + level * 50);
-            document.getElementById('xpNeeded').textContent = needed;
-            document.getElementById('xpBarFill').style.width = (xp / needed * 100) + '%';
-        }
-
-        // --- МУЗЫКА (БЕЗ ВИЗУАЛА) ---
-        function broadcastMusic(state) {
-            if (state) {
-                const url = document.getElementById('adminMusicUrl').value.trim();
-                if(!url) return;
-                localStorage.setItem('global_music_url', url);
-            } else { localStorage.removeItem('global_music_url'); }
-            checkGlobalMusic();
-        }
-
-        function checkGlobalMusic() {
-            const url = localStorage.getItem('global_music_url');
-            const container = document.getElementById('hiddenPlayerContainer');
-            const toggle = document.getElementById('muteToggle');
-            const status = document.getElementById('musicStatus');
-            if (url) {
-                let id = url.includes('v=') ? url.split('v=')[1].split('&')[0] : url.split('/').pop();
-                container.innerHTML = `<iframe src="https://www.youtube.com/embed/${id}?autoplay=1&mute=0" allow="autoplay"></iframe>`;
-                toggle.style.display = 'flex';
-                status.textContent = '🎵 Поток активен';
-            } else {
-                container.innerHTML = ''; toggle.style.display = 'none';
-                status.textContent = '🔕 Музыка не играет';
-            }
-        }
-
-        function toggleMute() {
-            isMuted = !isMuted;
-            document.getElementById('muteToggle').innerHTML = isMuted ? '🔇' : '🔊';
-            document.getElementById('hiddenPlayerContainer').style.opacity = isMuted ? '0.01' : '1';
-        }
-
-        // --- ГАЛЕРЕЯ (ФОТО) ---
-        async function handleUpload() {
-            const file = document.getElementById('fileInput').files[0];
-            if (!file) return;
-            const btn = document.getElementById('uploadBtn');
-            btn.disabled = true; btn.textContent = '...';
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('upload_preset', UPLOAD_PRESET);
+        const tryFetch = async () => {
             try {
-                const res = await fetch(CLOUDINARY_URL, { method: 'POST', body: formData });
-                const data = await res.json();
-                posts.unshift({ id: Date.now(), url: data.secure_url, desc: document.getElementById('postDesc').value, date: new Date().toLocaleDateString() });
-                storageUsed += file.size;
-                localStorage.setItem('posts_v8', JSON.stringify(posts));
-                localStorage.setItem('storage_v8', storageUsed);
-                renderPosts(); updateStorageUI();
-                document.getElementById('uploadModal').style.display = 'none';
-            } catch (e) { tg.showAlert("Ошибка!"); }
-            finally { btn.disabled = false; btn.textContent = 'Выложить'; }
-        }
-
-        function renderPosts() {
-            const filter = document.getElementById('dateFilter').value;
-            const container = document.getElementById('postsGrid');
-            const today = new Date().toLocaleDateString();
-            const filtered = posts.filter(p => filter === 'all' || p.date === today);
-            container.innerHTML = filtered.map(p => `
-                <div class="post-card">
-                    <img src="${p.url}" class="post-media" loading="lazy">
-                    <div style="padding:12px; font-size:13px;"><b>${p.desc || ''}</b><br><small style="color:#888">${p.date}</small></div>
-                </div>
-            `).join('');
-        }
-
-        function updateStorageUI() {
-            const mb = (storageUsed / 1024 / 1024).toFixed(1);
-            document.getElementById('storageSize').textContent = mb;
-            document.getElementById('storageBar').style.width = Math.min((mb / 500) * 100, 100) + '%';
-        }
-
-        function setTheme(t) {
-            document.body.className = t; localStorage.setItem('theme', t);
-            const h = document.getElementById('headerBox');
-            h.querySelectorAll('.emoji-particle').forEach(e => e.remove());
-            const emojis = themesData[t] || ['✨','⭐','🌟'];
-            for(let i=0; i<15; i++) {
-                const p = document.createElement('div'); p.className='emoji-particle';
-                p.textContent = emojis[Math.floor(Math.random()*emojis.length)];
-                p.style.left = Math.random()*100+'%'; p.style.fontSize='25px';
-                p.style.animationDuration = (Math.random()*3+4)+'s';
-                h.appendChild(p);
+                const r = await fetch(`${proxies[pIdx]}/api/v1/search?q=${encodeURIComponent(q)}&type=video`);
+                const d = await r.json();
+                renderResults(d);
+            } catch (e) {
+                pIdx = (pIdx + 1) % proxies.length;
+                if (pIdx !== 0) tryFetch();
+                else box.innerHTML = '<div style="padding:15px">ОШИБКА СЕТИ</div>';
             }
-        }
+        };
+        tryFetch();
+    }
 
-        function nav(id, el) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById(id+'Page').classList.add('active');
-            el.classList.add('active');
-        }
+    function renderResults(data) {
+        const box = document.getElementById('resultsBox');
+        box.innerHTML = '';
+        data.slice(0, 10).forEach(i => {
+            const div = document.createElement('div');
+            div.className = 'res-card';
+            div.innerHTML = `
+                <img src="${i.videoThumbnails[0].url}" width="60" style="border-radius:5px"> 
+                <div style="overflow:hidden">
+                    <div style="white-space:nowrap; text-overflow:ellipsis; overflow:hidden">${i.title}</div>
+                    <div style="font-size:0.6rem; opacity:0.6">${i.author}</div>
+                </div>`;
+            div.onclick = () => {
+                resetAll(); isYT = true; box.classList.remove('active');
+                document.getElementById('cover-art').style.display = 'none';
+                document.getElementById('yt-wrapper').style.display = 'block';
+                document.getElementById('trackTitle').innerText = i.title;
+                player.loadVideoById(i.videoId);
+                tg.HapticFeedback.impactOccurred('medium');
+            };
+            box.appendChild(div);
+        });
+    }
 
-        init();
-    </script>
+    // Управление
+    function togglePlay() {
+        if(isYT) {
+            if(player.getPlayerState() === 1) player.pauseVideo(); else player.playVideo();
+        } else if(isVideoFile) {
+            v.paused ? v.play() : v.pause();
+        } else {
+            a.paused ? a.play() : a.pause();
+        }
+        updatePlayIcon();
+        tg.HapticFeedback.impactOccurred('light');
+    }
+
+    function updatePlayIcon() {
+        const icon = document.getElementById('playIcon');
+        let playing = isYT ? (player.getPlayerState && player.getPlayerState() === 1) : (isVideoFile ? !v.paused : !a.paused);
+        icon.innerHTML = playing ? '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>' : '<path d="M8 5v14l11-7z"/>';
+    }
+
+    function seekTrack(dir) {
+        let d = dir * 10;
+        if(isYT) player.seekTo(player.getCurrentTime() + d);
+        else if(isVideoFile) v.currentTime += d;
+        else a.currentTime += d;
+        tg.HapticFeedback.selectionChanged();
+    }
+
+    // Прогресс
+    setInterval(() => {
+        let cur = 0, dur = 0;
+        if(isYT) { try { cur = player.getCurrentTime(); dur = player.getDuration(); } catch(e){} }
+        else if(isVideoFile) { cur = v.currentTime; dur = v.duration; }
+        else { cur = a.currentTime; dur = a.duration; }
+        if(dur) {
+            const bar = document.getElementById('progressBar');
+            bar.max = dur; bar.value = cur;
+            document.getElementById('curTime').innerText = formatTime(cur);
+            document.getElementById('durTime').innerText = formatTime(dur);
+        }
+    }, 500);
+
+    function formatTime(s) {
+        let m = Math.floor(s/60), sc = Math.floor(s%60);
+        return `${m}:${sc < 10 ? '0'+sc : sc}`;
+    }
+
+    // Файлы
+    document.getElementById('fileInput').onchange = function(e) {
+        const file = e.target.files[0];
+        if(!file) return;
+        resetAll();
+        const url = URL.createObjectURL(file);
+        document.getElementById('trackTitle').innerText = file.name;
+        if(file.type.startsWith('video')) {
+            isVideoFile = true;
+            document.getElementById('cover-art').style.display = 'none';
+            v.style.display = 'block'; v.src = url; v.play();
+        } else {
+            a.src = url; a.play();
+        }
+        updatePlayIcon();
+    };
+
+    // Matrix Фон
+    const canvas = document.getElementById('matrix-bg'), ctx = canvas.getContext('2d');
+    let drops = [];
+    function initM() {
+        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+        drops = Array(Math.floor(canvas.width / 20)).fill(1);
+    }
+    function drawM() {
+        ctx.fillStyle = "rgba(0, 0, 0, 0.1)"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--neon');
+        ctx.font = "14px monospace";
+        drops.forEach((y, i) => {
+            ctx.fillText(String.fromCharCode(0x30A0 + Math.random() * 96), i * 20, y * 20);
+            if (y * 20 > canvas.height && Math.random() > 0.98) drops[i] = 0;
+            drops[i]++;
+        });
+    }
+    window.onresize = initM; initM(); setInterval(drawM, 50);
+</script>
 </body>
 </html>
