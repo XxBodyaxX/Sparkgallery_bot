@@ -2,15 +2,20 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>ПЛЕЕР</title>
+    <title>CYBER PLAYER PRO</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;800&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
             --neon: #00f2ff; --bg: #05080a; --panel: rgba(10, 16, 20, 0.95);
             --border: rgba(0, 242, 255, 0.4); --text: #cffafe;
+            --frame-style: double;
         }
+        /* ТЕМЫ */
         body.theme-cyber { --neon: #00f2ff; --bg: #05080a; --border: #00f2ff66; --text: #cffafe; }
-        body.theme-winter { --neon: #a0e9ff; --bg: #0a141a; --border: #ffffff55; --text: #f0faff; }
+        body.theme-winter { 
+            --neon: #a0e9ff; --bg: #0a141a; --border: #ffffffaa; --text: #f0faff;
+            --frame-shadow: 0 0 20px #fff, inset 0 0 15px #a0e9ff;
+        }
         body.theme-gothic { --neon: #ff0000; --bg: #0a0000; --border: #330000; --text: #ffcccc; }
         body.theme-steampunk { --neon: #ffaa00; --bg: #1a0f00; --border: #553300; --text: #ffe0b3; }
         body.theme-biopunk { --neon: #39ff14; --bg: #040d04; --border: #1a4d00; --text: #d0ffd0; }
@@ -25,12 +30,26 @@
             transition: 0.5s;
         }
 
+        /* РАМКА ВОКРУГ ЭКРАНА */
+        body::before {
+            content: ""; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            border: 15px solid transparent;
+            border-image: linear-gradient(var(--bg), var(--border)) 30;
+            pointer-events: none; z-index: 1000; transition: 0.5s;
+        }
+        
+        body.theme-winter::before {
+            border-image: url('https://www.transparenttextures.com/patterns/frozen-wall.png') 30 repeat;
+            box-shadow: var(--frame-shadow);
+        }
+
         #matrix-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; opacity: 0.4; pointer-events: none; }
 
         .main-deck {
             position: relative; z-index: 10; width: 440px;
             background: var(--panel); border: 2px solid var(--border);
             border-radius: 15px; padding: 25px; backdrop-filter: blur(15px);
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
         }
 
         .search-bar { display: flex; gap: 5px; margin-bottom: 20px; background: rgba(0,0,0,0.5); padding: 5px; border-radius: 5px; border: 1px solid var(--border); }
@@ -40,31 +59,31 @@
         .results-dropdown {
             position: absolute; top: 75px; left: 25px; right: 25px; background: #000;
             border: 1px solid var(--neon); max-height: 200px; overflow-y: auto;
-            display: none; z-index: 100;
+            display: none; z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
         }
         .results-dropdown.active { display: block; }
         .res-card { display: flex; gap: 10px; padding: 10px; border-bottom: 1px solid #222; cursor: pointer; align-items: center; font-size: 0.8rem; }
+        .res-card:hover { background: rgba(255,255,255,0.1); }
 
         .display-container {
             width: 100%; height: 210px; background: #000; border: 1px solid var(--border);
             border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative;
         }
         #yt-wrapper, #local-video { width: 100%; height: 100%; transition: transform 0.4s ease; display: none; object-fit: contain; }
-        #yt-placeholder { width: 100%; height: 100%; }
         #cover-art { width: 100%; height: 100%; object-fit: cover; }
 
-        .track-info { text-align: center; margin-top: 10px; font-family: 'Orbitron'; font-size: 0.8rem; color: var(--neon); height: 20px; overflow: hidden; }
+        .track-info { text-align: center; margin-top: 10px; font-family: 'Orbitron'; font-size: 0.8rem; color: var(--neon); height: 20px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 
         .skip-control { display: flex; justify-content: center; align-items: center; gap: 8px; margin: 10px 0; font-size: 0.7rem; color: var(--neon); font-family: 'Orbitron'; }
         .skip-control input { background: transparent; border: 1px solid var(--neon); color: var(--neon); width: 50px; text-align: center; border-radius: 3px; }
 
         .progress-block { width: 100%; margin-bottom: 10px; }
-        input[type="range"] { width: 100%; cursor: pointer; }
+        input[type="range"] { width: 100%; cursor: pointer; accent-color: var(--neon); }
         .time-info { display: flex; justify-content: space-between; font-size: 0.65rem; font-family: 'Orbitron'; color: var(--neon); }
 
         .btn-row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
-        .btn { background: none; border: none; color: var(--text); cursor: pointer; display: flex; flex-direction: column; align-items: center; }
-        .btn:hover { color: var(--neon); }
+        .btn { background: none; border: none; color: var(--text); cursor: pointer; display: flex; flex-direction: column; align-items: center; transition: 0.2s; }
+        .btn:hover { color: var(--neon); transform: scale(1.1); }
         .btn svg { width: 28px; height: 28px; fill: currentColor; }
         .btn-val { font-size: 0.55rem; margin-top: 2px; font-family: 'Orbitron'; }
         
@@ -72,28 +91,31 @@
 
         .theme-selector { margin-top: 15px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
         .theme-btn { font-size: 0.55rem; padding: 6px 2px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: var(--text); cursor: pointer; text-align: center; border-radius: 2px; }
+        .theme-btn:hover { background: var(--neon); color: #000; }
 
-        .footer { display: flex; justify-content: center; margin-top: 15px; font-size: 0.65rem; }
+        .footer { display: flex; justify-content: space-around; margin-top: 15px; font-size: 0.65rem; font-family: 'Orbitron'; }
+        .footer label, .footer span { cursor: pointer; color: var(--neon); transition: 0.3s; }
+        .footer label:hover { text-shadow: 0 0 10px var(--neon); }
     </style>
 </head>
 <body class="theme-cyber">
 
 <canvas id="matrix-bg"></canvas>
 
-<div class="main-deck">
+<div class="main-deck" id="playerNode">
     <div class="search-bar">
         <input type="text" id="searchInput" placeholder="ПОИСК...">
         <button onclick="runSearch()">СКАН</button>
     </div>
     <div class="results-dropdown" id="resultsBox"></div>
 
-    <div class="display-container">
-        <div id="yt-wrapper"><div id="yt-placeholder"></div></div>
+    <div class="display-container" id="displayFrame">
+        <div id="yt-wrapper" style="width:100%;height:100%"><div id="yt-placeholder"></div></div>
         <video id="local-video"></video>
         <img id="cover-art" src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=500">
     </div>
 
-    <div id="trackTitle" class="track-info">ГОТОВ</div>
+    <div id="trackTitle" class="track-info">ОЖИДАНИЕ...</div>
 
     <div class="skip-control">
         <span>ПРЫЖОК:</span>
@@ -102,7 +124,7 @@
     </div>
 
     <div class="progress-block">
-        <input type="range" id="progressBar" value="0">
+        <input type="range" id="progressBar" value="0" step="1" oninput="manualSeek(this.value)">
         <div class="time-info">
             <span id="curTime">0:00</span>
             <span id="durTime">0:00</span>
@@ -124,6 +146,11 @@
             <svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
         </button>
 
+        <button class="btn" onclick="toggleFullscreen()">
+            <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+            <span class="btn-val">ЭКРАН</span>
+        </button>
+
         <button class="btn" onclick="seekTrack(1)">
             <svg viewBox="0 0 24 24"><path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/></svg>
             <span class="btn-val" id="lbl-fwd">+10с</span>
@@ -141,7 +168,8 @@
     </div>
 
     <div class="footer">
-        <label style="cursor:pointer; color:var(--neon)" for="fileInput">[ ВЫБРАТЬ ФАЙЛ ]</label>
+        <label for="fileInput">[ ОТКРЫТЬ ФАЙЛ ]</label>
+        <span onclick="window.location.reload()">[ СБРОС ]</span>
     </div>
     <input type="file" id="fileInput" accept="video/*,audio/*" style="display:none">
 </div>
@@ -171,11 +199,20 @@
         }
     }
 
+    function toggleFullscreen() {
+        let elem = document.getElementById('playerNode');
+        if (!document.fullscreenElement) {
+            elem.requestFullscreen().catch(err => { alert(`Ошибка: ${err.message}`); });
+        } else {
+            document.exitFullscreen();
+        }
+    }
+
     function onYouTubeIframeAPIReady() {
         player = new YT.Player('yt-placeholder', {
             height: '100%', width: '100%',
-            playerVars: { 'controls': 0, 'rel': 0 },
-            events: { 'onStateChange': () => updatePlayIcon() }
+            playerVars: { 'controls': 0, 'rel': 0, 'modestbranding': 1 },
+            events: { 'onStateChange': (e) => { updatePlayIcon(); if(e.data === 0) resetAll(); } }
         });
     }
 
@@ -192,7 +229,7 @@
             d.slice(0, 10).forEach(i => {
                 const div = document.createElement('div');
                 div.className = 'res-card';
-                div.innerHTML = `<img src="${i.videoThumbnails[0].url}" width="50"> <span>${i.title}</span>`;
+                div.innerHTML = `<img src="${i.videoThumbnails[0].url}" width="50" height="30" style="object-fit:cover"> <span>${i.title}</span>`;
                 div.onclick = () => {
                     resetAll(); isYT = true; box.classList.remove('active');
                     document.getElementById('cover-art').style.display = 'none';
@@ -217,6 +254,7 @@
         document.getElementById('yt-wrapper').style.display = 'none';
         document.getElementById('yt-wrapper').style.transform = 'rotate(0deg) scale(1)';
         document.getElementById('cover-art').style.display = 'block';
+        document.getElementById('trackTitle').innerText = "ГОТОВ";
     }
 
     function togglePlay() {
@@ -241,14 +279,21 @@
         else a.currentTime += delta;
     }
 
+    function manualSeek(val) {
+        if(isYT) player.seekTo(val);
+        else if(isVideoFile) v.currentTime = val;
+        else a.currentTime = val;
+    }
+
     setInterval(() => {
         let cur = 0, dur = 0;
         if(isYT) { try { cur = player.getCurrentTime(); dur = player.getDuration(); } catch(e){} }
         else if(isVideoFile) { cur = v.currentTime; dur = v.duration; }
         else { cur = a.currentTime; dur = a.duration; }
+        
         if(dur) {
             const bar = document.getElementById('progressBar');
-            bar.max = dur; bar.value = cur;
+            bar.max = Math.floor(dur); bar.value = Math.floor(cur);
             document.getElementById('curTime').innerText = formatTime(cur);
             document.getElementById('durTime').innerText = formatTime(dur);
         }
@@ -273,28 +318,35 @@
         } else {
             a.src = url; a.play();
         }
-        updatePlayIcon();
     };
 
-    function setTheme(t) { document.body.className = 'theme-' + t; }
+    function setTheme(t) { document.body.className = 'theme-' + t; initM(); }
 
     const canvas = document.getElementById('matrix-bg'), ctx = canvas.getContext('2d');
     let drops = [];
     function initM() {
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        drops = Array(Math.floor(canvas.width / 25)).fill(1);
+        drops = Array(Math.floor(canvas.width / 20)).fill(1);
     }
-    function drawM() {
-        ctx.fillStyle = "rgba(0, 0, 0, 0.1)"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    function draw() {
+        const isWinter = document.body.classList.contains('theme-winter');
+        ctx.fillStyle = isWinter ? "rgba(10, 20, 30, 0.2)" : "rgba(0, 0, 0, 0.1)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
         ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--neon');
-        ctx.font = "15px monospace";
+        ctx.font = isWinter ? "20px serif" : "15px monospace";
+        
         drops.forEach((y, i) => {
-            ctx.fillText(String.fromCharCode(0x30A0 + Math.random() * 96), i * 25, y * 25);
-            if (y * 25 > canvas.height && Math.random() > 0.98) drops[i] = 0;
+            const char = isWinter ? "❄" : String.fromCharCode(0x30A0 + Math.random() * 96);
+            ctx.fillText(char, i * 20, y * 20);
+            if (y * 20 > canvas.height && Math.random() > 0.98) drops[i] = 0;
             drops[i]++;
         });
     }
-    window.onresize = initM; initM(); setInterval(drawM, 60);
+    window.onresize = initM; initM(); setInterval(draw, 60);
+
+    // Закрытие поиска при клике мимо
+    window.onclick = (e) => { if(!e.target.closest('.search-bar')) document.getElementById('resultsBox').classList.remove('active'); }
 </script>
 </body>
 </html>
