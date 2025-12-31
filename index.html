@@ -14,7 +14,10 @@
         body.theme-cyber { --neon: #00f2ff; --bg: #05080a; --border: #00f2ff66; }
         body.theme-winter { --neon: #a0e9ff; --bg: #0a141a; --border: #a0e9ff33; }
         body.theme-gothic { --neon: #ff0000; --bg: #0a0000; --border: #330000; }
+        body.theme-steampunk { --neon: #ffaa00; --bg: #1a0f00; --border: #553300; }
+        body.theme-biopunk { --neon: #39ff14; --bg: #040d04; --border: #1a4d00; }
         body.theme-retro { --neon: #ff00ff; --bg: #120024; --border: #ff00ff66; }
+        body.theme-industrial { --neon: #999999; --bg: #111111; --border: #444444; }
 
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
         body {
@@ -35,7 +38,8 @@
             transition: all 0.3s ease;
         }
 
-        .main-deck.fullscreen-mode {
+        /* Полноэкранный режим для палубы */
+        .main-deck.fullscreen-active {
             max-width: none; width: 100vw; height: 100vh; border: none; border-radius: 0;
         }
 
@@ -47,8 +51,7 @@
             width: 100%; height: 210px; background: #000; border: 1px solid var(--border);
             border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative;
         }
-
-        .fullscreen-mode .display-container { height: 60vh; }
+        .fullscreen-active .display-container { height: 60vh; }
 
         #yt-wrapper, #local-video { width: 100%; height: 100%; display: none; object-fit: contain; }
         #cover-art { width: 100%; height: 100%; object-fit: cover; cursor: pointer; }
@@ -70,13 +73,16 @@
         
         .play-main { width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--border); color: var(--neon); display: flex; justify-content: center; align-items: center; }
 
-        .theme-container { margin-top: auto; padding-top: 10px; border-top: 1px dashed var(--border); text-align: center; }
-        .theme-selector { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; }
-        .theme-btn { font-size: 0.5rem; padding: 4px 8px; background: rgba(0,0,0,0.4); border: 1px solid var(--border); color: var(--text); cursor: pointer; border-radius: 4px; }
+        .theme-container { margin-top: auto; padding-top: 15px; border-top: 1px dashed var(--border); text-align: center; }
+        .theme-selector { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+        .theme-btn { font-size: 0.55rem; padding: 6px 10px; background: rgba(0,0,0,0.4); border: 1px solid var(--border); color: var(--text); cursor: pointer; border-radius: 4px; min-width: 90px; transition: 0.2s; }
+        .theme-btn:hover { background: var(--neon); color: #000; }
+
+        .footer { display: flex; justify-content: center; gap: 20px; margin-top: 15px; font-size: 0.7rem; font-family: 'Orbitron'; color: var(--neon); }
         
         .results-dropdown {
             position: absolute; top: 60px; left: 20px; right: 20px; background: rgba(5,8,10,0.98);
-            border: 1px solid var(--neon); max-height: 200px; overflow-y: auto;
+            border: 1px solid var(--neon); max-height: 240px; overflow-y: auto;
             display: none; z-index: 100;
         }
         .results-dropdown.active { display: block; }
@@ -145,7 +151,7 @@
             <svg id="playIcon" viewBox="0 0 24 24" width="35" height="35"><path d="M8 5v14l11-7z"/></svg>
         </button>
 
-        <button class="btn" onclick="toggleTGFullscreen()">
+        <button class="btn" onclick="toggleFS()">
             <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
             <span class="btn-val">ЭКРАН</span>
         </button>
@@ -158,10 +164,13 @@
 
     <div class="theme-container">
         <div class="theme-selector">
-            <div class="theme-btn" onclick="setTheme('cyber')">КИБЕР</div>
-            <div class="theme-btn" onclick="setTheme('winter')">ЗИМА</div>
+            <div class="theme-btn" onclick="setTheme('cyber')">КИБЕРПАНК</div>
+            <div class="theme-btn" onclick="setTheme('winter')">ЗИМНИЙ</div>
             <div class="theme-btn" onclick="setTheme('gothic')">ГОТИКА</div>
-            <div class="theme-btn" onclick="setTheme('retro')">РЕТРО</div>
+            <div class="theme-btn" onclick="setTheme('steampunk')">СТИМПАНК</div>
+            <div class="theme-btn" onclick="setTheme('biopunk')">БИОПАНК</div>
+            <div class="theme-btn" onclick="setTheme('retro')">РЕТРО-ВЕЙВ</div>
+            <div class="theme-btn" onclick="setTheme('industrial')">ИНДАСТРИАЛ</div>
         </div>
     </div>
 
@@ -193,7 +202,7 @@
         document.getElementById('skipLblFwd').innerText = `+${val}с`;
     }
 
-    // ИСПРАВЛЕННАЯ ФУНКЦИЯ СКОРОСТИ
+    // ИСПРАВЛЕННАЯ СКОРОСТЬ
     function setSpeed(v) {
         currentSpeed = parseFloat(v);
         applySpeed();
@@ -214,15 +223,13 @@
             events: { 
                 'onStateChange': (e) => {
                     updatePlayIcon();
-                    // Принудительно ставим скорость, когда видео начало играть
                     if(e.data === YT.PlayerState.PLAYING) {
-                        applySpeed();
+                        applySpeed(); // Принудительная скорость при старте
                         cover.style.display = 'none';
                         document.getElementById('yt-wrapper').style.display = 'block';
                     }
                     if(e.data === YT.PlayerState.ENDED) updatePlayIcon();
-                },
-                'onReady': () => { applySpeed(); }
+                } 
             }
         });
     }
@@ -233,24 +240,29 @@
         const box = document.getElementById('resultsBox');
         box.innerHTML = '<div style="padding:15px; color:var(--neon);">ПОИСК...</div>';
         box.classList.add('active');
-        try {
-            const response = await fetch(`${proxies[currentProxyIdx]}/api/v1/search?q=${encodeURIComponent(query)}&type=video`);
-            const data = await response.json();
-            box.innerHTML = '';
-            data.slice(0, 8).forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'res-card';
-                const thumb = item.videoThumbnails?.[0]?.url || `https://img.youtube.com/vi/${item.videoId}/mqdefault.jpg`;
-                card.innerHTML = `<img src="${thumb}" width="50"> <div style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">${item.title}</div>`;
-                card.onclick = () => {
-                    resetMedia(); isYT = true; box.classList.remove('active');
-                    document.getElementById('trackTitle').innerText = item.title;
-                    cover.src = thumb; cover.style.display = 'block';
-                    player.cueVideoById(item.videoId);
-                };
-                box.appendChild(card);
-            });
-        } catch (e) { currentProxyIdx = (currentProxyIdx + 1) % proxies.length; box.innerHTML = '<div style="padding:15px">ПОВТОРИТЕ</div>'; }
+        
+        const tryFetch = async (retry = 0) => {
+            if (retry >= proxies.length) { box.innerHTML = '<div style="padding:15px">ОШИБКА</div>'; return; }
+            try {
+                const response = await fetch(`${proxies[currentProxyIdx]}/api/v1/search?q=${encodeURIComponent(query)}&type=video`);
+                const data = await response.json();
+                box.innerHTML = '';
+                data.slice(0, 8).forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'res-card';
+                    const thumb = item.videoThumbnails?.[0]?.url || `https://img.youtube.com/vi/${item.videoId}/mqdefault.jpg`;
+                    card.innerHTML = `<img src="${thumb}" width="50"> <div style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">${item.title}</div>`;
+                    card.onclick = () => {
+                        resetMedia(); isYT = true; box.classList.remove('active');
+                        document.getElementById('trackTitle').innerText = item.title;
+                        cover.src = thumb; cover.style.display = 'block';
+                        player.cueVideoById(item.videoId);
+                    };
+                    box.appendChild(card);
+                });
+            } catch (e) { currentProxyIdx = (currentProxyIdx + 1) % proxies.length; await tryFetch(retry + 1); }
+        };
+        await tryFetch();
     }
 
     function resetMedia() {
@@ -277,21 +289,15 @@
     function updatePlayIcon() {
         const icon = document.getElementById('playIcon');
         let playing = false;
-        if(isYT) { try { const s = player.getPlayerState(); playing = (s === 1 || s === 3); } catch(e){} }
-        else if(isFile) playing = !video.paused && !video.ended;
+        if(isYT) {
+            try { 
+                const s = player.getPlayerState();
+                playing = (s === 1 || s === 3); // PLAYING или BUFFERING
+            } catch(e){}
+        } else if(isFile) playing = !video.paused && !video.ended;
         else playing = !audio.paused && !audio.ended;
-        icon.innerHTML = playing ? '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>' : '<path d="M8 5v14l11-7z"/>';
-    }
 
-    function toggleTGFullscreen() {
-        const node = document.getElementById('playerNode');
-        if (!isFull) {
-            if (tg.requestFullscreen) tg.requestFullscreen();
-            node.classList.add('fullscreen-mode'); isFull = true;
-        } else {
-            if (tg.exitFullscreen) tg.exitFullscreen();
-            node.classList.remove('fullscreen-mode'); isFull = false;
-        }
+        icon.innerHTML = playing ? '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>' : '<path d="M8 5v14l11-7z"/>';
     }
 
     function seekTrack(dir) {
@@ -311,6 +317,20 @@
         rotation = (rotation + 90) % 360; 
         const target = isYT ? document.getElementById('yt-wrapper') : video;
         target.style.transform = `rotate(${rotation}deg) scale(${ (rotation % 180 === 0) ? 1 : 0.6 })`;
+    }
+
+    // ПОЛНОЭКРАННЫЙ РЕЖИМ ДЛЯ TELEGRAM
+    function toggleFS() {
+        const node = document.getElementById('playerNode');
+        if (!isFull) {
+            if (tg.requestFullscreen) tg.requestFullscreen();
+            node.classList.add('fullscreen-active');
+            isFull = true;
+        } else {
+            if (tg.exitFullscreen) tg.exitFullscreen();
+            node.classList.remove('fullscreen-active');
+            isFull = false;
+        }
     }
 
     video.onended = audio.onended = () => updatePlayIcon();
@@ -341,7 +361,8 @@
             isFile = true; cover.style.display = 'none';
             video.style.display = 'block'; video.src = u; video.play();
         } else { audio.src = u; audio.play(); }
-        applySpeed(); updatePlayIcon();
+        applySpeed();
+        updatePlayIcon();
     };
 
     function setTheme(t) { document.body.className = 'theme-' + t; }
@@ -359,6 +380,7 @@
         });
     }
     window.onresize = rs; rs(); setInterval(draw, 50);
+    window.onclick = (e) => { if(!e.target.closest('.search-bar')) document.getElementById('resultsBox').classList.remove('active'); }
 </script>
 </body>
 </html>
