@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CYBER PLAYER STABLE</title>
+    <title>CYBER PLAYER ULTRA</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;800&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
     <style>
@@ -45,7 +45,7 @@
             border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative;
         }
 
-        #yt-wrapper, #local-video { width: 100%; height: 100%; display: none; object-fit: contain; }
+        #yt-wrapper, #local-video { width: 100%; height: 100%; display: none; object-fit: contain; transition: transform 0.4s ease; }
         #cover-art { width: 100%; height: 100%; object-fit: cover; }
 
         .track-info { text-align: center; margin: 10px 0; font-family: 'Orbitron'; font-size: 0.75rem; color: var(--neon); height: 18px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
@@ -85,26 +85,26 @@
 <div class="main-deck" id="playerNode">
     <div class="search-bar">
         <input type="text" id="searchInput" placeholder="НАЗВАНИЕ ВИДЕО...">
-        <button onclick="поискВидео()">ПОИСК</button>
+        <button onclick="runSearch()">ПОИСК</button>
     </div>
     <div class="results-dropdown" id="resultsBox"></div>
 
     <div class="display-container">
-        <div id="yt-wrapper"><div id="yt-placeholder"></div></div>
+        <div id="yt-wrapper" style="width:100%;height:100%"><div id="yt-placeholder"></div></div>
         <video id="local-video"></video>
-        <img id="cover-art" src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=500" alt="Cover">
+        <img id="cover-art" src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=500">
     </div>
 
     <div id="trackTitle" class="track-info">ОЖИДАНИЕ ВИДЕО</div>
 
     <div class="skip-config">
         <span>ИНТЕРВАЛ ПЕРЕМОТКИ:</span>
-        <input type="number" id="skipInp" value="10" min="1" max="60" onchange="изменитьШаг(this.value)">
+        <input type="number" id="skipInp" value="10" min="1" max="60" onchange="updateSkipStep(this.value)">
         <span>СЕК.</span>
     </div>
 
     <div class="progress-block">
-        <input type="range" id="progressBar" value="0" step="1" oninput="перемотать(this.value)">
+        <input type="range" id="progressBar" value="0" step="1" oninput="manualSeek(this.value)">
         <div class="time-info">
             <span id="curTime">0:00</span>
             <span id="durTime">0:00</span>
@@ -112,39 +112,39 @@
     </div>
 
     <div class="btn-row">
-        <button class="btn" onclick="сдвиг(-1)">
+        <button class="btn" onclick="seekTrack(-1)">
             <svg viewBox="0 0 24 24" style="transform: scaleX(-1);"><path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/></svg>
             <span class="btn-val" id="skipLblBack">-10с</span>
         </button>
 
-        <button class="btn" onclick="поворот()">
+        <button class="btn" onclick="rotateVideo()">
             <svg viewBox="0 0 24 24"><path d="M12 4V1l5 5-5 5V8c-3.31 0-6 2.69-6 6 0 1.01.25 1.97.7 2.8l-1.46 1.46C4.46 16.97 4 15.51 4 14c0-4.42 3.58-8 8-8z"/></svg>
             <span class="btn-val">УГОЛ</span>
         </button>
 
-        <button class="btn play-main" onclick="стартСтоп()">
+        <button class="btn play-main" onclick="togglePlay()">
             <svg id="playIcon" viewBox="0 0 24 24" width="35" height="35"><path d="M8 5v14l11-7z"/></svg>
         </button>
 
-        <button class="btn" onclick="экран()">
+        <button class="btn" onclick="toggleFS()">
             <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
             <span class="btn-val">РАЗМЕР</span>
         </button>
 
-        <button class="btn" onclick="сдвиг(1)">
+        <button class="btn" onclick="seekTrack(1)">
             <svg viewBox="0 0 24 24"><path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/></svg>
             <span class="btn-val" id="skipLblFwd">+10с</span>
         </button>
     </div>
 
     <div class="theme-selector">
-        <div class="theme-btn" onclick="тема('cyber')">КИБЕР</div>
-        <div class="theme-btn" onclick="тема('winter')">ЗИМА</div>
-        <div class="theme-btn" onclick="тема('gothic')">ГОТИКА</div>
-        <div class="theme-btn" onclick="тема('steampunk')">ПАРОВОЗ</div>
-        <div class="theme-btn" onclick="тема('biopunk')">БИОПАНК</div>
-        <div class="theme-btn" onclick="тема('retro')">РЕТРО</div>
-        <div class="theme-btn" onclick="тема('industrial')">ЗАВОД</div>
+        <div class="theme-btn" onclick="setTheme('cyber')">КИБЕР</div>
+        <div class="theme-btn" onclick="setTheme('winter')">ЗИМА</div>
+        <div class="theme-btn" onclick="setTheme('gothic')">ГОТИКА</div>
+        <div class="theme-btn" onclick="setTheme('steampunk')">ПАРОВОЗ</div>
+        <div class="theme-btn" onclick="setTheme('biopunk')">БИОПАНК</div>
+        <div class="theme-btn" onclick="setTheme('retro')">РЕТРО</div>
+        <div class="theme-btn" onclick="setTheme('industrial')">ЗАВОД</div>
     </div>
 
     <div class="footer">
@@ -161,136 +161,164 @@
     const tg = window.Telegram.WebApp;
     tg.ready();
 
-    let плеер, ютубРежим = false, файлРежим = false, шаг = 10, градус = 0;
-    const звук = document.getElementById('local-audio');
-    const видео = document.getElementById('local-video');
+    let player, isYT = false, isFile = false, skipStep = 10, rotation = 0;
+    const audio = document.getElementById('local-audio'), video = document.getElementById('local-video');
     
-    const поискУрл = "https://inv.tux.pizza/api/v1/search?q=";
+    // МАКСИМАЛЬНО СТАБИЛЬНЫЙ СПИСОК ИНСТАНЦИЙ
+    const proxies = [
+        "https://inv.tux.pizza",
+        "https://invidious.flokinet.to",
+        "https://inv.vern.cc",
+        "https://yewtu.be",
+        "https://invidious.io.lol",
+        "https://iv.ggtyler.dev"
+    ];
+    let currentProxyIdx = 0;
 
-    function изменитьШаг(v) {
-        шаг = Math.min(60, Math.max(1, parseInt(v) || 10));
-        document.getElementById('skipLblBack').innerText = `-${шаг}с`;
-        document.getElementById('skipLblFwd').innerText = `+${шаг}с`;
+    function updateSkipStep(v) {
+        skipStep = Math.min(60, Math.max(1, parseInt(v) || 10));
+        document.getElementById('skipLblBack').innerText = `-${skipStep}с`;
+        document.getElementById('skipLblFwd').innerText = `+${skipStep}с`;
     }
 
     function onYouTubeIframeAPIReady() {
-        плеер = new YT.Player('yt-placeholder', {
+        player = new YT.Player('yt-placeholder', {
             height: '100%', width: '100%',
             playerVars: { 'controls': 0, 'modestbranding': 1, 'playsinline': 1 },
-            events: { 'onStateChange': обновитьКнопку }
+            events: { 'onStateChange': updatePlayIcon }
         });
     }
 
-    async function поискВидео() {
-        const текст = document.getElementById('searchInput').value;
-        if(!текст) return;
-        const блок = document.getElementById('resultsBox');
-        блок.innerHTML = '<div style="padding:15px; color:var(--neon)">ПОИСК В СЕТИ...</div>';
-        блок.classList.add('active');
+    async function runSearch() {
+        const query = document.getElementById('searchInput').value;
+        if(!query) return;
         
-        try {
-            const res = await fetch(поискУрл + encodeURIComponent(текст) + "&type=video");
-            const data = await res.json();
-            
-            блок.innerHTML = '';
-            if(!data || data.length === 0) {
-                блок.innerHTML = '<div style="padding:15px">НИЧЕГО НЕ НАЙДЕНО.</div>';
+        const box = document.getElementById('resultsBox');
+        box.innerHTML = '<div style="padding:15px; color:var(--neon)">СКАНИРОВАНИЕ СЕТИ...</div>';
+        box.classList.add('active');
+        
+        const tryFetch = async (retryCount = 0) => {
+            if (retryCount >= proxies.length) {
+                box.innerHTML = '<div style="padding:15px">ВСЕ СЕРВЕРЫ ЗАНЯТЫ. ПОПРОБУЙТЕ ПОЗЖЕ.</div>';
                 return;
             }
 
-            data.slice(0, 10).forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'res-card';
-                const img = item.videoThumbnails ? item.videoThumbnails[0].url : `https://img.youtube.com/vi/${item.videoId}/default.jpg`;
-                card.innerHTML = `<img src="${img}" width="50" height="35"> <div>${item.title}</div>`;
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000); // Таймаут 5 сек
+
+                const response = await fetch(`${proxies[currentProxyIdx]}/api/v1/search?q=${encodeURIComponent(query)}&type=video`, {
+                    signal: controller.signal
+                });
                 
-                card.onclick = () => {
-                    стопВсе(); 
-                    ютубРежим = true; 
-                    блок.classList.remove('active');
-                    document.getElementById('cover-art').style.display = 'none';
-                    document.getElementById('yt-wrapper').style.display = 'block';
-                    document.getElementById('trackTitle').innerText = item.title;
-                    плеер.loadVideoById(item.videoId);
-                };
-                блок.appendChild(card);
-            });
-        } catch (e) { 
-            блок.innerHTML = '<div style="padding:15px">ОШИБКА СЕРВЕРА.</div>';
-        }
+                clearTimeout(timeoutId);
+                const data = await response.json();
+                
+                if(!data || data.length === 0) throw new Error("Empty");
+
+                box.innerHTML = '';
+                data.slice(0, 10).forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'res-card';
+                    const thumb = item.videoThumbnails ? item.videoThumbnails[0].url : `https://img.youtube.com/vi/${item.videoId}/default.jpg`;
+                    card.innerHTML = `<img src="${thumb}" width="50" height="35" style="object-fit:cover"> <div>${item.title}</div>`;
+                    
+                    card.onclick = () => {
+                        resetMedia(); 
+                        isYT = true; 
+                        box.classList.remove('active');
+                        document.getElementById('cover-art').style.display = 'none';
+                        document.getElementById('yt-wrapper').style.display = 'block';
+                        document.getElementById('trackTitle').innerText = item.title;
+                        player.loadVideoById(item.videoId);
+                    };
+                    box.appendChild(card);
+                });
+
+            } catch (e) {
+                console.log(`Proxy ${proxies[currentProxyIdx]} failed, switching...`);
+                currentProxyIdx = (currentProxyIdx + 1) % proxies.length;
+                await tryFetch(retryCount + 1);
+            }
+        };
+
+        await tryFetch();
     }
 
-    function стопВсе() {
-        ютубРежим = файлРежим = false; градус = 0;
-        try { плеер.stopVideo(); } catch(e){}
-        звук.pause(); видео.pause();
-        видео.style.display = 'none';
+    function resetMedia() {
+        isYT = isFile = false; rotation = 0;
+        try { player.stopVideo(); } catch(e){}
+        audio.pause(); video.pause();
+        video.style.display = 'none';
+        video.style.transform = 'none';
         document.getElementById('yt-wrapper').style.display = 'none';
-        document.getElementById('cover-art').style.display = 'block';
         document.getElementById('yt-wrapper').style.transform = 'none';
-        видео.style.transform = 'none';
+        document.getElementById('cover-art').style.display = 'block';
     }
 
-    function стартСтоп() {
-        if(ютубРежим) {
-            const s = плеер.getPlayerState();
-            s === 1 ? плеер.pauseVideo() : плеер.playVideo();
-        } else if(файлРежим) {
-            видео.paused ? видео.play() : видео.pause();
+    function togglePlay() {
+        if(isYT) {
+            const state = player.getPlayerState();
+            state === 1 ? player.pauseVideo() : player.playVideo();
+        } else if(isFile) {
+            video.paused ? video.play() : video.pause();
         } else {
-            звук.paused ? звук.play() : звук.pause();
+            audio.paused ? audio.play() : audio.pause();
         }
-        setTimeout(обновитьКнопку, 100);
+        setTimeout(updatePlayIcon, 100);
     }
 
-    function обновитьКнопку() {
-        const btn = document.getElementById('playIcon');
-        let active = false;
-        if(ютубРежим) active = (плеер.getPlayerState && плеер.getPlayerState() === 1);
-        else if(файлРежим) active = !видео.paused;
-        else active = !звук.paused;
-        btn.innerHTML = active ? '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>' : '<path d="M8 5v14l11-7z"/>';
+    function updatePlayIcon() {
+        const icon = document.getElementById('playIcon');
+        let playing = false;
+        if(isYT) playing = (player.getPlayerState && player.getPlayerState() === 1);
+        else if(isFile) playing = !video.paused;
+        else playing = !audio.paused;
+        icon.innerHTML = playing ? '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>' : '<path d="M8 5v14l11-7z"/>';
     }
 
-    function сдвиг(dir) {
-        const d = dir * шаг;
-        if(ютубРежим) плеер.seekTo(плеер.getCurrentTime() + d);
-        else if(файлРежим) видео.currentTime += d;
-        else звук.currentTime += d;
+    function seekTrack(dir) {
+        const d = dir * skipStep;
+        if(isYT) player.seekTo(player.getCurrentTime() + d);
+        else if(isFile) video.currentTime += d;
+        else audio.currentTime += d;
     }
 
-    function перемотать(v_val) {
-        if(ютубРежим) плеер.seekTo(v_val);
-        else if(файлРежим) видео.currentTime = v_val;
-        else звук.currentTime = v_val;
+    function manualSeek(v) {
+        if(isYT) player.seekTo(v);
+        else if(isFile) video.currentTime = v;
+        else audio.currentTime = v;
     }
 
-    function поворот() {
-        градус = (градус + 90) % 360; 
-        const t = ютубРежим ? document.getElementById('yt-wrapper') : видео;
-        t.style.transform = `rotate(${градус}deg)`;
+    function rotateVideo() {
+        rotation = (rotation + 90) % 360; 
+        const target = isYT ? document.getElementById('yt-wrapper') : video;
+        if(target) {
+            let scale = (rotation === 90 || rotation === 270) ? 0.6 : 1;
+            target.style.transform = `rotate(${rotation}deg) scale(${scale})`;
+        }
     }
 
-    function экран() {
-        const n = document.getElementById('playerNode');
+    function toggleFS() {
+        const node = document.getElementById('playerNode');
         if (!tg.isExpanded) tg.expand();
         try {
             if (document.fullscreenElement) document.exitFullscreen();
-            else n.requestFullscreen();
+            else node.requestFullscreen();
         } catch(e){}
     }
 
     setInterval(() => {
-        let c = 0, d = 0;
-        if(ютубРежим) { try { c = плеер.getCurrentTime(); d = плеер.getDuration(); } catch(e){} }
-        else if(файлРежим) { c = видео.currentTime; d = видео.duration; }
-        else { c = звук.currentTime; d = звук.duration; }
+        let cur = 0, dur = 0;
+        if(isYT) { try { cur = player.getCurrentTime(); dur = player.getDuration(); } catch(e){} }
+        else if(isFile) { cur = video.currentTime; dur = video.duration; }
+        else { cur = audio.currentTime; dur = audio.duration; }
         
-        if(d) {
-            const b = document.getElementById('progressBar');
-            b.max = Math.floor(d); b.value = Math.floor(c);
-            document.getElementById('curTime').innerText = fmt(c);
-            document.getElementById('durTime').innerText = fmt(d);
+        if(dur) {
+            const bar = document.getElementById('progressBar');
+            bar.max = Math.floor(dur); bar.value = Math.floor(cur);
+            document.getElementById('curTime').innerText = fmt(cur);
+            document.getElementById('durTime').innerText = fmt(dur);
         }
     }, 500);
 
@@ -301,25 +329,25 @@
 
     document.getElementById('fileInput').onchange = (e) => {
         const f = e.target.files[0]; if(!f) return;
-        стопВсе(); const u = URL.createObjectURL(f);
+        resetMedia(); const u = URL.createObjectURL(f);
         document.getElementById('trackTitle').innerText = f.name;
         if(f.type.startsWith('video')) {
-            файлРежим = true; document.getElementById('cover-art').style.display = 'none';
-            видео.style.display = 'block'; видео.src = u; видео.play();
-        } else { звук.src = u; звук.play(); }
+            isFile = true; document.getElementById('cover-art').style.display = 'none';
+            video.style.display = 'block'; video.src = u; video.play();
+        } else { audio.src = u; audio.play(); }
+        updatePlayIcon();
     };
 
-    function тема(t) { document.body.className = 'theme-' + t; }
+    function setTheme(t) { document.body.className = 'theme-' + t; }
 
-    // Фон Матрица
-    const can = document.getElementById('matrix-bg'), x = can.getContext('2d');
+    const can = document.getElementById('matrix-bg'), ctx = can.getContext('2d');
     let dr = [];
     function rs() { can.width = window.innerWidth; can.height = window.innerHeight; dr = Array(Math.floor(can.width / 20)).fill(1); }
     function draw() {
-        x.fillStyle = "rgba(0,0,0,0.05)"; x.fillRect(0,0,can.width,can.height);
-        x.fillStyle = getComputedStyle(document.body).getPropertyValue('--neon');
+        ctx.fillStyle = "rgba(0,0,0,0.05)"; ctx.fillRect(0,0,can.width,can.height);
+        ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--neon');
         dr.forEach((y, i) => {
-            x.fillText(Math.random()>0.5?"0":"1", i*20, y*20);
+            ctx.fillText(Math.random()>0.5?"0":"1", i*20, y*20);
             if(y*20 > can.height && Math.random()>0.975) dr[i]=0; dr[i]++;
         });
     }
