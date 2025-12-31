@@ -35,8 +35,6 @@
             box-shadow: 0 0 40px rgba(0,0,0,0.8);
         }
 
-        .twa-fs { width: 100vw !important; height: 100vh !important; max-width: none !important; border-radius: 0 !important; }
-
         .search-bar { display: flex; gap: 5px; margin-bottom: 15px; background: rgba(0,0,0,0.5); padding: 5px; border-radius: 5px; border: 1px solid var(--border); }
         .search-bar input { flex: 1; background: transparent; border: none; color: var(--neon); font-family: 'Orbitron'; padding: 8px; font-size: 0.8rem; }
         .search-bar button { background: var(--neon); border: none; color: #000; padding: 0 15px; cursor: pointer; font-family: 'Orbitron'; font-weight: bold; border-radius: 3px; }
@@ -49,35 +47,39 @@
         #yt-wrapper, #local-video { width: 100%; height: 100%; display: none; object-fit: contain; }
         #cover-art { width: 100%; height: 100%; object-fit: cover; }
 
-        .track-info { text-align: center; margin: 10px 0; font-family: 'Orbitron'; font-size: 0.75rem; color: var(--neon); height: 18px; overflow: hidden; }
+        .track-info { text-align: center; margin: 10px 0; font-family: 'Orbitron'; font-size: 0.75rem; color: var(--neon); height: 18px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 
         .skip-config { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px; font-family: 'Orbitron'; font-size: 0.7rem; color: var(--neon); }
-        .skip-config input { background: rgba(0,0,0,0.5); border: 1px solid var(--border); color: var(--neon); width: 45px; text-align: center; }
+        .skip-config input { background: rgba(0,0,0,0.5); border: 1px solid var(--border); color: var(--neon); width: 50px; text-align: center; padding: 2px; }
 
         .progress-block { width: 100%; margin: 5px 0 15px 0; }
         input[type="range"] { width: 100%; cursor: pointer; accent-color: var(--neon); }
         .time-info { display: flex; justify-content: space-between; font-size: 0.6rem; font-family: 'Orbitron'; color: var(--neon); }
 
         .btn-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .btn { background: none; border: none; color: var(--text); cursor: pointer; display: flex; flex-direction: column; align-items: center; }
-        .btn svg { width: 30px; height: 30px; fill: currentColor; }
-        .btn-val { font-size: 0.5rem; margin-top: 2px; font-family: 'Orbitron'; }
+        .btn { background: none; border: none; color: var(--text); cursor: pointer; display: flex; flex-direction: column; align-items: center; transition: 0.3s; }
+        .btn:active { transform: scale(0.9); }
+        .btn svg { width: 28px; height: 28px; fill: currentColor; }
+        .btn-val { font-size: 0.55rem; margin-top: 4px; font-family: 'Orbitron'; color: var(--neon); }
         
-        .play-main { width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--border); color: var(--neon); display: flex; justify-content: center; align-items: center; }
+        .play-main { width: 55px; height: 55px; border-radius: 50%; border: 2px solid var(--border); color: var(--neon); display: flex; justify-content: center; align-items: center; }
 
         .theme-selector { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
         .theme-btn { font-size: 0.55rem; padding: 6px 2px; background: rgba(0,0,0,0.4); border: 1px solid var(--border); color: var(--text); cursor: pointer; text-align: center; }
 
         .footer { display: flex; justify-content: center; gap: 20px; margin-top: 20px; font-size: 0.7rem; font-family: 'Orbitron'; }
-        .footer label, .footer span { cursor: pointer; color: var(--neon); }
+        .footer label, .footer span { cursor: pointer; color: var(--neon); border-bottom: 1px solid transparent; }
+        .footer label:hover { border-bottom: 1px solid var(--neon); }
 
         .results-dropdown {
-            position: absolute; top: 65px; left: 20px; right: 20px; background: rgba(5,8,10,0.98);
-            border: 1px solid var(--neon); max-height: 200px; overflow-y: auto;
-            display: none; z-index: 100;
+            position: absolute; top: 60px; left: 20px; right: 20px; background: rgba(5,8,10,0.98);
+            border: 1px solid var(--neon); max-height: 250px; overflow-y: auto;
+            display: none; z-index: 100; box-shadow: 0 0 20px #000;
         }
         .results-dropdown.active { display: block; }
-        .res-card { display: flex; gap: 10px; padding: 10px; border-bottom: 1px solid #222; cursor: pointer; align-items: center; font-size: 0.75rem; }
+        .res-card { display: flex; gap: 10px; padding: 8px; border-bottom: 1px solid rgba(0,242,255,0.1); cursor: pointer; align-items: center; font-size: 0.7rem; }
+        .res-card:hover { background: rgba(0,242,255,0.1); }
+        .res-card img { border-radius: 4px; }
     </style>
 </head>
 <body class="theme-cyber">
@@ -86,7 +88,7 @@
 
 <div class="main-deck" id="playerNode">
     <div class="search-bar">
-        <input type="text" id="searchInput" placeholder="ПОИСК ВИДЕО...">
+        <input type="text" id="searchInput" placeholder="НАЗВАНИЕ ВИДЕО...">
         <button onclick="runSearch()">ПОИСК</button>
     </div>
     <div class="results-dropdown" id="resultsBox"></div>
@@ -97,10 +99,10 @@
         <img id="cover-art" src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=500">
     </div>
 
-    <div id="trackTitle" class="track-info">СИСТЕМА ГОТОВА</div>
+    <div id="trackTitle" class="track-info">READY TO SCAN</div>
 
     <div class="skip-config">
-        <span>ПЕРЕМОТКА:</span>
+        <span>ШАГ ПЕРЕМОТКИ:</span>
         <input type="number" id="skipInp" value="10" min="1" max="60" onchange="updateSkip(this.value)">
         <span>СЕК.</span>
     </div>
@@ -116,26 +118,26 @@
     <div class="btn-row">
         <button class="btn" onclick="seekTrack(-1)">
             <svg viewBox="0 0 24 24" style="transform: scaleX(-1);"><path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/></svg>
-            <span class="btn-val" id="skipLblBack">-10с</span>
+            <span class="btn-val" id="skipLblBack">-10s</span>
         </button>
 
         <button class="btn" onclick="rotateVideo()">
             <svg viewBox="0 0 24 24"><path d="M12 4V1l5 5-5 5V8c-3.31 0-6 2.69-6 6 0 1.01.25 1.97.7 2.8l-1.46 1.46C4.46 16.97 4 15.51 4 14c0-4.42 3.58-8 8-8z"/></svg>
-            <span class="btn-val">ПОВОРОТ</span>
+            <span class="btn-val">ROT</span>
         </button>
 
         <button class="btn play-main" onclick="togglePlay()">
-            <svg id="playIcon" viewBox="0 0 24 24" width="35" height="35"><path d="M8 5v14l11-7z"/></svg>
+            <svg id="playIcon" viewBox="0 0 24 24" width="30" height="30"><path d="M8 5v14l11-7z"/></svg>
         </button>
 
         <button class="btn" onclick="toggleFull()">
             <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
-            <span class="btn-val">ЭКРАН</span>
+            <span class="btn-val">WIDE</span>
         </button>
 
         <button class="btn" onclick="seekTrack(1)">
             <svg viewBox="0 0 24 24"><path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/></svg>
-            <span class="btn-val" id="skipLblFwd">+10с</span>
+            <span class="btn-val" id="skipLblFwd">+10s</span>
         </button>
     </div>
 
@@ -150,8 +152,8 @@
     </div>
 
     <div class="footer">
-        <label for="fileInput">[ ФАЙЛ ]</label>
-        <span onclick="location.reload()">[ СБРОС ]</span>
+        <label for="fileInput">[ FILE ]</label>
+        <span onclick="location.reload()">[ RESET ]</span>
     </div>
     <input type="file" id="fileInput" accept="video/*,audio/*" style="display:none">
 </div>
@@ -166,36 +168,25 @@
     let player, isYT = false, isVideoFile = false, skipTime = 10, rot = 0;
     const a = document.getElementById('local-audio'), v = document.getElementById('local-video');
     
-    // Список рабочих API-прокси для поиска
+    // Используем рабочий API Invidious
     const searchAPIs = [
-        "https://pipedapi.kavin.rocks/search?q=",
-        "https://vid.puffyan.us/api/v1/search?q=",
+        "https://invidious.lunar.icu/api/v1/search?q=",
         "https://inv.tux.pizza/api/v1/search?q="
     ];
     let currentApiIdx = 0;
 
     function updateSkip(val) {
         skipTime = Math.min(60, Math.max(1, parseInt(val) || 10));
-        document.getElementById('skipLblBack').innerText = `-${skipTime}с`;
-        document.getElementById('skipLblFwd').innerText = `+${skipTime}с`;
+        document.getElementById('skipLblBack').innerText = `-${skipTime}s`;
+        document.getElementById('skipLblFwd').innerText = `+${skipTime}s`;
         document.getElementById('skipInp').value = skipTime;
-    }
-
-    function toggleFull() {
-        const n = document.getElementById('playerNode');
-        if (!tg.isExpanded) tg.expand();
-        n.classList.toggle('twa-fs');
-        try {
-            if (!document.fullscreenElement) n.requestFullscreen();
-            else document.exitFullscreen();
-        } catch(e) {}
     }
 
     function onYouTubeIframeAPIReady() {
         player = new YT.Player('yt-placeholder', {
             height: '100%', width: '100%',
-            playerVars: { 'controls': 0, 'rel': 0, 'modestbranding': 1 },
-            events: { 'onStateChange': (e) => updatePlayIcon() }
+            playerVars: { 'controls': 0, 'rel': 0, 'modestbranding': 1, 'playsinline': 1 },
+            events: { 'onStateChange': () => updatePlayIcon() }
         });
     }
 
@@ -203,41 +194,39 @@
         const q = document.getElementById('searchInput').value;
         if(!q) return;
         const box = document.getElementById('resultsBox');
-        box.innerHTML = '<div style="padding:15px; color:var(--neon)">СКАНИРОВАНИЕ СЕТИ...</div>';
+        box.innerHTML = '<div style="padding:15px; color:var(--neon)">SCANNING NETWORK...</div>';
         box.classList.add('active');
         
         try {
-            const apiUrl = searchAPIs[currentApiIdx] + encodeURIComponent(q) + "&filter=videos";
-            const res = await fetch(apiUrl);
+            const res = await fetch(searchAPIs[currentApiIdx] + encodeURIComponent(q));
             const data = await res.json();
             
-            // Обработка разных форматов API (Piped vs Invidious)
-            const items = data.items || data || [];
             box.innerHTML = '';
-            
-            if(items.length === 0) throw new Error("No results");
+            if(!data || data.length === 0) throw new Error();
 
-            items.slice(0, 10).forEach(item => {
-                const id = item.url ? item.url.split('v=')[1] : item.videoId;
-                if(!id) return;
+            data.slice(0, 15).forEach(item => {
+                if(item.type !== 'video') return;
                 
                 const div = document.createElement('div');
                 div.className = 'res-card';
-                div.innerHTML = `<img src="${item.thumbnail || item.videoThumbnails[0].url}" width="50"> <span>${item.title}</span>`;
+                const thumb = item.videoThumbnails ? item.videoThumbnails[0].url : `https://img.youtube.com/vi/${item.videoId}/default.jpg`;
+                div.innerHTML = `<img src="${thumb}" width="60" height="45"> <div>${item.title}</div>`;
+                
                 div.onclick = () => {
-                    resetMedia(); isYT = true; box.classList.remove('active');
+                    resetMedia(); 
+                    isYT = true; 
+                    box.classList.remove('active');
                     document.getElementById('cover-art').style.display = 'none';
                     document.getElementById('yt-wrapper').style.display = 'block';
                     document.getElementById('trackTitle').innerText = item.title;
-                    player.loadVideoById(id);
+                    player.loadVideoById(item.videoId);
                 };
                 box.appendChild(div);
             });
         } catch (e) { 
-            // Если ошибка, пробуем следующий API в списке
             currentApiIdx = (currentApiIdx + 1) % searchAPIs.length;
-            box.innerHTML = '<div style="padding:15px">СЕРВЕР ПЕРЕГРУЖЕН. ПРОБУЮ СНОВА...</div>';
-            setTimeout(runSearch, 500);
+            box.innerHTML = '<div style="padding:15px">SERVER BUSY. RETRYING...</div>';
+            setTimeout(runSearch, 1000);
         }
     }
 
@@ -248,25 +237,34 @@
         v.style.display = 'none';
         document.getElementById('yt-wrapper').style.display = 'none';
         document.getElementById('cover-art').style.display = 'block';
+        v.style.transform = 'none';
+        document.getElementById('yt-wrapper').style.transform = 'none';
     }
 
     function togglePlay() {
         if(isYT) {
             const state = player.getPlayerState();
             state === 1 ? player.pauseVideo() : player.playVideo();
-        } else if(isVideoFile) v.paused ? v.play() : v.pause();
-        else a.paused ? a.play() : a.pause();
+        } else if(isVideoFile) {
+            v.paused ? v.play() : v.pause();
+        } else {
+            a.paused ? a.play() : a.pause();
+        }
         updatePlayIcon();
     }
 
     function updatePlayIcon() {
         const icon = document.getElementById('playIcon');
-        let playing = isYT ? (player.getPlayerState && player.getPlayerState() === 1) : (isVideoFile ? !v.paused : !a.paused);
+        let playing = false;
+        if(isYT) playing = (player.getPlayerState && player.getPlayerState() === 1);
+        else if(isVideoFile) playing = !v.paused;
+        else playing = !a.paused;
+        
         icon.innerHTML = playing ? '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>' : '<path d="M8 5v14l11-7z"/>';
     }
 
     function seekTrack(dir) {
-        let delta = dir * skipTime;
+        const delta = dir * skipTime;
         if(isYT) player.seekTo(player.getCurrentTime() + delta);
         else if(isVideoFile) v.currentTime += delta;
         else a.currentTime += delta;
@@ -281,18 +279,31 @@
     function rotateVideo() {
         rot = (rot + 90) % 360; 
         const target = isYT ? document.getElementById('yt-wrapper') : v;
-        let s = (rot === 90 || rot === 270) ? 0.6 : 1;
-        target.style.transform = `rotate(${rot}deg) scale(${s})`;
+        target.style.transform = `rotate(${rot}deg)`;
+        target.style.transition = '0.3s';
+    }
+
+    function toggleFull() {
+        if (!tg.isExpanded) tg.expand();
+        const p = document.getElementById('playerNode');
+        if (document.fullscreenElement) document.exitFullscreen();
+        else p.requestFullscreen().catch(() => {});
     }
 
     setInterval(() => {
         let cur = 0, dur = 0;
-        if(isYT) { try { cur = player.getCurrentTime(); dur = player.getDuration(); } catch(e){} }
-        else if(isVideoFile) { cur = v.currentTime; dur = v.duration; }
-        else { cur = a.currentTime; dur = a.duration; }
-        if(dur) {
+        if(isYT) { 
+            try { cur = player.getCurrentTime(); dur = player.getDuration(); } catch(e){} 
+        } else if(isVideoFile) { 
+            cur = v.currentTime; dur = v.duration; 
+        } else if(a.src) { 
+            cur = a.currentTime; dur = a.duration; 
+        }
+        
+        if(dur && !isNaN(dur)) {
             const bar = document.getElementById('progressBar');
-            bar.max = Math.floor(dur); bar.value = Math.floor(cur);
+            bar.max = Math.floor(dur);
+            bar.value = Math.floor(cur);
             document.getElementById('curTime').innerText = formatTime(cur);
             document.getElementById('durTime').innerText = formatTime(dur);
         }
@@ -313,35 +324,38 @@
             isVideoFile = true;
             document.getElementById('cover-art').style.display = 'none';
             v.style.display = 'block'; v.src = url; v.play();
-        } else { a.src = url; a.play(); }
+        } else {
+            a.src = url; a.play();
+        }
     };
 
     function setTheme(t) { document.body.className = 'theme-' + t; }
 
+    // Matrix Background Logic
     const canvas = document.getElementById('matrix-bg'), ctx = canvas.getContext('2d');
     let drops = [];
     function initM() {
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        drops = Array(Math.floor(canvas.width / 25)).fill(1);
+        drops = Array(Math.floor(canvas.width / 20)).fill(1);
     }
     const themeAssets = {
-        cyber:["⚡","💾"], winter:["❄","❅"], gothic:["💀","🦇"], steampunk:["⚙","🕰"], biopunk:["🧬","🌿"], retro:["👾","🕹"], industrial:["☢","🛠"]
+        cyber:["0","1"], winter:["*","+"], gothic:["†","v"], steampunk:["8","9"], biopunk:["o","x"], retro:["#","="], industrial:["-","!"]
     };
     function drawM() {
         const theme = document.body.className.replace('theme-', '');
         const assets = themeAssets[theme] || themeAssets.cyber;
-        ctx.fillStyle = "rgba(0, 0, 0, 0.15)";
+        ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--neon');
-        ctx.font = "15px monospace";
+        ctx.font = "14px monospace";
         drops.forEach((y, i) => {
-            const char = Math.random() > 0.985 ? assets[Math.floor(Math.random()*assets.length)] : (Math.random()>0.5?"1":"0");
-            ctx.fillText(char, i * 25, y * 25);
-            if (y * 25 > canvas.height && Math.random() > 0.98) drops[i] = 0;
+            const char = assets[Math.floor(Math.random()*assets.length)];
+            ctx.fillText(char, i * 20, y * 20);
+            if (y * 20 > canvas.height && Math.random() > 0.975) drops[i] = 0;
             drops[i]++;
         });
     }
-    window.onresize = initM; initM(); setInterval(drawM, 85);
+    window.onresize = initM; initM(); setInterval(drawM, 50);
     window.onclick = (e) => { if(!e.target.closest('.search-bar')) document.getElementById('resultsBox').classList.remove('active'); }
 </script>
 </body>
