@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>CYBER PLAYER PRO</title>
+    <title>CYBER PLAYER STABLE</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;800&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
     <style>
@@ -35,7 +35,6 @@
             box-shadow: 0 0 40px rgba(0,0,0,0.8);
         }
 
-        #playerNode:fullscreen { width: 100vw; height: 100vh; border-radius: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         .twa-fs { width: 100vw !important; height: 100vh !important; max-width: none !important; border-radius: 0 !important; }
 
         .search-bar { display: flex; gap: 5px; margin-bottom: 15px; background: rgba(0,0,0,0.5); padding: 5px; border-radius: 5px; border: 1px solid var(--border); }
@@ -46,7 +45,6 @@
             width: 100%; height: 210px; background: #000; border: 1px solid var(--border);
             border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative;
         }
-        #playerNode:fullscreen .display-container, .twa-fs .display-container { height: 50vh; width: 90%; }
 
         #yt-wrapper, #local-video { width: 100%; height: 100%; display: none; object-fit: contain; }
         #cover-art { width: 100%; height: 100%; object-fit: cover; }
@@ -54,34 +52,32 @@
         .track-info { text-align: center; margin: 10px 0; font-family: 'Orbitron'; font-size: 0.75rem; color: var(--neon); height: 18px; overflow: hidden; }
 
         .skip-config { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px; font-family: 'Orbitron'; font-size: 0.7rem; color: var(--neon); }
-        .skip-config input { background: rgba(0,0,0,0.5); border: 1px solid var(--border); color: var(--neon); width: 45px; text-align: center; border-radius: 3px; }
+        .skip-config input { background: rgba(0,0,0,0.5); border: 1px solid var(--border); color: var(--neon); width: 45px; text-align: center; }
 
         .progress-block { width: 100%; margin: 5px 0 15px 0; }
         input[type="range"] { width: 100%; cursor: pointer; accent-color: var(--neon); }
         .time-info { display: flex; justify-content: space-between; font-size: 0.6rem; font-family: 'Orbitron'; color: var(--neon); }
 
         .btn-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .btn { background: none; border: none; color: var(--text); cursor: pointer; display: flex; flex-direction: column; align-items: center; transition: 0.2s; }
-        .btn:hover { color: var(--neon); transform: scale(1.1); }
+        .btn { background: none; border: none; color: var(--text); cursor: pointer; display: flex; flex-direction: column; align-items: center; }
         .btn svg { width: 30px; height: 30px; fill: currentColor; }
         .btn-val { font-size: 0.5rem; margin-top: 2px; font-family: 'Orbitron'; }
         
-        .play-main { width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--border); color: var(--neon); display: flex; justify-content: center; align-items: center; box-shadow: 0 0 15px var(--border); }
+        .play-main { width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--border); color: var(--neon); display: flex; justify-content: center; align-items: center; }
 
         .theme-selector { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
         .theme-btn { font-size: 0.55rem; padding: 6px 2px; background: rgba(0,0,0,0.4); border: 1px solid var(--border); color: var(--text); cursor: pointer; text-align: center; }
 
         .footer { display: flex; justify-content: center; gap: 20px; margin-top: 20px; font-size: 0.7rem; font-family: 'Orbitron'; }
-        .footer label, .footer span { cursor: pointer; color: var(--neon); text-decoration: underline; }
+        .footer label, .footer span { cursor: pointer; color: var(--neon); }
 
         .results-dropdown {
-            position: absolute; top: 65px; left: 20px; right: 20px; background: rgba(0,0,0,0.95);
-            border: 1px solid var(--neon); max-height: 180px; overflow-y: auto;
-            display: none; z-index: 100; box-shadow: 0 10px 30px #000;
+            position: absolute; top: 65px; left: 20px; right: 20px; background: rgba(5,8,10,0.98);
+            border: 1px solid var(--neon); max-height: 200px; overflow-y: auto;
+            display: none; z-index: 100;
         }
         .results-dropdown.active { display: block; }
         .res-card { display: flex; gap: 10px; padding: 10px; border-bottom: 1px solid #222; cursor: pointer; align-items: center; font-size: 0.75rem; }
-        .res-card:hover { background: #111; color: var(--neon); }
     </style>
 </head>
 <body class="theme-cyber">
@@ -101,7 +97,7 @@
         <img id="cover-art" src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=500">
     </div>
 
-    <div id="trackTitle" class="track-info">ОЖИДАНИЕ</div>
+    <div id="trackTitle" class="track-info">СИСТЕМА ГОТОВА</div>
 
     <div class="skip-config">
         <span>ПЕРЕМОТКА:</span>
@@ -169,13 +165,17 @@
 
     let player, isYT = false, isVideoFile = false, skipTime = 10, rot = 0;
     const a = document.getElementById('local-audio'), v = document.getElementById('local-video');
-    const themeAssets = {
-        cyber:["⚡","💾"], winter:["❄","❅"], gothic:["💀","🦇"], steampunk:["⚙","🕰"], biopunk:["🧬","🌿"], retro:["👾","🕹"], industrial:["☢","🛠"]
-    };
+    
+    // Список рабочих API-прокси для поиска
+    const searchAPIs = [
+        "https://pipedapi.kavin.rocks/search?q=",
+        "https://vid.puffyan.us/api/v1/search?q=",
+        "https://inv.tux.pizza/api/v1/search?q="
+    ];
+    let currentApiIdx = 0;
 
     function updateSkip(val) {
-        if(val > 60) val = 60; if(val < 1) val = 1;
-        skipTime = parseInt(val);
+        skipTime = Math.min(60, Math.max(1, parseInt(val) || 10));
         document.getElementById('skipLblBack').innerText = `-${skipTime}с`;
         document.getElementById('skipLblFwd').innerText = `+${skipTime}с`;
         document.getElementById('skipInp').value = skipTime;
@@ -186,20 +186,16 @@
         if (!tg.isExpanded) tg.expand();
         n.classList.toggle('twa-fs');
         try {
-            if (!document.fullscreenElement) {
-                if (n.requestFullscreen) n.requestFullscreen();
-                else if (n.webkitRequestFullscreen) n.webkitRequestFullscreen();
-            } else {
-                document.exitFullscreen();
-            }
+            if (!document.fullscreenElement) n.requestFullscreen();
+            else document.exitFullscreen();
         } catch(e) {}
     }
 
     function onYouTubeIframeAPIReady() {
         player = new YT.Player('yt-placeholder', {
             height: '100%', width: '100%',
-            playerVars: { 'controls': 0, 'rel': 0, 'modestbranding': 1, 'iv_load_policy': 3 },
-            events: { 'onStateChange': () => updatePlayIcon() }
+            playerVars: { 'controls': 0, 'rel': 0, 'modestbranding': 1 },
+            events: { 'onStateChange': (e) => updatePlayIcon() }
         });
     }
 
@@ -207,36 +203,41 @@
         const q = document.getElementById('searchInput').value;
         if(!q) return;
         const box = document.getElementById('resultsBox');
-        box.innerHTML = '<div style="padding:15px; color:var(--neon)">ПОИСК ВИДЕО...</div>';
+        box.innerHTML = '<div style="padding:15px; color:var(--neon)">СКАНИРОВАНИЕ СЕТИ...</div>';
         box.classList.add('active');
         
         try {
-            // Использование Piped API (альтернатива YouTube)
-            const res = await fetch(`https://pipedapi.kavin.rocks/search?q=${encodeURIComponent(q)}&filter=videos`);
+            const apiUrl = searchAPIs[currentApiIdx] + encodeURIComponent(q) + "&filter=videos";
+            const res = await fetch(apiUrl);
             const data = await res.json();
+            
+            // Обработка разных форматов API (Piped vs Invidious)
+            const items = data.items || data || [];
             box.innerHTML = '';
             
-            if(!data.items || data.items.length === 0) {
-                box.innerHTML = '<div style="padding:15px">НИЧЕГО НЕ НАЙДЕНО</div>';
-                return;
-            }
+            if(items.length === 0) throw new Error("No results");
 
-            data.items.slice(0, 10).forEach(item => {
+            items.slice(0, 10).forEach(item => {
+                const id = item.url ? item.url.split('v=')[1] : item.videoId;
+                if(!id) return;
+                
                 const div = document.createElement('div');
                 div.className = 'res-card';
-                const videoId = item.url.split('v=')[1];
-                div.innerHTML = `<img src="${item.thumbnail}" width="50"> <span>${item.title}</span>`;
+                div.innerHTML = `<img src="${item.thumbnail || item.videoThumbnails[0].url}" width="50"> <span>${item.title}</span>`;
                 div.onclick = () => {
                     resetMedia(); isYT = true; box.classList.remove('active');
                     document.getElementById('cover-art').style.display = 'none';
                     document.getElementById('yt-wrapper').style.display = 'block';
                     document.getElementById('trackTitle').innerText = item.title;
-                    player.loadVideoById(videoId);
+                    player.loadVideoById(id);
                 };
                 box.appendChild(div);
             });
         } catch (e) { 
-            box.innerHTML = '<div style="padding:15px">ОШИБКА API. ПОПРОБУЙТЕ СНОВА.</div>'; 
+            // Если ошибка, пробуем следующий API в списке
+            currentApiIdx = (currentApiIdx + 1) % searchAPIs.length;
+            box.innerHTML = '<div style="padding:15px">СЕРВЕР ПЕРЕГРУЖЕН. ПРОБУЮ СНОВА...</div>';
+            setTimeout(runSearch, 500);
         }
     }
 
@@ -244,9 +245,8 @@
         isYT = false; isVideoFile = false; rot = 0;
         try { player.stopVideo(); } catch(e){}
         a.pause(); v.pause();
-        v.style.display = 'none'; v.style.transform = 'none';
+        v.style.display = 'none';
         document.getElementById('yt-wrapper').style.display = 'none';
-        document.getElementById('yt-wrapper').style.transform = 'none';
         document.getElementById('cover-art').style.display = 'block';
     }
 
@@ -254,11 +254,8 @@
         if(isYT) {
             const state = player.getPlayerState();
             state === 1 ? player.pauseVideo() : player.playVideo();
-        } else if(isVideoFile) {
-            v.paused ? v.play() : v.pause();
-        } else {
-            a.paused ? a.play() : a.pause();
-        }
+        } else if(isVideoFile) v.paused ? v.play() : v.pause();
+        else a.paused ? a.play() : a.pause();
         updatePlayIcon();
     }
 
@@ -317,7 +314,6 @@
             document.getElementById('cover-art').style.display = 'none';
             v.style.display = 'block'; v.src = url; v.play();
         } else { a.src = url; a.play(); }
-        updatePlayIcon();
     };
 
     function setTheme(t) { document.body.className = 'theme-' + t; }
@@ -328,6 +324,9 @@
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
         drops = Array(Math.floor(canvas.width / 25)).fill(1);
     }
+    const themeAssets = {
+        cyber:["⚡","💾"], winter:["❄","❅"], gothic:["💀","🦇"], steampunk:["⚙","🕰"], biopunk:["🧬","🌿"], retro:["👾","🕹"], industrial:["☢","🛠"]
+    };
     function drawM() {
         const theme = document.body.className.replace('theme-', '');
         const assets = themeAssets[theme] || themeAssets.cyber;
@@ -336,8 +335,7 @@
         ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--neon');
         ctx.font = "15px monospace";
         drops.forEach((y, i) => {
-            const isEmoji = Math.random() > 0.985;
-            const char = isEmoji ? assets[Math.floor(Math.random() * assets.length)] : (Math.random() > 0.5 ? "1" : "0");
+            const char = Math.random() > 0.985 ? assets[Math.floor(Math.random()*assets.length)] : (Math.random()>0.5?"1":"0");
             ctx.fillText(char, i * 25, y * 25);
             if (y * 25 > canvas.height && Math.random() > 0.98) drops[i] = 0;
             drops[i]++;
