@@ -107,7 +107,7 @@
 
     <div class="config-row">
         <div class="config-item">
-            <span>ПЕРЕМОТКА (С):</span>
+            <span>ПЕРЕМОТКА (макс. 60 сек):</span>
             <input type="number" id="skipInp" value="10" oninput="updateSkipStep(this)">
         </div>
         <div class="config-item">
@@ -187,26 +187,34 @@
     let player, isYT = false, isFile = false, skipStep = 10, rotation = 0, currentSpeed = 1, isFull = false;
     const audio = document.getElementById('local-audio'), video = document.getElementById('local-video'), cover = document.getElementById('cover-art');
     
-    // Больше прокси для стабильности поиска
     const proxies = ["https://invidious.v0l.me", "https://invidious.dhusch.de", "https://inv.vern.cc", "https://inv.tux.pizza"];
     let currentProxyIdx = 0;
 
-    // НОРМАЛЬНАЯ ПЕРЕМОТКА: обновляет шаг и текст на кнопках
+    // ПЕРЕМОТКА С ЛИМИТОМ 60 СЕКУНД
     function updateSkipStep(input) {
         let val = parseInt(input.value);
         if (isNaN(val) || val < 1) val = 1; 
+        if (val > 60) {
+            val = 60;
+            input.value = 60; // Авто-исправление значения в поле ввода
+        }
         skipStep = val;
         document.getElementById('skipLblBack').innerText = `-${val}с`;
         document.getElementById('skipLblFwd').innerText = `+${val}с`;
     }
 
     function applySpeed() {
-        if(isYT && player && player.setPlaybackRate) player.setPlaybackRate(currentSpeed);
+        if(isYT && player && player.setPlaybackRate) {
+            try { player.setPlaybackRate(currentSpeed); } catch(e) {}
+        }
         if(isFile) video.playbackRate = currentSpeed;
         audio.playbackRate = currentSpeed;
     }
 
-    function setSpeed(v) { currentSpeed = parseFloat(v); applySpeed(); }
+    function setSpeed(v) { 
+        currentSpeed = parseFloat(v); 
+        applySpeed(); 
+    }
 
     function onYouTubeIframeAPIReady() {
         player = new YT.Player('yt-placeholder', {
@@ -215,7 +223,7 @@
             events: { 
                 'onStateChange': (e) => {
                     updatePlayIcon();
-                    if(e.data === 1) { 
+                    if(e.data === 1 || e.data === 3) {
                         applySpeed();
                         cover.style.display = 'none';
                         document.getElementById('yt-wrapper').style.display = 'block';
@@ -229,12 +237,10 @@
         const query = document.getElementById('searchInput').value;
         if(!query) return;
         const box = document.getElementById('resultsBox');
-        
         if (retry === 0) {
             box.innerHTML = '<div style="padding:15px; color:var(--neon);">ПОИСК...</div>';
             box.classList.add('active');
         }
-        
         try {
             const response = await fetch(`${proxies[currentProxyIdx]}/api/v1/search?q=${encodeURIComponent(query)}&type=video`);
             const data = await response.json();
@@ -251,7 +257,10 @@
                     document.getElementById('trackTitle').innerText = item.title;
                     cover.style.display = 'none';
                     document.getElementById('yt-wrapper').style.display = 'block';
-                    if(player && player.loadVideoById) player.loadVideoById(item.videoId);
+                    if(player && player.loadVideoById) {
+                        player.loadVideoById(item.videoId);
+                        setTimeout(applySpeed, 1000);
+                    }
                 };
                 box.appendChild(card);
             });
@@ -281,8 +290,10 @@
             else { player.playVideo(); setTimeout(applySpeed, 300); }
         } else if(isFile) {
             video.paused ? video.play() : video.pause();
+            applySpeed();
         } else {
             audio.paused ? audio.play() : audio.pause();
+            applySpeed();
         }
         setTimeout(updatePlayIcon, 200);
     }
@@ -351,7 +362,11 @@
         if(f.type.startsWith('video')) {
             isFile = true; cover.style.display = 'none';
             video.style.display = 'block'; video.src = u; video.play();
-        } else { audio.src = u; audio.play(); }
+            setTimeout(applySpeed, 200);
+        } else { 
+            audio.src = u; audio.play(); 
+            setTimeout(applySpeed, 200);
+        }
         updatePlayIcon();
     };
 
