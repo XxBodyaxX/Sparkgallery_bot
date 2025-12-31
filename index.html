@@ -38,7 +38,6 @@
             transition: all 0.3s ease;
         }
 
-        /* Полноэкранный режим для палубы */
         .main-deck.fullscreen-active {
             max-width: none; width: 100vw; height: 100vh; border: none; border-radius: 0;
         }
@@ -202,18 +201,18 @@
         document.getElementById('skipLblFwd').innerText = `+${val}с`;
     }
 
-    // ИСПРАВЛЕННАЯ СКОРОСТЬ
-    function setSpeed(v) {
-        currentSpeed = parseFloat(v);
-        applySpeed();
-    }
-
+    // Универсальная функция применения скорости
     function applySpeed() {
         if(isYT && player && typeof player.setPlaybackRate === 'function') {
             player.setPlaybackRate(currentSpeed);
         }
         if(isFile) video.playbackRate = currentSpeed;
         audio.playbackRate = currentSpeed;
+    }
+
+    function setSpeed(v) {
+        currentSpeed = parseFloat(v);
+        applySpeed();
     }
 
     function onYouTubeIframeAPIReady() {
@@ -223,8 +222,10 @@
             events: { 
                 'onStateChange': (e) => {
                     updatePlayIcon();
+                    // Самый важный момент: YT часто сбрасывает скорость при буферизации.
+                    // Принудительно ставим ее снова, как только видео реально заиграло.
                     if(e.data === YT.PlayerState.PLAYING) {
-                        applySpeed(); // Принудительная скорость при старте
+                        applySpeed();
                         cover.style.display = 'none';
                         document.getElementById('yt-wrapper').style.display = 'block';
                     }
@@ -276,8 +277,13 @@
     function togglePlay() {
         if(isYT) {
             const state = player.getPlayerState();
-            if (state === 1) player.pauseVideo();
-            else { player.playVideo(); applySpeed(); }
+            if (state === 1) {
+                player.pauseVideo();
+            } else {
+                player.playVideo();
+                // Повторный вызов после задержки, чтобы API успело «проснуться»
+                setTimeout(applySpeed, 200);
+            }
         } else if(isFile) {
             video.paused ? video.play() : video.pause();
         } else {
@@ -292,7 +298,7 @@
         if(isYT) {
             try { 
                 const s = player.getPlayerState();
-                playing = (s === 1 || s === 3); // PLAYING или BUFFERING
+                playing = (s === 1 || s === 3);
             } catch(e){}
         } else if(isFile) playing = !video.paused && !video.ended;
         else playing = !audio.paused && !audio.ended;
@@ -319,7 +325,6 @@
         target.style.transform = `rotate(${rotation}deg) scale(${ (rotation % 180 === 0) ? 1 : 0.6 })`;
     }
 
-    // ПОЛНОЭКРАННЫЙ РЕЖИМ ДЛЯ TELEGRAM
     function toggleFS() {
         const node = document.getElementById('playerNode');
         if (!isFull) {
