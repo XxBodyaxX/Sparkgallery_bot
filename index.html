@@ -52,7 +52,7 @@
         .track-info { text-align: center; margin: 10px 0; font-family: 'Orbitron'; font-size: 0.75rem; color: var(--neon); height: 18px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 
         .skip-config { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px; font-family: 'Orbitron'; font-size: 0.7rem; color: var(--neon); }
-        .skip-config input { background: rgba(0,0,0,0.5); border: 1px solid var(--border); color: var(--neon); width: 50px; text-align: center; font-family: 'Orbitron'; }
+        .skip-config input { background: rgba(0,0,0,0.5); border: 1px solid var(--border); color: var(--neon); width: 60px; text-align: center; font-family: 'Orbitron'; }
 
         .progress-block { width: 100%; margin: 5px 0 15px 0; }
         input[type="range"] { width: 100%; cursor: pointer; accent-color: var(--neon); }
@@ -65,7 +65,6 @@
         
         .play-main { width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--border); color: var(--neon); display: flex; justify-content: center; align-items: center; }
 
-        /* ЦЕНТРИРОВАННЫЙ БЛОК ТЕМ */
         .theme-container { 
             margin-top: auto; 
             padding-top: 15px; 
@@ -95,7 +94,7 @@
             cursor: pointer; 
             transition: 0.3s; 
             border-radius: 4px;
-            min-width: 75px;
+            min-width: 90px;
         }
         .theme-btn:hover, .theme-btn:active { background: var(--neon); color: #000; }
 
@@ -117,7 +116,7 @@
 <div class="main-deck" id="playerNode">
     <div class="search-bar">
         <input type="text" id="searchInput" placeholder="ПОИСК ВИДЕО...">
-        <button onclick="runSearch()">SCAN</button>
+        <button onclick="runSearch()">ПОИСК</button>
     </div>
     
     <div class="results-dropdown" id="resultsBox"></div>
@@ -128,12 +127,12 @@
         <img id="cover-art" src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=500">
     </div>
 
-    <div id="trackTitle" class="track-info">SYSTEM READY</div>
+    <div id="trackTitle" class="track-info">СИСТЕМА ГОТОВА</div>
 
     <div class="skip-config">
-        <span>STEP:</span>
-        <input type="number" id="skipInp" value="10" min="1" max="60" onchange="updateSkipStep(this.value)">
-        <span>SEC</span>
+        <span>ПЕРЕМОТКА <span id="limitText">(60)</span>:</span>
+        <input type="number" id="skipInp" value="10" min="1" oninput="updateSkipStep(this.value)">
+        <span>СЕК.</span>
     </div>
 
     <div class="progress-block">
@@ -147,12 +146,12 @@
     <div class="btn-row">
         <button class="btn" onclick="seekTrack(-1)">
             <svg viewBox="0 0 24 24" style="transform: scaleX(-1);"><path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/></svg>
-            <span class="btn-val" id="skipLblBack">-10s</span>
+            <span class="btn-val" id="skipLblBack">-10с</span>
         </button>
 
         <button class="btn" onclick="rotateVideo()">
             <svg viewBox="0 0 24 24"><path d="M12 4V1l5 5-5 5V8c-3.31 0-6 2.69-6 6 0 1.01.25 1.97.7 2.8l-1.46 1.46C4.46 16.97 4 15.51 4 14c0-4.42 3.58-8 8-8z"/></svg>
-            <span class="btn-val">ROTATE</span>
+            <span class="btn-val">ПОВОРОТ</span>
         </button>
 
         <button class="btn play-main" onclick="togglePlay()">
@@ -161,31 +160,31 @@
 
         <button class="btn" onclick="toggleFS()">
             <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
-            <span class="btn-val">SIZE</span>
+            <span class="btn-val">ЭКРАН</span>
         </button>
 
         <button class="btn" onclick="seekTrack(1)">
             <svg viewBox="0 0 24 24"><path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/></svg>
-            <span class="btn-val" id="skipLblFwd">+10s</span>
+            <span class="btn-val" id="skipLblFwd">+10с</span>
         </button>
     </div>
 
     <div class="theme-container">
-        <span class="theme-label">INTERFACE SELECT</span>
+        <span class="theme-label">ВЫБОР ИНТЕРФЕЙСА</span>
         <div class="theme-selector">
-            <div class="theme-btn" onclick="setTheme('cyber')">CYBER</div>
-            <div class="theme-btn" onclick="setTheme('winter')">WINTER</div>
-            <div class="theme-btn" onclick="setTheme('gothic')">GOTHIC</div>
-            <div class="theme-btn" onclick="setTheme('steampunk')">STEAM</div>
-            <div class="theme-btn" onclick="setTheme('biopunk')">BIO</div>
-            <div class="theme-btn" onclick="setTheme('retro')">RETRO</div>
-            <div class="theme-btn" onclick="setTheme('industrial')">INDUS</div>
+            <div class="theme-btn" onclick="setTheme('cyber')">КИБЕРПАНК</div>
+            <div class="theme-btn" onclick="setTheme('winter')">ЗИМНИЙ</div>
+            <div class="theme-btn" onclick="setTheme('gothic')">ГОТИКА</div>
+            <div class="theme-btn" onclick="setTheme('steampunk')">СТИМПАНК</div>
+            <div class="theme-btn" onclick="setTheme('biopunk')">БИОПАНК</div>
+            <div class="theme-btn" onclick="setTheme('retro')">РЕТРО-ВЕЙВ</div>
+            <div class="theme-btn" onclick="setTheme('industrial')">ИНДАСТРИАЛ</div>
         </div>
     </div>
 
     <div class="footer">
-        <label for="fileInput" style="cursor:pointer">[ FILE ]</label>
-        <span onclick="location.reload()" style="cursor:pointer">[ RESET ]</span>
+        <label for="fileInput" style="cursor:pointer">[ ОТКРЫТЬ ФАЙЛ ]</label>
+        <span onclick="location.reload()" style="cursor:pointer">[ ПЕРЕЗАГРУЗКА ]</span>
     </div>
     <input type="file" id="fileInput" accept="video/*,audio/*" style="display:none">
 </div>
@@ -201,18 +200,16 @@
     const audio = document.getElementById('local-audio'), video = document.getElementById('local-video');
     
     const proxies = [
-        "https://inv.tux.pizza",
-        "https://invidious.flokinet.to",
-        "https://inv.vern.cc",
-        "https://yewtu.be",
-        "https://iv.ggtyler.dev"
+        "https://inv.tux.pizza", "https://invidious.flokinet.to", "https://inv.vern.cc", "https://yewtu.be", "https://iv.ggtyler.dev"
     ];
     let currentProxyIdx = 0;
 
     function updateSkipStep(v) {
-        skipStep = Math.min(60, Math.max(1, parseInt(v) || 10));
-        document.getElementById('skipLblBack').innerText = `-${skipStep}s`;
-        document.getElementById('skipLblFwd').innerText = `+${skipStep}s`;
+        let val = parseInt(v) || 1;
+        document.getElementById('limitText').innerText = `(${val > 60 ? val : 60})`;
+        skipStep = val;
+        document.getElementById('skipLblBack').innerText = `-${skipStep}с`;
+        document.getElementById('skipLblFwd').innerText = `+${skipStep}с`;
     }
 
     function onYouTubeIframeAPIReady() {
@@ -226,34 +223,27 @@
     async function runSearch() {
         const query = document.getElementById('searchInput').value;
         if(!query) return;
-        
         const box = document.getElementById('resultsBox');
-        box.innerHTML = '<div style="padding:15px; color:var(--neon); font-size: 0.7rem;">SCANNING NETWORK...</div>';
+        box.innerHTML = '<div style="padding:15px; color:var(--neon); font-size: 0.7rem;">СКАНИРОВАНИЕ...</div>';
         box.classList.add('active');
         
         const tryFetch = async (retryCount = 0) => {
             if (retryCount >= proxies.length) {
-                box.innerHTML = '<div style="padding:15px">OFFLINE. TRY AGAIN later.</div>';
+                box.innerHTML = '<div style="padding:15px">ОШИБКА СЕТИ. ПОПРОБУЙТЕ ПОЗЖЕ.</div>';
                 return;
             }
-
             try {
                 const response = await fetch(`${proxies[currentProxyIdx]}/api/v1/search?q=${encodeURIComponent(query)}&type=video`);
                 const data = await response.json();
-                
                 if(!data || data.length === 0) throw new Error();
-
                 box.innerHTML = '';
                 data.slice(0, 10).forEach(item => {
                     const card = document.createElement('div');
                     card.className = 'res-card';
                     const thumb = item.videoThumbnails ? item.videoThumbnails[0].url : `https://img.youtube.com/vi/${item.videoId}/default.jpg`;
                     card.innerHTML = `<img src="${thumb}" width="50" height="35" style="object-fit:cover"> <div style="flex:1">${item.title}</div>`;
-                    
                     card.onclick = () => {
-                        resetMedia(); 
-                        isYT = true; 
-                        box.classList.remove('active');
+                        resetMedia(); isYT = true; box.classList.remove('active');
                         document.getElementById('cover-art').style.display = 'none';
                         document.getElementById('yt-wrapper').style.display = 'block';
                         document.getElementById('trackTitle').innerText = item.title;
@@ -273,8 +263,7 @@
         isYT = isFile = false; rotation = 0;
         try { player.stopVideo(); } catch(e){}
         audio.pause(); video.pause();
-        video.style.display = 'none';
-        video.style.transform = 'none';
+        video.style.display = 'none'; video.style.transform = 'none';
         document.getElementById('yt-wrapper').style.display = 'none';
         document.getElementById('yt-wrapper').style.transform = 'none';
         document.getElementById('cover-art').style.display = 'block';
@@ -339,7 +328,6 @@
         if(isYT) { try { cur = player.getCurrentTime(); dur = player.getDuration(); } catch(e){} }
         else if(isFile) { cur = video.currentTime; dur = video.duration; }
         else { cur = audio.currentTime; dur = audio.duration; }
-        
         if(dur) {
             const bar = document.getElementById('progressBar');
             bar.max = Math.floor(dur); bar.value = Math.floor(cur);
