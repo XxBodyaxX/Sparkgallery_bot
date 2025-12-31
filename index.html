@@ -38,7 +38,9 @@
             transition: all 0.3s ease;
         }
 
-        .main-deck.fullscreen-active { max-width: none; width: 100vw; height: 100vh; border: none; border-radius: 0; }
+        .main-deck.fullscreen-active {
+            max-width: none; width: 100vw; height: 100vh; border: none; border-radius: 0;
+        }
 
         .search-bar { display: flex; gap: 5px; margin-bottom: 15px; background: rgba(0,0,0,0.5); padding: 5px; border-radius: 5px; border: 1px solid var(--border); }
         .search-bar input { flex: 1; background: transparent; border: none; color: var(--neon); font-family: 'Orbitron'; padding: 8px; font-size: 0.8rem; }
@@ -51,7 +53,7 @@
         .fullscreen-active .display-container { height: 60vh; }
 
         #yt-wrapper, #local-video { width: 100%; height: 100%; display: none; object-fit: contain; }
-        #cover-art { width: 100%; height: 100%; object-fit: cover; cursor: pointer; position: absolute; z-index: 5; }
+        #cover-art { width: 100%; height: 100%; object-fit: cover; cursor: pointer; position: absolute; z-index: 2; }
 
         .track-info { text-align: center; margin: 10px 0; font-family: 'Orbitron'; font-size: 0.75rem; color: var(--neon); height: 18px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 
@@ -68,11 +70,12 @@
         .btn svg { width: 30px; height: 30px; fill: currentColor; }
         .btn-val { font-size: 0.55rem; margin-top: 4px; font-family: 'Orbitron'; color: var(--neon); }
         
-        .play-main { width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--border); color: var(--neon); display: flex; justify-content: center; align-items: center; background: rgba(0,0,0,0.3); }
+        .play-main { width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--border); color: var(--neon); display: flex; justify-content: center; align-items: center; }
 
         .theme-container { margin-top: auto; padding-top: 15px; border-top: 1px dashed var(--border); text-align: center; }
         .theme-selector { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
-        .theme-btn { font-size: 0.55rem; padding: 6px 10px; background: rgba(0,0,0,0.4); border: 1px solid var(--border); color: var(--text); cursor: pointer; border-radius: 4px; min-width: 90px; }
+        .theme-btn { font-size: 0.55rem; padding: 6px 10px; background: rgba(0,0,0,0.4); border: 1px solid var(--border); color: var(--text); cursor: pointer; border-radius: 4px; min-width: 90px; transition: 0.2s; }
+        .theme-btn:hover { background: var(--neon); color: #000; }
 
         .footer { display: flex; justify-content: center; gap: 20px; margin-top: 15px; font-size: 0.7rem; font-family: 'Orbitron'; color: var(--neon); }
         
@@ -107,7 +110,7 @@
 
     <div class="config-row">
         <div class="config-item">
-            <span>ПЕРЕМОТКА:</span>
+            <span>ПЕРЕМОТКА (МАКС 60С):</span>
             <input type="number" id="skipInp" value="10" min="1" max="60" oninput="updateSkipStep(this)">
         </div>
         <div class="config-item">
@@ -164,7 +167,9 @@
             <div class="theme-btn" onclick="setTheme('winter')">ЗИМНИЙ</div>
             <div class="theme-btn" onclick="setTheme('gothic')">ГОТИКА</div>
             <div class="theme-btn" onclick="setTheme('steampunk')">СТИМПАНК</div>
-            <div class="theme-btn" onclick="setTheme('retro')">РЕТРО</div>
+            <div class="theme-btn" onclick="setTheme('biopunk')">БИОПАНК</div>
+            <div class="theme-btn" onclick="setTheme('retro')">РЕТРО-ВЕЙВ</div>
+            <div class="theme-btn" onclick="setTheme('industrial')">ИНДАСТРИАЛ</div>
         </div>
     </div>
 
@@ -180,7 +185,8 @@
 
 <script>
     const tg = window.Telegram.WebApp;
-    tg.ready(); tg.expand();
+    tg.ready();
+    tg.expand();
 
     let player, isYT = false, isFile = false, skipStep = 10, rotation = 0, currentSpeed = 1, isFull = false;
     const audio = document.getElementById('local-audio'), video = document.getElementById('local-video'), cover = document.getElementById('cover-art');
@@ -190,33 +196,37 @@
 
     function updateSkipStep(input) {
         let val = Math.min(parseInt(input.value) || 1, 60);
-        skipStep = val;
+        input.value = val; skipStep = val;
         document.getElementById('skipLblBack').innerText = `-${val}с`;
         document.getElementById('skipLblFwd').innerText = `+${val}с`;
     }
 
     function applySpeed() {
-        if(isYT && player && player.setPlaybackRate) player.setPlaybackRate(currentSpeed);
+        if(isYT && player && typeof player.setPlaybackRate === 'function') {
+            player.setPlaybackRate(currentSpeed);
+        }
         if(isFile) video.playbackRate = currentSpeed;
         audio.playbackRate = currentSpeed;
     }
 
-    function setSpeed(v) { currentSpeed = parseFloat(v); applySpeed(); }
+    function setSpeed(v) {
+        currentSpeed = parseFloat(v);
+        applySpeed();
+    }
 
     function onYouTubeIframeAPIReady() {
         player = new YT.Player('yt-placeholder', {
             height: '100%', width: '100%',
-            playerVars: { 'controls': 0, 'modestbranding': 1, 'rel': 0, 'playsinline': 1 },
+            playerVars: { 'controls': 0, 'modestbranding': 1, 'rel': 0, 'iv_load_policy': 3, 'playsinline': 1 },
             events: { 
                 'onStateChange': (e) => {
                     updatePlayIcon();
-                    if(e.data === 1) { // Плеер начал играть (PLAYING)
+                    if(e.data === YT.PlayerState.PLAYING) {
                         applySpeed();
                         cover.style.display = 'none';
                         document.getElementById('yt-wrapper').style.display = 'block';
                     }
-                },
-                'onError': () => { alert("Ошибка YouTube. Попробуйте другой ролик."); }
+                } 
             }
         });
     }
@@ -228,32 +238,40 @@
         box.innerHTML = '<div style="padding:15px; color:var(--neon);">ПОИСК...</div>';
         box.classList.add('active');
         
-        try {
-            const response = await fetch(`${proxies[currentProxyIdx]}/api/v1/search?q=${encodeURIComponent(query)}&type=video`);
-            const data = await response.json();
-            box.innerHTML = '';
-            data.slice(0, 8).forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'res-card';
-                const thumb = `https://img.youtube.com/vi/${item.videoId}/mqdefault.jpg`;
-                card.innerHTML = `<img src="${thumb}" width="50"> <div style="flex:1; overflow:hidden;">${item.title}</div>`;
-                card.onclick = () => {
-                    resetMedia(); isYT = true; box.classList.remove('active');
-                    document.getElementById('trackTitle').innerText = item.title;
-                    cover.src = thumb; 
-                    if(player && player.cueVideoById) player.cueVideoById(item.videoId);
-                };
-                box.appendChild(card);
-            });
-        } catch (e) { 
-            currentProxyIdx = (currentProxyIdx + 1) % proxies.length; 
-            box.innerHTML = '<div style="padding:15px">Ошибка. Нажмите поиск еще раз.</div>'; 
-        }
+        const tryFetch = async (retry = 0) => {
+            if (retry >= proxies.length) { box.innerHTML = '<div style="padding:15px">ОШИБКА СЕТИ</div>'; return; }
+            try {
+                const response = await fetch(`${proxies[currentProxyIdx]}/api/v1/search?q=${encodeURIComponent(query)}&type=video`);
+                const data = await response.json();
+                box.innerHTML = '';
+                data.slice(0, 8).forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'res-card';
+                    const thumb = `https://img.youtube.com/vi/${item.videoId}/mqdefault.jpg`;
+                    card.innerHTML = `<img src="${thumb}" width="50"> <div style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">${item.title}</div>`;
+                    card.onclick = () => {
+                        resetMedia(); 
+                        isYT = true; 
+                        box.classList.remove('active');
+                        document.getElementById('trackTitle').innerText = item.title;
+                        
+                        // Скрываем обложку и показываем плеер
+                        cover.style.display = 'none';
+                        document.getElementById('yt-wrapper').style.display = 'block';
+                        
+                        // Запускаем видео сразу (loadVideoById вместо cueVideoById)
+                        player.loadVideoById(item.videoId);
+                    };
+                    box.appendChild(card);
+                });
+            } catch (e) { currentProxyIdx = (currentProxyIdx + 1) % proxies.length; await tryFetch(retry + 1); }
+        };
+        await tryFetch();
     }
 
     function resetMedia() {
         isYT = isFile = false; rotation = 0;
-        if(player && player.stopVideo) try { player.stopVideo(); } catch(e){}
+        try { player.stopVideo(); } catch(e){}
         audio.pause(); video.pause();
         video.style.display = 'none'; document.getElementById('yt-wrapper').style.display = 'none';
         cover.style.display = 'block';
@@ -261,29 +279,32 @@
 
     function togglePlay() {
         if(isYT) {
-            if(!player || !player.getPlayerState) {
-                onYouTubeIframeAPIReady(); // Попытка переинициализации если плеер упал
-                return;
-            }
             const state = player.getPlayerState();
-            if (state === 1 || state === 3) player.pauseVideo();
-            else { player.playVideo(); setTimeout(applySpeed, 300); }
+            if (state === 1) {
+                player.pauseVideo();
+            } else {
+                player.playVideo();
+                setTimeout(applySpeed, 200);
+            }
         } else if(isFile) {
             video.paused ? video.play() : video.pause();
         } else {
             audio.paused ? audio.play() : audio.pause();
         }
-        setTimeout(updatePlayIcon, 200);
+        setTimeout(updatePlayIcon, 150);
     }
 
     function updatePlayIcon() {
         const icon = document.getElementById('playIcon');
         let playing = false;
-        if(isYT && player && player.getPlayerState) {
-            const s = player.getPlayerState();
-            playing = (s === 1 || s === 3);
-        } else if(isFile) playing = !video.paused;
-        else playing = !audio.paused;
+        if(isYT) {
+            try { 
+                const s = player.getPlayerState();
+                playing = (s === 1 || s === 3);
+            } catch(e){}
+        } else if(isFile) playing = !video.paused && !video.ended;
+        else playing = !audio.paused && !audio.ended;
+
         icon.innerHTML = playing ? '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>' : '<path d="M8 5v14l11-7z"/>';
     }
 
@@ -310,16 +331,20 @@
         const node = document.getElementById('playerNode');
         if (!isFull) {
             if (tg.requestFullscreen) tg.requestFullscreen();
-            node.classList.add('fullscreen-active'); isFull = true;
+            node.classList.add('fullscreen-active');
+            isFull = true;
         } else {
             if (tg.exitFullscreen) tg.exitFullscreen();
-            node.classList.remove('fullscreen-active'); isFull = false;
+            node.classList.remove('fullscreen-active');
+            isFull = false;
         }
     }
 
+    video.onended = audio.onended = () => updatePlayIcon();
+
     setInterval(() => {
         let cur = 0, dur = 0;
-        if(isYT && player && player.getCurrentTime) { cur = player.getCurrentTime(); dur = player.getDuration(); }
+        if(isYT) { try { cur = player.getCurrentTime(); dur = player.getDuration(); } catch(e){} }
         else if(isFile) { cur = video.currentTime; dur = video.duration; }
         else { cur = audio.currentTime; dur = audio.duration; }
         if(dur) {
@@ -328,7 +353,7 @@
             document.getElementById('curTime').innerText = fmt(cur);
             document.getElementById('durTime').innerText = fmt(dur);
         }
-    }, 1000);
+    }, 500);
 
     function fmt(s) {
         let m = Math.floor(s/60), sc = Math.floor(s%60);
@@ -343,7 +368,8 @@
             isFile = true; cover.style.display = 'none';
             video.style.display = 'block'; video.src = u; video.play();
         } else { audio.src = u; audio.play(); }
-        setTimeout(applySpeed, 100); updatePlayIcon();
+        applySpeed();
+        updatePlayIcon();
     };
 
     function setTheme(t) { document.body.className = 'theme-' + t; }
@@ -361,6 +387,7 @@
         });
     }
     window.onresize = rs; rs(); setInterval(draw, 50);
+    window.onclick = (e) => { if(!e.target.closest('.search-bar')) document.getElementById('resultsBox').classList.remove('active'); }
 </script>
 </body>
 </html>
