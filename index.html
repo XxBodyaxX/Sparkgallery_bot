@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>CYBER PLAYER TWA</title>
+    <title>CYBER PLAYER ULTIMATE</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;800&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
     <style>
@@ -32,30 +32,22 @@
             position: relative; z-index: 10; width: 92vw; max-width: 440px;
             background: var(--panel); border: 2px solid var(--border);
             border-radius: 15px; padding: 20px; backdrop-filter: blur(15px);
-            box-shadow: 0 0 40px rgba(0,0,0,0.7);
-            transition: all 0.3s ease;
+            box-shadow: 0 0 40px rgba(0,0,0,0.8);
         }
 
-        /* Специальный класс для псевдо-полного экрана внутри Телеграм */
-        .twa-fullscreen {
-            width: 100vw !important;
-            height: 100vh !important;
-            max-width: none !important;
-            border-radius: 0 !important;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
+        /* Fullscreen */
+        #playerNode:fullscreen { width: 100vw; height: 100vh; border-radius: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .twa-fs { width: 100vw !important; height: 100vh !important; max-width: none !important; border-radius: 0 !important; }
 
         .search-bar { display: flex; gap: 5px; margin-bottom: 15px; background: rgba(0,0,0,0.5); padding: 5px; border-radius: 5px; border: 1px solid var(--border); }
         .search-bar input { flex: 1; background: transparent; border: none; color: var(--neon); font-family: 'Orbitron'; padding: 8px; font-size: 0.8rem; }
         .search-bar button { background: var(--neon); border: none; color: #000; padding: 0 10px; cursor: pointer; font-family: 'Orbitron'; font-weight: bold; }
 
         .display-container {
-            width: 100%; height: 200px; background: #000; border: 1px solid var(--border);
+            width: 100%; height: 210px; background: #000; border: 1px solid var(--border);
             border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative;
         }
-        .twa-fullscreen .display-container { height: 50vh; }
+        #playerNode:fullscreen .display-container, .twa-fs .display-container { height: 55vh; }
 
         #yt-wrapper, #local-video { width: 100%; height: 100%; display: none; object-fit: contain; }
         #cover-art { width: 100%; height: 100%; object-fit: cover; }
@@ -66,7 +58,7 @@
         input[type="range"] { width: 100%; cursor: pointer; accent-color: var(--neon); }
         .time-info { display: flex; justify-content: space-between; font-size: 0.6rem; font-family: 'Orbitron'; color: var(--neon); }
 
-        .btn-row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+        .btn-row { display: flex; justify-content: space-between; align-items: center; }
         .btn { background: none; border: none; color: var(--text); cursor: pointer; display: flex; flex-direction: column; align-items: center; }
         .btn svg { width: 28px; height: 28px; fill: currentColor; }
         .btn-val { font-size: 0.5rem; margin-top: 2px; font-family: 'Orbitron'; }
@@ -74,14 +66,14 @@
         .play-main { width: 55px; height: 55px; border-radius: 50%; border: 2px solid var(--border); color: var(--neon); display: flex; justify-content: center; align-items: center; }
 
         .theme-selector { margin-top: 15px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
-        .theme-btn { font-size: 0.5rem; padding: 5px; background: rgba(0,0,0,0.4); border: 1px solid var(--border); color: var(--text); cursor: pointer; text-align: center; }
+        .theme-btn { font-size: 0.5rem; padding: 6px 2px; background: rgba(0,0,0,0.4); border: 1px solid var(--border); color: var(--text); cursor: pointer; text-align: center; }
 
         .footer { display: flex; justify-content: center; gap: 15px; margin-top: 15px; font-size: 0.65rem; font-family: 'Orbitron'; }
         .footer label, .footer span { cursor: pointer; color: var(--neon); }
 
         .results-dropdown {
             position: absolute; top: 65px; left: 20px; right: 20px; background: #000;
-            border: 1px solid var(--neon); max-height: 150px; overflow-y: auto;
+            border: 1px solid var(--neon); max-height: 160px; overflow-y: auto;
             display: none; z-index: 100;
         }
         .results-dropdown.active { display: block; }
@@ -94,8 +86,8 @@
 
 <div class="main-deck" id="playerNode">
     <div class="search-bar">
-        <input type="text" id="searchInput" placeholder="ПОИСК...">
-        <button onclick="runSearch()">СКАН</button>
+        <input type="text" id="searchInput" placeholder="НАЙТИ ТРЕК...">
+        <button onclick="runSearch()">ПОИСК</button>
     </div>
     <div class="results-dropdown" id="resultsBox"></div>
 
@@ -105,7 +97,7 @@
         <img id="cover-art" src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=500">
     </div>
 
-    <div id="trackTitle" class="track-info">READY</div>
+    <div id="trackTitle" class="track-info">ОЖИДАНИЕ...</div>
 
     <div class="progress-block">
         <input type="range" id="progressBar" value="0" step="1" oninput="manualSeek(this.value)">
@@ -118,42 +110,42 @@
     <div class="btn-row">
         <button class="btn" onclick="seekTrack(-1)">
             <svg viewBox="0 0 24 24" style="transform: scaleX(-1);"><path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/></svg>
-            <span class="btn-val">-10s</span>
+            <span class="btn-val">-10с</span>
         </button>
 
         <button class="btn" onclick="rotateVideo()">
             <svg viewBox="0 0 24 24"><path d="M12 4V1l5 5-5 5V8c-3.31 0-6 2.69-6 6 0 1.01.25 1.97.7 2.8l-1.46 1.46C4.46 16.97 4 15.51 4 14c0-4.42 3.58-8 8-8z"/></svg>
-            <span class="btn-val">ROT</span>
+            <span class="btn-val">ПОВОРОТ</span>
         </button>
 
         <button class="btn play-main" onclick="togglePlay()">
             <svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
         </button>
 
-        <button class="btn" onclick="toggleTWAFullscreen()">
+        <button class="btn" onclick="toggleFull()">
             <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
-            <span class="btn-val">FULL</span>
+            <span class="btn-val">ЭКРАН</span>
         </button>
 
         <button class="btn" onclick="seekTrack(1)">
             <svg viewBox="0 0 24 24"><path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/></svg>
-            <span class="btn-val">+10s</span>
+            <span class="btn-val">+10с</span>
         </button>
     </div>
 
     <div class="theme-selector">
-        <div class="theme-btn" onclick="setTheme('cyber')">CYBER</div>
-        <div class="theme-btn" onclick="setTheme('winter')">WINTER</div>
-        <div class="theme-btn" onclick="setTheme('gothic')">GOTHIC</div>
-        <div class="theme-btn" onclick="setTheme('steampunk')">STEAM</div>
-        <div class="theme-btn" onclick="setTheme('biopunk')">BIO</div>
-        <div class="theme-btn" onclick="setTheme('retro')">RETRO</div>
-        <div class="theme-btn" onclick="setTheme('industrial')">INDUS</div>
+        <div class="theme-btn" onclick="setTheme('cyber')">КИБЕР</div>
+        <div class="theme-btn" onclick="setTheme('winter')">ЗИМА</div>
+        <div class="theme-btn" onclick="setTheme('gothic')">ГОТИКА</div>
+        <div class="theme-btn" onclick="setTheme('steampunk')">ПАРОВОЗ</div>
+        <div class="theme-btn" onclick="setTheme('biopunk')">БИОПАНК</div>
+        <div class="theme-btn" onclick="setTheme('retro')">РЕТРО</div>
+        <div class="theme-btn" onclick="setTheme('industrial')">ЗАВОД</div>
     </div>
 
     <div class="footer">
-        <label for="fileInput">[ FILE ]</label>
-        <span onclick="location.reload()">[ RESET ]</span>
+        <label for="fileInput">[ ФАЙЛ ]</label>
+        <span onclick="location.reload()">[ СБРОС ]</span>
     </div>
     <input type="file" id="fileInput" accept="video/*,audio/*" style="display:none">
 </div>
@@ -163,31 +155,23 @@
 
 <script>
     const tg = window.Telegram.WebApp;
-    tg.ready(); // Сообщаем Телеграму, что приложение готово
+    tg.ready();
 
     let player, isYT = false, isVideoFile = false, skipSec = 10, currentRotation = 0;
     const a = document.getElementById('local-audio'), v = document.getElementById('local-video');
     const themeAssets = {
-        cyber: ["0", "1"], winter: ["❄", "❅"], gothic: ["💀", "🦇"],
+        cyber: ["⚡", "💾"], winter: ["❄", "❅"], gothic: ["💀", "🦇"],
         steampunk: ["⚙", "🕰"], biopunk: ["🧬", "🌿"], retro: ["👾", "🕹"], industrial: ["☢", "🛠"]
     };
 
-    // Функция для реального полного экрана в Telegram
-    function toggleTWAFullscreen() {
+    function toggleFull() {
         const node = document.getElementById('playerNode');
-        
-        // 1. Расширяем WebApp через SDK
-        if (!tg.isExpanded) {
-            tg.expand(); 
-        }
-
-        // 2. Переключаем визуальный класс для CSS
-        node.classList.toggle('twa-fullscreen');
-
-        // 3. Пытаемся вызвать нативный Fullscreen (для десктопа)
+        if (!tg.isExpanded) tg.expand();
+        node.classList.toggle('twa-fs');
         try {
             if (!document.fullscreenElement) {
                 if (node.requestFullscreen) node.requestFullscreen();
+                else if (node.webkitRequestFullscreen) node.webkitRequestFullscreen();
             } else {
                 if (document.exitFullscreen) document.exitFullscreen();
             }
@@ -197,7 +181,7 @@
     function onYouTubeIframeAPIReady() {
         player = new YT.Player('yt-placeholder', {
             height: '100%', width: '100%',
-            playerVars: { 'controls': 0, 'rel': 0 },
+            playerVars: { 'controls': 0, 'rel': 0, 'modestbranding': 1 },
             events: { 'onStateChange': () => updatePlayIcon() }
         });
     }
@@ -206,13 +190,17 @@
         const q = document.getElementById('searchInput').value;
         if(!q) return;
         const box = document.getElementById('resultsBox');
-        box.innerHTML = '<div style="padding:10px">SCANNING...</div>';
+        box.innerHTML = '<div style="padding:15px">ПОДКЛЮЧЕНИЕ К СЕТИ...</div>';
         box.classList.add('active');
+        
         try {
-            const r = await fetch(`https://invidious.flokinet.to/api/v1/search?q=${encodeURIComponent(q)}&type=video`);
-            const d = await r.json();
+            // Используем проверенный прокси Invidious
+            const res = await fetch(`https://vid.puffyan.us/api/v1/search?q=${encodeURIComponent(q)}&type=video`);
+            const data = await res.json();
             box.innerHTML = '';
-            d.slice(0, 10).forEach(i => {
+            if(!data.length) { box.innerHTML = '<div style="padding:15px">НИЧЕГО НЕ НАЙДЕНО</div>'; return; }
+            
+            data.slice(0, 10).forEach(i => {
                 const div = document.createElement('div');
                 div.className = 'res-card';
                 div.innerHTML = `<img src="${i.videoThumbnails[0].url}" width="40"> <span>${i.title}</span>`;
@@ -225,11 +213,13 @@
                 };
                 box.appendChild(div);
             });
-        } catch (e) { box.innerHTML = '<div style="padding:10px">ERROR</div>'; }
+        } catch (e) { 
+            box.innerHTML = '<div style="padding:15px">ОШИБКА ПОИСКА. ПОПРОБУЙТЕ СНОВА.</div>'; 
+        }
     }
 
     function resetMedia() {
-        isYT = false; isVideoFile = false;
+        isYT = false; isVideoFile = false; currentRotation = 0;
         try { player.stopVideo(); } catch(e){}
         a.pause(); v.pause();
         v.style.display = 'none';
@@ -259,10 +249,10 @@
         else a.currentTime += d;
     }
 
-    function manualSeek(v_val) {
-        if(isYT) player.seekTo(v_val);
-        else if(isVideoFile) v.currentTime = v_val;
-        else a.currentTime = v_val;
+    function manualSeek(val) {
+        if(isYT) player.seekTo(val);
+        else if(isVideoFile) v.currentTime = val;
+        else a.currentTime = val;
     }
 
     function rotateVideo() {
@@ -310,7 +300,7 @@
     let drops = [];
     function initM() {
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        drops = Array(Math.floor(canvas.width / 30)).fill(1);
+        drops = Array(Math.floor(canvas.width / 25)).fill(1);
     }
     function drawM() {
         const theme = document.body.className.replace('theme-', '');
@@ -318,15 +308,20 @@
         ctx.fillStyle = "rgba(0, 0, 0, 0.15)";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--neon');
-        ctx.font = "18px monospace";
+        ctx.font = "16px monospace";
+        
         drops.forEach((y, i) => {
-            const char = Math.random() > 0.93 ? assets[Math.floor(Math.random() * assets.length)] : (Math.random() > 0.5 ? "1" : "0");
-            ctx.fillText(char, i * 30, y * 30);
-            if (y * 30 > canvas.height && Math.random() > 0.985) drops[i] = 0;
+            // Вероятность появления эмодзи 2% вместо символа матрицы
+            const isEmoji = Math.random() > 0.98;
+            const char = isEmoji ? assets[Math.floor(Math.random() * assets.length)] : (Math.random() > 0.5 ? "1" : "0");
+            
+            ctx.fillText(char, i * 25, y * 25);
+            if (y * 25 > canvas.height && Math.random() > 0.98) drops[i] = 0;
             drops[i]++;
         });
     }
     window.onresize = initM; initM(); setInterval(drawM, 80);
+    window.onclick = (e) => { if(!e.target.closest('.search-bar')) document.getElementById('resultsBox').classList.remove('active'); }
 </script>
 </body>
 </html>
