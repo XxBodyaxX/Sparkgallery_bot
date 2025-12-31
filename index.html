@@ -14,10 +14,7 @@
         body.theme-cyber { --neon: #00f2ff; --bg: #05080a; --border: #00f2ff66; }
         body.theme-winter { --neon: #a0e9ff; --bg: #0a141a; --border: #a0e9ff33; }
         body.theme-gothic { --neon: #ff0000; --bg: #0a0000; --border: #330000; }
-        body.theme-steampunk { --neon: #ffaa00; --bg: #1a0f00; --border: #553300; }
-        body.theme-biopunk { --neon: #39ff14; --bg: #040d04; --border: #1a4d00; }
         body.theme-retro { --neon: #ff00ff; --bg: #120024; --border: #ff00ff66; }
-        body.theme-industrial { --neon: #999999; --bg: #111111; --border: #444444; }
 
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
         body {
@@ -38,7 +35,6 @@
             transition: all 0.3s ease;
         }
 
-        /* Полноэкранный режим для палубы плеера */
         .main-deck.fullscreen-mode {
             max-width: none; width: 100vw; height: 100vh; border: none; border-radius: 0;
         }
@@ -50,12 +46,9 @@
         .display-container {
             width: 100%; height: 210px; background: #000; border: 1px solid var(--border);
             border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative;
-            transition: height 0.3s ease;
         }
 
-        .fullscreen-mode .display-container {
-            height: 60vh; /* Увеличиваем видео в полноэкранном режиме */
-        }
+        .fullscreen-mode .display-container { height: 60vh; }
 
         #yt-wrapper, #local-video { width: 100%; height: 100%; display: none; object-fit: contain; }
         #cover-art { width: 100%; height: 100%; object-fit: cover; cursor: pointer; }
@@ -79,7 +72,7 @@
 
         .theme-container { margin-top: auto; padding-top: 10px; border-top: 1px dashed var(--border); text-align: center; }
         .theme-selector { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; }
-        .theme-btn { font-size: 0.5rem; padding: 4px 8px; background: rgba(0,0,0,0.4); border: 1px solid var(--border); color: var(--text); cursor: pointer; border-radius: 4px; transition: 0.2s; }
+        .theme-btn { font-size: 0.5rem; padding: 4px 8px; background: rgba(0,0,0,0.4); border: 1px solid var(--border); color: var(--text); cursor: pointer; border-radius: 4px; }
         
         .results-dropdown {
             position: absolute; top: 60px; left: 20px; right: 20px; background: rgba(5,8,10,0.98);
@@ -168,7 +161,6 @@
             <div class="theme-btn" onclick="setTheme('cyber')">КИБЕР</div>
             <div class="theme-btn" onclick="setTheme('winter')">ЗИМА</div>
             <div class="theme-btn" onclick="setTheme('gothic')">ГОТИКА</div>
-            <div class="theme-btn" onclick="setTheme('steampunk')">СТИМ</div>
             <div class="theme-btn" onclick="setTheme('retro')">РЕТРО</div>
         </div>
     </div>
@@ -186,7 +178,7 @@
 <script>
     const tg = window.Telegram.WebApp;
     tg.ready();
-    tg.expand(); // Сразу расширяем окно при запуске
+    tg.expand();
 
     let player, isYT = false, isFile = false, skipStep = 10, rotation = 0, currentSpeed = 1, isFull = false;
     const audio = document.getElementById('local-audio'), video = document.getElementById('local-video'), cover = document.getElementById('cover-art');
@@ -201,9 +193,16 @@
         document.getElementById('skipLblFwd').innerText = `+${val}с`;
     }
 
+    // ИСПРАВЛЕННАЯ ФУНКЦИЯ СКОРОСТИ
     function setSpeed(v) {
         currentSpeed = parseFloat(v);
-        if(isYT && player?.setPlaybackRate) player.setPlaybackRate(currentSpeed);
+        applySpeed();
+    }
+
+    function applySpeed() {
+        if(isYT && player && typeof player.setPlaybackRate === 'function') {
+            player.setPlaybackRate(currentSpeed);
+        }
         if(isFile) video.playbackRate = currentSpeed;
         audio.playbackRate = currentSpeed;
     }
@@ -215,12 +214,15 @@
             events: { 
                 'onStateChange': (e) => {
                     updatePlayIcon();
+                    // Принудительно ставим скорость, когда видео начало играть
                     if(e.data === YT.PlayerState.PLAYING) {
-                        player.setPlaybackRate(currentSpeed);
+                        applySpeed();
                         cover.style.display = 'none';
                         document.getElementById('yt-wrapper').style.display = 'block';
                     }
-                } 
+                    if(e.data === YT.PlayerState.ENDED) updatePlayIcon();
+                },
+                'onReady': () => { applySpeed(); }
             }
         });
     }
@@ -248,7 +250,7 @@
                 };
                 box.appendChild(card);
             });
-        } catch (e) { currentProxyIdx = (currentProxyIdx + 1) % proxies.length; box.innerHTML = '<div style="padding:15px">ПОВТОРИТЕ ПОИСК</div>'; }
+        } catch (e) { currentProxyIdx = (currentProxyIdx + 1) % proxies.length; box.innerHTML = '<div style="padding:15px">ПОВТОРИТЕ</div>'; }
     }
 
     function resetMedia() {
@@ -262,7 +264,8 @@
     function togglePlay() {
         if(isYT) {
             const state = player.getPlayerState();
-            state === 1 ? player.pauseVideo() : player.playVideo();
+            if (state === 1) player.pauseVideo();
+            else { player.playVideo(); applySpeed(); }
         } else if(isFile) {
             video.paused ? video.play() : video.pause();
         } else {
@@ -274,7 +277,7 @@
     function updatePlayIcon() {
         const icon = document.getElementById('playIcon');
         let playing = false;
-        if(isYT) { try { playing = (player.getPlayerState() === 1); } catch(e){} }
+        if(isYT) { try { const s = player.getPlayerState(); playing = (s === 1 || s === 3); } catch(e){} }
         else if(isFile) playing = !video.paused && !video.ended;
         else playing = !audio.paused && !audio.ended;
         icon.innerHTML = playing ? '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>' : '<path d="M8 5v14l11-7z"/>';
@@ -283,21 +286,11 @@
     function toggleTGFullscreen() {
         const node = document.getElementById('playerNode');
         if (!isFull) {
-            // Включаем полноэкранный режим в Telegram
-            if (tg.requestFullscreen) {
-                tg.requestFullscreen();
-            } else {
-                tg.expand();
-            }
-            node.classList.add('fullscreen-mode');
-            isFull = true;
+            if (tg.requestFullscreen) tg.requestFullscreen();
+            node.classList.add('fullscreen-mode'); isFull = true;
         } else {
-            // Выходим из полноэкранного режима
-            if (tg.exitFullscreen) {
-                tg.exitFullscreen();
-            }
-            node.classList.remove('fullscreen-mode');
-            isFull = false;
+            if (tg.exitFullscreen) tg.exitFullscreen();
+            node.classList.remove('fullscreen-mode'); isFull = false;
         }
     }
 
@@ -348,7 +341,7 @@
             isFile = true; cover.style.display = 'none';
             video.style.display = 'block'; video.src = u; video.play();
         } else { audio.src = u; audio.play(); }
-        updatePlayIcon();
+        applySpeed(); updatePlayIcon();
     };
 
     function setTheme(t) { document.body.className = 'theme-' + t; }
@@ -366,7 +359,6 @@
         });
     }
     window.onresize = rs; rs(); setInterval(draw, 50);
-    window.onclick = (e) => { if(!e.target.closest('.search-bar')) document.getElementById('resultsBox').classList.remove('active'); }
 </script>
 </body>
 </html>
