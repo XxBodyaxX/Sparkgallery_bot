@@ -46,7 +46,7 @@
             border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative;
         }
 
-        #yt-wrapper, #local-video { width: 100%; height: 100%; display: none; object-fit: contain; transition: transform 0.4s ease; }
+        #yt-wrapper, #local-video { width: 100%; height: 100%; display: none; object-fit: contain; }
         #cover-art { width: 100%; height: 100%; object-fit: cover; }
 
         .track-info { text-align: center; margin: 10px 0; font-family: 'Orbitron'; font-size: 0.75rem; color: var(--neon); height: 18px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
@@ -66,9 +66,7 @@
         
         .play-main { width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--border); color: var(--neon); display: flex; justify-content: center; align-items: center; }
 
-        .theme-container { 
-            margin-top: auto; padding-top: 15px; border-top: 1px dashed var(--border); text-align: center; 
-        }
+        .theme-container { margin-top: auto; padding-top: 15px; border-top: 1px dashed var(--border); text-align: center; }
         .theme-label { font-size: 0.6rem; font-family: 'Orbitron'; color: var(--neon); margin-bottom: 10px; display: block; letter-spacing: 2px; }
         .theme-selector { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
         .theme-btn { font-size: 0.55rem; padding: 6px 10px; background: rgba(0,0,0,0.4); border: 1px solid var(--border); color: var(--text); cursor: pointer; border-radius: 4px; min-width: 90px; }
@@ -107,7 +105,7 @@
 
     <div class="config-row">
         <div class="config-item">
-            <span>ШАГ <span id="limitText">(макс. 60)</span>:</span>
+            <span>ШАГ (макс. 60 сек.):</span>
             <input type="number" id="skipInp" value="10" min="1" max="60" oninput="updateSkipStep(this)">
         </div>
         <div class="config-item">
@@ -188,8 +186,14 @@
     let player, isYT = false, isFile = false, skipStep = 10, rotation = 0, currentSpeed = 1;
     const audio = document.getElementById('local-audio'), video = document.getElementById('local-video');
     
+    // МАКСИМАЛЬНО ОБНОВЛЕННЫЙ СПИСОК ПРОКСИ
     const proxies = [
-        "https://invidious.dhusch.de", "https://inv.tux.pizza", "https://iv.ggtyler.dev", "https://invidious.flokinet.to"
+        "https://invidious.v0l.me",
+        "https://invidious.dhusch.de",
+        "https://inv.vern.cc",
+        "https://invidious.lunar.icu",
+        "https://invidious.perennialte.ch",
+        "https://invidious.projectsegfau.lt"
     ];
     let currentProxyIdx = 0;
 
@@ -203,7 +207,7 @@
 
     function setSpeed(v) {
         currentSpeed = parseFloat(v);
-        if(isYT && player.setPlaybackRate) player.setPlaybackRate(currentSpeed);
+        if(isYT && player && player.setPlaybackRate) player.setPlaybackRate(currentSpeed);
         if(isFile) video.playbackRate = currentSpeed;
         audio.playbackRate = currentSpeed;
     }
@@ -211,7 +215,7 @@
     function onYouTubeIframeAPIReady() {
         player = new YT.Player('yt-placeholder', {
             height: '100%', width: '100%',
-            playerVars: { 'controls': 0, 'modestbranding': 1, 'playsinline': 1, 'fs': 0 },
+            playerVars: { 'controls': 0, 'modestbranding': 1, 'playsinline': 1 },
             events: { 
                 'onStateChange': (e) => {
                     updatePlayIcon();
@@ -225,20 +229,24 @@
         const query = document.getElementById('searchInput').value;
         if(!query) return;
         const box = document.getElementById('resultsBox');
-        box.innerHTML = '<div style="padding:15px; color:var(--neon); font-size: 0.7rem;">ПОИСК...</div>';
+        box.innerHTML = '<div style="padding:15px; color:var(--neon); font-size: 0.7rem;">ПОИСК (ПРОБУЮ УЗЕЛ '+ (currentProxyIdx + 1) +')...</div>';
         box.classList.add('active');
         
         const tryFetch = async (retryCount = 0) => {
             if (retryCount >= proxies.length) {
-                box.innerHTML = '<div style="padding:15px">ОШИБКА.</div>';
+                box.innerHTML = '<div style="padding:15px">СЕРВЕРЫ ПЕРЕГРУЖЕНЫ. ПОПРОБУЙТЕ СНОВА.</div>';
                 return;
             }
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 3000);
             try {
-                const response = await fetch(`${proxies[currentProxyIdx]}/api/v1/search?q=${encodeURIComponent(query)}&type=video`, { signal: controller.signal });
+                const response = await fetch(`${proxies[currentProxyIdx]}/api/v1/search?q=${encodeURIComponent(query)}&type=video`);
+                if (!response.ok) throw new Error();
                 const data = await response.json();
-                clearTimeout(timeoutId);
+                
+                if(!data || data.length === 0) {
+                    currentProxyIdx = (currentProxyIdx + 1) % proxies.length;
+                    return tryFetch(retryCount + 1);
+                }
+
                 box.innerHTML = '';
                 data.slice(0, 10).forEach(item => {
                     const card = document.createElement('div');
