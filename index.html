@@ -164,7 +164,9 @@
             <div class="theme-btn" onclick="setTheme('winter')">ЗИМНИЙ</div>
             <div class="theme-btn" onclick="setTheme('gothic')">ГОТИКА</div>
             <div class="theme-btn" onclick="setTheme('steampunk')">СТИМПАНК</div>
+            <div class="theme-btn" onclick="setTheme('biopunk')">БИОПАНК</div>
             <div class="theme-btn" onclick="setTheme('retro')">РЕТРО</div>
+            <div class="theme-btn" onclick="setTheme('industrial')">ПРОМЗОНА</div>
         </div>
     </div>
 
@@ -185,16 +187,11 @@
     let player, isYT = false, isFile = false, skipStep = 10, rotation = 0, currentSpeed = 1, isFull = false;
     const audio = document.getElementById('local-audio'), video = document.getElementById('local-video'), cover = document.getElementById('cover-art');
     
-    // Добавлены дополнительные прокси на случай, если первый не работает
-    const proxies = [
-        "https://invidious.v0l.me",
-        "https://inv.tux.pizza",
-        "https://invidious.dhusch.de",
-        "https://inv.vern.cc"
-    ];
+    // Больше прокси для стабильности поиска
+    const proxies = ["https://invidious.v0l.me", "https://invidious.dhusch.de", "https://inv.vern.cc", "https://inv.tux.pizza"];
     let currentProxyIdx = 0;
 
-    // ИСПРАВЛЕННАЯ ПЕРЕМОТКА
+    // НОРМАЛЬНАЯ ПЕРЕМОТКА: обновляет шаг и текст на кнопках
     function updateSkipStep(input) {
         let val = parseInt(input.value);
         if (isNaN(val) || val < 1) val = 1; 
@@ -214,7 +211,7 @@
     function onYouTubeIframeAPIReady() {
         player = new YT.Player('yt-placeholder', {
             height: '100%', width: '100%',
-            playerVars: { 'controls': 0, 'modestbranding': 1, 'rel': 0, 'playsinline': 1 },
+            playerVars: { 'controls': 0, 'modestbranding': 1, 'rel': 0, 'playsinline': 1, 'origin': window.location.origin },
             events: { 
                 'onStateChange': (e) => {
                     updatePlayIcon();
@@ -228,16 +225,16 @@
         });
     }
 
-    async function runSearch(retryCount = 0) {
+    async function runSearch(retry = 0) {
         const query = document.getElementById('searchInput').value;
         if(!query) return;
         const box = document.getElementById('resultsBox');
         
-        if (retryCount === 0) {
+        if (retry === 0) {
             box.innerHTML = '<div style="padding:15px; color:var(--neon);">ПОИСК...</div>';
             box.classList.add('active');
         }
-
+        
         try {
             const response = await fetch(`${proxies[currentProxyIdx]}/api/v1/search?q=${encodeURIComponent(query)}&type=video`);
             const data = await response.json();
@@ -245,7 +242,8 @@
             data.slice(0, 10).forEach(item => {
                 const card = document.createElement('div');
                 card.className = 'res-card';
-                card.innerHTML = `<img src="https://img.youtube.com/vi/${item.videoId}/mqdefault.jpg" width="50"> <div style="flex:1; overflow:hidden;">${item.title}</div>`;
+                const thumb = `https://img.youtube.com/vi/${item.videoId}/mqdefault.jpg`;
+                card.innerHTML = `<img src="${thumb}" width="50"> <div style="flex:1; overflow:hidden;">${item.title}</div>`;
                 card.onclick = () => {
                     resetMedia(); 
                     isYT = true; 
@@ -258,11 +256,11 @@
                 box.appendChild(card);
             });
         } catch (e) { 
-            if (retryCount < proxies.length) {
+            if (retry < proxies.length) {
                 currentProxyIdx = (currentProxyIdx + 1) % proxies.length;
-                runSearch(retryCount + 1);
+                runSearch(retry + 1);
             } else {
-                box.innerHTML = '<div style="padding:15px">Ошибка сети. Попробуйте позже.</div>';
+                box.innerHTML = '<div style="padding:15px">Ошибка. Попробуй позже.</div>';
             }
         }
     }
