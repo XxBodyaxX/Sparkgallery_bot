@@ -130,8 +130,8 @@
     <div id="trackTitle" class="track-info">СИСТЕМА ГОТОВА</div>
 
     <div class="skip-config">
-        <span>ПЕРЕМОТКА <span id="limitText">(60)</span>:</span>
-        <input type="number" id="skipInp" value="10" min="1" oninput="updateSkipStep(this.value)">
+        <span>ПЕРЕМОТКА <span id="limitText">(10)</span>:</span>
+        <input type="number" id="skipInp" value="10" min="1" max="60" oninput="updateSkipStep(this)">
         <span>СЕК.</span>
     </div>
 
@@ -184,7 +184,7 @@
 
     <div class="footer">
         <label for="fileInput" style="cursor:pointer">[ ОТКРЫТЬ ФАЙЛ ]</label>
-        <span onclick="location.reload()" style="cursor:pointer">[ ПЕРЕЗАГРУЗКА ]</span>
+        <span onclick="location.reload()" style="cursor:pointer">[ СБРОС ]</span>
     </div>
     <input type="file" id="fileInput" accept="video/*,audio/*" style="display:none">
 </div>
@@ -204,10 +204,17 @@
     ];
     let currentProxyIdx = 0;
 
-    function updateSkipStep(v) {
-        let val = parseInt(v) || 1;
-        document.getElementById('limitText').innerText = `(${val > 60 ? val : 60})`;
+    // ЖЕСТКОЕ ОГРАНИЧЕНИЕ ДО 60 СЕКУНД
+    function updateSkipStep(input) {
+        let val = parseInt(input.value) || 1;
+        
+        if (val > 60) {
+            val = 60;
+            input.value = 60; // Автоматически меняем цифру в поле ввода на 60
+        }
+        
         skipStep = val;
+        document.getElementById('limitText').innerText = `(${skipStep})`; // Меняем текст в скобках
         document.getElementById('skipLblBack').innerText = `-${skipStep}с`;
         document.getElementById('skipLblFwd').innerText = `+${skipStep}с`;
     }
